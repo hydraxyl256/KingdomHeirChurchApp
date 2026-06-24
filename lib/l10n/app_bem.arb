@@ -1,0 +1,11 @@
+{
+  "@@locale": "bem",
+  "appTitle": "Kingdom Heir",
+  "welcomeMessage": "Mwaiseni, {name}",
+  "sermonsTab": "Amashiwi",
+  "eventsTab": "Ifyakucitika",
+  "givingTab": "Ukupeela",
+  "prayerTab": "Ipepo",
+  "settingsLanguage": "Ulwimi",
+  "settingsLanguageDesc": "Cinja ulwimi"
+}

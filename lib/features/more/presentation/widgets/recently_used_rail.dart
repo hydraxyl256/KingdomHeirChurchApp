@@ -1,0 +1,297 @@
+// Kingdom Heir — Recently Used rail (smart feature)
+//
+// A horizontal scrolling rail of the 3 most recently used features,
+// rendered as glassy progress cards. The rail sits just below the
+// profile hero so users can resume their journey with one tap.
+//
+// Layout:
+//   • Horizontal `ListView.separated` wrapped in a height-bounded
+//     `SizedBox` and then in a `SliverToBoxAdapter` from the host screen.
+//     The vertical axis is fully bounded by the `SizedBox`, so this is
+//     **not** a nested scrollable in the vertical sense — the only
+//     vertical scroller is the screen-level `CustomScrollView`.
+//   • Card width derived from LayoutBuilder — never hardcoded
+//   • Empty state: a single, full-width "Nothing yet" card with a CTA
+//
+// Animation:
+//   • Staggered entrance via flutter_animate (50ms delay per card)
+
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:intl/intl.dart';
+
+import 'package:kingdom_heir/core/responsive/breakpoints.dart';
+import 'package:kingdom_heir/core/responsive/insets.dart';
+import 'package:kingdom_heir/core/theme/app_colors.dart';
+import 'package:kingdom_heir/core/theme/app_typography.dart';
+import 'package:kingdom_heir/core/theme/motion.dart';
+import 'package:kingdom_heir/core/theme/radius.dart';
+import 'package:kingdom_heir/features/more/domain/more_models.dart';
+import 'package:kingdom_heir/features/more/presentation/widgets/feature_catalog.dart';
+
+class RecentlyUsedRail extends StatelessWidget {
+  const RecentlyUsedRail({required this.items, super.key});
+
+  final List<RecentItem> items;
+
+  @override
+  Widget build(BuildContext context) {
+    final insets = Insets.of(context);
+
+    if (items.isEmpty) {
+      return Padding(
+        padding: EdgeInsets.fromLTRB(insets.lg, insets.md, insets.lg, 0),
+        child: _EmptyRecentCard(),
+      );
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Card width depends on band — never a hardcoded number.
+        final band = layoutBandFromWidth(constraints.maxWidth);
+        final cardWidth = switch (band) {
+          LayoutBand.xs => constraints.maxWidth * 0.78,
+          LayoutBand.sm => constraints.maxWidth * 0.72,
+          LayoutBand.md => constraints.maxWidth * 0.62,
+          LayoutBand.lg => constraints.maxWidth * 0.45,
+          LayoutBand.xl => constraints.maxWidth * 0.32,
+          LayoutBand.xxl => constraints.maxWidth * 0.28,
+        };
+
+        return SizedBox(
+          height: 132 + insets.md,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.fromLTRB(insets.lg, insets.md, insets.lg, 0),
+            itemCount: items.length,
+            separatorBuilder: (_, __) => SizedBox(width: insets.sm),
+            itemBuilder: (context, i) {
+              final item = items[i];
+              return SizedBox(
+                width: cardWidth,
+                child: _RecentCard(item: item)
+                    .animate()
+                    .fadeIn(
+                      duration: AppMotion.standard,
+                      delay: Duration(milliseconds: i * 60),
+                    )
+                    .slideX(begin: 0.06, end: 0, duration: AppMotion.standard),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _RecentCard extends StatelessWidget {
+  const _RecentCard({required this.item});
+  final RecentItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    final spec = FeatureCatalog.of(item.feature);
+    final palette = AccentPalette.of(spec.accent, isDark: false);
+    final insets = Insets.of(context);
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => context.goToFeature(item.feature),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        child: Container(
+          padding: EdgeInsets.all(insets.md),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                palette.bg,
+                Color.alphaBlend(
+                  AppColors.warmWhite.withValues(alpha: 0.55),
+                  palette.bg,
+                ),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(AppRadius.xl),
+            border: Border.all(color: palette.border, width: 0.8),
+            boxShadow: [
+              BoxShadow(
+                color: palette.fg.withValues(alpha: 0.08),
+                blurRadius: 14,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: palette.fg.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                    ),
+                    child: Icon(spec.icon, color: palette.fg, size: 18),
+                  ),
+                  SizedBox(width: insets.xs),
+                  Expanded(
+                    child: Text(
+                      'CONTINUE',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.textTheme.labelSmall?.copyWith(
+                        color: palette.fg.withValues(alpha: 0.85),
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.4,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    _relative(item.usedAt),
+                    style: AppTypography.textTheme.labelSmall?.copyWith(
+                      color: palette.fg.withValues(alpha: 0.6),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: insets.xs),
+              Text(
+                item.label,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: AppTypography.textTheme.titleSmall?.copyWith(
+                  color: palette.fg,
+                  fontWeight: FontWeight.w700,
+                  height: 1.2,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                item.subtitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTypography.textTheme.bodySmall?.copyWith(
+                  color: palette.fg.withValues(alpha: 0.7),
+                ),
+              ),
+              const Spacer(),
+              if (item.progress != null) _ProgressBar(value: item.progress!),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  static String _relative(DateTime when) {
+    final diff = DateTime.now().difference(when);
+    if (diff.inMinutes < 1) return 'now';
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m';
+    if (diff.inHours < 24) return '${diff.inHours}h';
+    if (diff.inDays < 7) return '${diff.inDays}d';
+    return DateFormat('MMM d').format(when);
+  }
+}
+
+class _ProgressBar extends StatelessWidget {
+  const _ProgressBar({required this.value});
+  final double value;
+
+  @override
+  Widget build(BuildContext context) {
+    final clamped = value.clamp(0.0, 1.0);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Stack(
+          children: [
+            Container(
+              height: 4,
+              width: constraints.maxWidth,
+              decoration: BoxDecoration(
+                color: AppColors.gold.withValues(alpha: 0.18),
+                borderRadius: BorderRadius.circular(AppRadius.full),
+              ),
+            ),
+            AnimatedContainer(
+              duration: AppMotion.emphasized,
+              curve: AppMotion.decelerate,
+              height: 4,
+              width: constraints.maxWidth * clamped,
+              decoration: BoxDecoration(
+                color: AppColors.goldDark,
+                borderRadius: BorderRadius.circular(AppRadius.full),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _EmptyRecentCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final insets = Insets.of(context);
+    final theme = Theme.of(context);
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(insets.lg),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: AppColors.gold.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(AppRadius.full),
+            ),
+            child: const Icon(
+              Icons.history_rounded,
+              color: AppColors.goldDark,
+              size: 18,
+            ),
+          ),
+          SizedBox(width: insets.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'No recent activity yet',
+                  style: AppTypography.textTheme.titleSmall?.copyWith(
+                    color: theme.colorScheme.onSurface,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(height: insets.xxxs),
+                Text(
+                  'Features you open will appear here so you can jump back in.',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

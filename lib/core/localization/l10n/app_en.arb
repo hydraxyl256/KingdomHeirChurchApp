@@ -1,0 +1,78 @@
+{
+  "@@locale": "en",
+  "appTitle": "Kingdom Heir",
+  "@appTitle": { "description": "The app name" },
+
+  "welcomeBack": "Welcome Back",
+  "@welcomeBack": { "description": "Login screen heading" },
+
+  "signIn": "Sign In",
+  "signUp": "Create Account",
+  "signOut": "Sign Out",
+  "email": "Email Address",
+  "password": "Password",
+  "confirmPassword": "Confirm Password",
+  "fullName": "Full Name",
+  "forgotPassword": "Forgot Password?",
+  "dontHaveAccount": "Don't have an account?",
+  "alreadyHaveAccount": "Already have an account?",
+
+  "dashboard": "Dashboard",
+  "sermons": "Sermons",
+  "bible": "Bible",
+  "events": "Events",
+  "giving": "Giving",
+  "groups": "Groups",
+  "devotionals": "Devotionals",
+  "podcasts": "Podcasts",
+  "kids": "Kids",
+  "bookstore": "Bookstore",
+  "volunteers": "Volunteers",
+  "members": "Members",
+  "news": "News",
+  "settings": "Settings",
+  "live": "Live",
+
+  "goodMorning": "Good Morning 🌅",
+  "goodAfternoon": "Good Afternoon ☀️",
+  "goodEvening": "Good Evening 🌙",
+
+  "giveNow": "Give Now",
+  "givingHistory": "Giving History",
+  "tithe": "Tithe",
+  "offering": "Offering",
+  "missions": "Missions",
+  "buildingFund": "Building Fund",
+
+  "liveNow": "LIVE",
+  "watchersCount": "{count} watching",
+  "@watchersCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+
+  "checkIn": "Check In",
+  "checkOut": "Check Out",
+  "safetyCode": "Safety Code",
+
+  "readMore": "Read More",
+  "seeAll": "See All",
+  "tryAgain": "Try Again",
+  "save": "Save",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "skip": "Skip",
+  "next": "Next",
+  "getStarted": "Get Started",
+  "continue_": "Continue",
+
+  "errorGeneric": "An unexpected error occurred.",
+  "errorNetwork": "No internet connection. Please check your network.",
+  "errorAuth": "Authentication failed.",
+
+  "notificationsTitle": "Notifications",
+  "appearanceTitle": "Appearance",
+  "languageTitle": "Language",
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark"
+}

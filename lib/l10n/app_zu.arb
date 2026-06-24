@@ -1,0 +1,11 @@
+{
+  "@@locale": "zu",
+  "appTitle": "Kingdom Heir",
+  "welcomeMessage": "Siyakwemukela, {name}",
+  "sermonsTab": "Izintshumayelo",
+  "eventsTab": "Imicimbi",
+  "givingTab": "Ukunikela",
+  "prayerTab": "Umkhuleko",
+  "settingsLanguage": "Ulimi",
+  "settingsLanguageDesc": "Shintsha ulimi"
+}

@@ -1,0 +1,11 @@
+{
+  "@@locale": "ur",
+  "appTitle": "کنگڈم ہیئر",
+  "welcomeMessage": "خوش آمدید، {name}",
+  "sermonsTab": "خطبات",
+  "eventsTab": "تقریبات",
+  "givingTab": "عطیہ",
+  "prayerTab": "دعا",
+  "settingsLanguage": "زبان",
+  "settingsLanguageDesc": "ایپ کی زبان تبدیل کریں"
+}

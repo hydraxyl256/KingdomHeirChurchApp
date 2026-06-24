@@ -1,0 +1,11 @@
+{
+  "@@locale": "fr",
+  "appTitle": "Kingdom Heir",
+  "welcomeMessage": "Bienvenue, {name}",
+  "sermonsTab": "Sermons",
+  "eventsTab": "Événements",
+  "givingTab": "Dons",
+  "prayerTab": "Prière",
+  "settingsLanguage": "Langue",
+  "settingsLanguageDesc": "Changer la langue de l'application"
+}

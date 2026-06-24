@@ -1,0 +1,23 @@
+{
+  "@@locale": "en",
+  "appTitle": "Kingdom Heir",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "welcomeMessage": "Welcome back, {name}",
+  "@welcomeMessage": {
+    "description": "Welcome greeting for the user",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "John"
+      }
+    }
+  },
+  "sermonsTab": "Sermons",
+  "eventsTab": "Events",
+  "givingTab": "Giving",
+  "prayerTab": "Prayer",
+  "settingsLanguage": "Language",
+  "settingsLanguageDesc": "Change app language"
+}

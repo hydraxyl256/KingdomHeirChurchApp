@@ -1,0 +1,11 @@
+{
+  "@@locale": "ss",
+  "appTitle": "Kingdom Heir",
+  "welcomeMessage": "Wemukelekile, {name}",
+  "sermonsTab": "Tishumayelo",
+  "eventsTab": "Imicimbi",
+  "givingTab": "Kunikela",
+  "prayerTab": "Umkhuleko",
+  "settingsLanguage": "Lulwimi",
+  "settingsLanguageDesc": "Shintja lulwimi"
+}

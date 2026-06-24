@@ -1,0 +1,119 @@
+name: kingdom_heir
+description: Kingdom Heir — A production-ready church management app.
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # Audio & Media
+  audio_service: ^0.18.15
+  audio_session: ^0.1.21
+  cached_network_image: ^3.3.1
+  chewie: ^1.13.1
+  just_audio: ^0.9.40
+  video_player: ^2.10.1
+
+  # Charts & Calendar
+  fl_chart: ^1.2.0
+  table_calendar: ^3.1.2
+
+  # Forms
+  reactive_forms: ^17.0.1
+
+  # Functional Error Handling
+  fpdart: ^1.1.0
+
+  # Navigation
+  go_router: ^14.2.7
+
+  # Networking
+  connectivity_plus: ^6.0.5
+  dio: ^5.6.0
+
+  # Payments
+  flutter_stripe: ^10.2.0
+
+  # Serialization / Immutable Models
+  equatable: ^2.0.5
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+
+  # State Management
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+
+  # Backend
+  supabase_flutter: ^2.5.6
+
+  # Secure Storage
+  flutter_secure_storage: ^9.2.2
+  shared_preferences: ^2.3.2
+
+  # UI & UX
+  flex_color_scheme: ^7.3.1
+  flutter_animate: ^4.5.0
+  flutter_svg: ^2.0.10+1
+  google_fonts: ^6.2.1
+  lottie: ^3.1.2
+  shimmer: ^3.0.0
+
+  # Utilities
+  image_picker: ^1.2.2
+  intl: ^0.20.2
+  logger: ^2.4.0
+  path_provider: ^2.1.4
+  permission_handler: ^11.3.1
+  sentry_flutter: ^8.7.0
+  share_plus: ^9.0.0
+  timeago: ^3.7.0
+  url_launcher: ^6.3.0
+  firebase_core: ^3.4.0
+  firebase_analytics: ^11.3.0
+  firebase_crashlytics: ^4.1.0
+  sentry_logging: ^8.14.2
+  firebase_messaging: ^15.1.0
+  flutter_local_notifications: ^20.1.0
+  device_info_plus: ^10.1.2
+  package_info_plus: ^8.0.0
+  http: ^1.6.0
+  flutter_html: ^3.0.0
+  just_audio_background: ^0.0.1-beta.17
+  youtube_player_iframe: ^5.1.3
+  csv: ^6.0.0
+  file_saver: ^0.2.13
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # Analysis
+  flutter_lints: ^4.0.0
+  very_good_analysis: ^6.0.0
+
+  # Code Generation
+  build_runner: ^2.4.12
+  freezed: ^2.5.7
+  json_serializable: ^6.8.0
+  riverpod_generator: ^2.4.3
+
+  # Testing
+  mocktail: ^1.0.4
+  riverpod_test: ^0.1.0
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/lottie/
+
+

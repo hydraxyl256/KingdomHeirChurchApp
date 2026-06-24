@@ -1,0 +1,75 @@
+{
+  "@@locale": "fr",
+  "appTitle": "Kingdom Heir",
+
+  "welcomeBack": "Bon retour",
+  "signIn": "Se connecter",
+  "signUp": "Créer un compte",
+  "signOut": "Se déconnecter",
+  "email": "Adresse e-mail",
+  "password": "Mot de passe",
+  "confirmPassword": "Confirmer le mot de passe",
+  "fullName": "Nom complet",
+  "forgotPassword": "Mot de passe oublié?",
+  "dontHaveAccount": "Pas encore de compte?",
+  "alreadyHaveAccount": "Déjà un compte?",
+
+  "dashboard": "Tableau de bord",
+  "sermons": "Sermons",
+  "bible": "Bible",
+  "events": "Événements",
+  "giving": "Offrandes",
+  "groups": "Groupes",
+  "devotionals": "Dévotionnels",
+  "podcasts": "Podcasts",
+  "kids": "Enfants",
+  "bookstore": "Librairie",
+  "volunteers": "Bénévoles",
+  "members": "Membres",
+  "news": "Actualités",
+  "settings": "Paramètres",
+  "live": "En direct",
+
+  "goodMorning": "Bonjour 🌅",
+  "goodAfternoon": "Bon après-midi ☀️",
+  "goodEvening": "Bonsoir 🌙",
+
+  "giveNow": "Donner maintenant",
+  "givingHistory": "Historique des dons",
+  "tithe": "Dîme",
+  "offering": "Offrande",
+  "missions": "Missions",
+  "buildingFund": "Fonds de construction",
+
+  "liveNow": "EN DIRECT",
+  "watchersCount": "{count} spectateurs",
+  "@watchersCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+
+  "checkIn": "S'enregistrer",
+  "checkOut": "Se désenregistrer",
+  "safetyCode": "Code de sécurité",
+
+  "readMore": "Lire la suite",
+  "seeAll": "Voir tout",
+  "tryAgain": "Réessayer",
+  "save": "Enregistrer",
+  "cancel": "Annuler",
+  "confirm": "Confirmer",
+  "skip": "Passer",
+  "next": "Suivant",
+  "getStarted": "Commencer",
+  "continue_": "Continuer",
+
+  "errorGeneric": "Une erreur inattendue s'est produite.",
+  "errorNetwork": "Pas de connexion Internet.",
+  "errorAuth": "Échec de l'authentification.",
+
+  "notificationsTitle": "Notifications",
+  "appearanceTitle": "Apparence",
+  "languageTitle": "Langue",
+  "themeSystem": "Système",
+  "themeLight": "Clair",
+  "themeDark": "Sombre"
+}
