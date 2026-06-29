@@ -263,18 +263,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
   }
 
-  Future<void> _signInWithApple() async {
-    final messenger = ScaffoldMessenger.of(context);
-    await ref.read(authNotifierProvider.notifier).signInWithApple();
-    if (!mounted) return;
-    final state = ref.read(authNotifierProvider);
-    if (state.hasError) {
-      messenger.showSnackBar(
-        SnackBar(content: Text(state.error.toString())),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
@@ -382,7 +370,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           onThemeChanged: (v) =>
                               setState(() => _theme = v ?? 'Royal Dark'),
                           onSocialGoogle: _signInWithGoogle,
-                          onSocialApple: _signInWithApple,
                           reduceMotion: reduceMotion,
                         ),
                       ],
@@ -1805,7 +1792,6 @@ class _StepPreferences extends StatelessWidget {
     required this.onLanguageChanged,
     required this.onThemeChanged,
     required this.onSocialGoogle,
-    required this.onSocialApple,
     required this.reduceMotion,
   });
 
@@ -1823,7 +1809,6 @@ class _StepPreferences extends StatelessWidget {
   final ValueChanged<String?> onLanguageChanged;
   final ValueChanged<String?> onThemeChanged;
   final VoidCallback onSocialGoogle;
-  final VoidCallback onSocialApple;
   final bool reduceMotion;
 
   @override
@@ -1911,28 +1896,12 @@ class _StepPreferences extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _SocialButton(
-                          label: 'Google',
-                          icon: const _GoogleIcon(),
-                          onTap: onSocialGoogle,
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      Expanded(
-                        child: _SocialButton(
-                          label: 'Apple',
-                          icon: const Icon(
-                            Icons.apple_rounded,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                          onTap: onSocialApple,
-                        ),
-                      ),
-                    ],
+                  Center(
+                    child: _SocialButton(
+                      label: 'Google',
+                      icon: const _GoogleIcon(),
+                      onTap: onSocialGoogle,
+                    ),
                   ),
                 ],
               ),

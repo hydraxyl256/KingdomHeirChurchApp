@@ -150,7 +150,36 @@ class _SermonNotesPanelState extends ConsumerState<SermonNotesPanel> {
                     padding: EdgeInsets.all(AppSpacing.sm),
                     child: Center(child: CircularProgressIndicator()),
                   ),
-                  error: (_, __) => const SizedBox.shrink(),
+                  error: (_, __) => Padding(
+                    padding: const EdgeInsets.all(AppSpacing.sm),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.cloud_off_rounded,
+                            color: AppColors.error, size: 24,),
+                        const SizedBox(height: AppSpacing.xs),
+                        const Text(
+                          'Could not load notes.',
+                          style: TextStyle(
+                            color: AppColors.error,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        FilledButton(
+                          onPressed: () => ref
+                              .refresh(notesBySermonProvider(widget.sermonId)),
+                          style: ButtonStyle(
+                            backgroundColor:
+                                WidgetStateProperty.all(AppColors.gold),
+                            foregroundColor:
+                                WidgetStateProperty.all(AppColors.ink),
+                          ),
+                          child: const Text('Try Again'),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ],

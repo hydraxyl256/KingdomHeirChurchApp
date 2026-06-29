@@ -1,1340 +1,1283 @@
+// Kingdom Heir — Start Here: Premium Onboarding Experience
+//
+// 4-page PageView flow that warmly welcomes first-time visitors and
+// guides them naturally toward Register or Sign In.
+//
+//   Page 0 — Welcome        (hero, logo, CTAs)
+//   Page 1 — Discover       (5 discovery cards with Learn More)
+//   Page 2 — Experience     (6 church-life value rows)
+//   Page 3 — Join the Family (closing CTA)
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kingdom_heir/core/router/route_names.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
+import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
-import 'package:kingdom_heir/core/theme/elevation.dart';
 import 'package:kingdom_heir/core/theme/motion.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
-import 'package:kingdom_heir/core/theme/spacing.dart';
 
-/// Kingdom Heirs — Start Here (redesigned)
-///
-/// A modern onboarding experience, not a card list.
-/// Sections (top → bottom):
-///   1. Hero — full-bleed navy gradient, gold accent line, animated headline.
-///   2. Vision preview — Netflix-style horizontal scroll of pillar tiles.
-///   3. Founder story — editorial layout: portrait card + pull-quote + CTA.
-///   4. Statement of Faith — numbered accordion of pillars (YouVersion feel).
-///   5. Church impact — animated stat tiles (Apple HIG counter presentation).
-///   6. Join community CTA — full-bleed gold gradient panel + dual actions.
-class StartHereHubScreen extends ConsumerWidget {
+// ─────────────────────────────────────────────────────────────────────────────
+// Root — manages page state, progress indicator, navigation
+// ─────────────────────────────────────────────────────────────────────────────
+
+class StartHereHubScreen extends StatefulWidget {
   const StartHereHubScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final reduceMotion = MediaQuery.of(context).disableAnimations;
-    return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(
-          parent: AlwaysScrollableScrollPhysics(),
-        ),
-        slivers: [
-          const _StartHereAppBar(),
-          const SliverToBoxAdapter(
-            child: _HeroSection(),
-          ),
-          const SliverToBoxAdapter(
-            child: _SectionHeader(
-              eyebrow: '01 — OUR VISION',
-              title: 'A future worth inheriting.',
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: _VisionPreviewSection(reduceMotion: reduceMotion),
-          ),
-          const SliverToBoxAdapter(
-            child: _SectionHeader(
-              eyebrow: '02 — THE FOUNDER',
-              title: 'A letter from our father in faith.',
-            ),
-          ),
-          const SliverToBoxAdapter(child: _FounderStorySection()),
-          const SliverToBoxAdapter(
-            child: _SectionHeader(
-              eyebrow: '03 — STATEMENT OF FAITH',
-              title: 'What we believe.',
-            ),
-          ),
-          const SliverToBoxAdapter(child: _StatementOfFaithSection()),
-          const SliverToBoxAdapter(
-            child: _SectionHeader(
-              eyebrow: '04 — OUR IMPACT',
-              title: 'Kingdom across the nations.',
-            ),
-          ),
-          const SliverToBoxAdapter(child: _ImpactSection()),
-          const SliverToBoxAdapter(child: _JoinCommunityCta()),
-          const SliverToBoxAdapter(child: _FooterMark()),
-        ],
-      ),
-    );
-  }
+  State<StartHereHubScreen> createState() => _StartHereHubScreenState();
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// App Bar — transparent, scrolls under content
-// ─────────────────────────────────────────────────────────────────────────────
+class _StartHereHubScreenState extends State<StartHereHubScreen> {
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
 
-class _StartHereAppBar extends StatelessWidget {
-  const _StartHereAppBar();
+  static const int _pageCount = 4;
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _nextPage() {
+    if (_currentPage < _pageCount - 1) {
+      _pageController.nextPage(
+        duration: AppMotion.emphasized,
+        curve: AppMotion.decelerate,
+      );
+    }
+  }
+
+  void _previousPage() {
+    if (_currentPage > 0) {
+      _pageController.previousPage(
+        duration: AppMotion.emphasized,
+        curve: AppMotion.decelerate,
+      );
+    }
+  }
+
+  void _goToPage(int index) {
+    _pageController.animateToPage(
+      index,
+      duration: AppMotion.emphasized,
+      curve: AppMotion.decelerate,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SliverAppBar(
-      pinned: true,
-      stretch: true,
-      backgroundColor: AppColors.navy.withValues(alpha: 0.85),
-      foregroundColor: AppColors.warmWhite,
-      surfaceTintColor: Colors.transparent,
-      elevation: 0,
-      scrolledUnderElevation: AppElevation.level1,
-      expandedHeight: 0,
-      toolbarHeight: AppSpacing.appBarHeight,
-      flexibleSpace: FlexibleSpaceBar(
-        titlePadding: const EdgeInsets.only(
-          left: AppSpacing.lg,
-          bottom: AppSpacing.md,
-          right: AppSpacing.lg,
-        ),
-        title: Text(
-          'Kingdom Heirs',
-          style: AppTypography.textTheme.titleMedium?.copyWith(
-            color: AppColors.gold,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 1.5,
-          ),
-        ),
-      ),
-    );
-  }
-}
+    final isDark = _currentPage == 0 || _currentPage == 3;
 
-// ─────────────────────────────────────────────────────────────────────────────
-// 1. HERO
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _HeroSection extends StatelessWidget {
-  const _HeroSection();
-
-  @override
-  Widget build(BuildContext context) {
-    final mq = MediaQuery.of(context);
-    final heroHeight = (mq.size.height * 0.7).clamp(420.0, 720.0);
-
-    final content = Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        AppSpacing.massive,
-        AppSpacing.lg,
-        AppSpacing.xxl,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Eyebrow
-          const _Eyebrow(label: 'WELCOME TO KINGDOM HEIRS')
-              .animate(key: const ValueKey('hero-eyebrow'))
-              .fadeIn(
-                duration: AppMotion.standard,
-                curve: AppMotion.decelerate,
-              ),
-          const SizedBox(height: AppSpacing.md),
-
-          // Headline — Playfair display
-          Text(
-            'Inheriting a legacy of\nexcellence.',
-            style: AppTypography.textTheme.displaySmall?.copyWith(
-              color: AppColors.warmWhite,
-              fontWeight: FontWeight.w600,
-              height: 1.1,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: isDark
+          ? SystemUiOverlayStyle.light.copyWith(
+              statusBarColor: Colors.transparent,
+              systemNavigationBarColor: AppColors.navy,
+            )
+          : SystemUiOverlayStyle.dark.copyWith(
+              statusBarColor: Colors.transparent,
+              systemNavigationBarColor: AppColors.backgroundLight,
             ),
-          )
-              .animate()
-              .fadeIn(
-                delay: const Duration(milliseconds: 100),
-                duration: AppMotion.emphasized,
-                curve: AppMotion.decelerate,
-              )
-              .slideY(
-                begin: 0.08,
-                end: 0,
-                duration: AppMotion.emphasized,
-                curve: AppMotion.decelerate,
-              ),
-
-          const SizedBox(height: AppSpacing.lg),
-
-          // Subtitle
-          Text(
-            'A modern community built on timeless truth — discover who we '
-            'are, what we believe, and where we are going.',
-            style: AppTypography.textTheme.bodyLarge?.copyWith(
-              color: AppColors.warmWhite.withValues(alpha: 0.78),
-              height: 1.55,
+      child: Scaffold(
+        backgroundColor: AppColors.backgroundLight,
+        body: Stack(
+          children: [
+            // ── Pages ──────────────────────────────────────────────────────
+            PageView(
+              controller: _pageController,
+              physics: const BouncingScrollPhysics(),
+              onPageChanged: (i) => setState(() => _currentPage = i),
+              children: [
+                _WelcomePage(onExplore: _nextPage),
+                _DiscoverPage(
+                  onNext: _nextPage,
+                  onBack: _previousPage,
+                ),
+                _ExperiencePage(
+                  onNext: _nextPage,
+                  onBack: _previousPage,
+                ),
+                _JoinFamilyPage(onBack: _previousPage),
+              ],
             ),
-          ).animate().fadeIn(
-                delay: const Duration(milliseconds: 250),
-                duration: AppMotion.emphasized,
-                curve: AppMotion.decelerate,
+
+            // ── Progress dot indicator (center-bottom, only on pages 1-3) ──
+            if (_currentPage > 0)
+              Positioned(
+                bottom: MediaQuery.of(context).padding.bottom + 16,
+                left: 0,
+                right: 0,
+                child: _DotIndicator(
+                  count: _pageCount,
+                  current: _currentPage,
+                  onDotTap: _goToPage,
+                  dark: _currentPage == 3,
+                ),
               ),
-
-          const SizedBox(height: AppSpacing.xxl),
-
-          // CTA cluster
-          Wrap(
-            spacing: AppSpacing.md,
-            runSpacing: AppSpacing.md,
-            children: [
-              _PrimaryPillButton(
-                label: 'Begin the journey',
-                icon: Icons.arrow_forward_rounded,
-                onPressed: () => context.push(RouteNames.startHereVision),
-              ),
-              _GhostPillButton(
-                label: 'I already have an account',
-                onPressed: () => context.push(RouteNames.login),
-              ),
-            ],
-          ).animate().fadeIn(
-                delay: const Duration(milliseconds: 400),
-                duration: AppMotion.emphasized,
-              ),
-        ],
-      ),
-    );
-
-    return SizedBox(
-      height: heroHeight,
-      width: double.infinity,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Layered background
-          const _HeroBackdrop(),
-          // Soft vignette + top fade for app bar legibility
-          const _HeroVignette(),
-          // Content
-          content,
-        ],
-      ),
-    );
-  }
-}
-
-class _HeroBackdrop extends StatelessWidget {
-  const _HeroBackdrop();
-
-  @override
-  Widget build(BuildContext context) {
-    return const DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF0B1120), // deepest navy
-            Color(0xFF0F172A), // mid navy
-            Color(0xFF162033), // softer navy
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Dot Progress Indicator
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _DotIndicator extends StatelessWidget {
+  const _DotIndicator({
+    required this.count,
+    required this.current,
+    required this.onDotTap,
+    this.dark = false,
+  });
+
+  final int count;
+  final int current;
+  final void Function(int) onDotTap;
+  final bool dark;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(count, (i) {
+        final isActive = i == current;
+        return GestureDetector(
+          onTap: () => onDotTap(i),
+          child: AnimatedContainer(
+            duration: AppMotion.standard,
+            curve: AppMotion.decelerate,
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            width: isActive ? 24 : 8,
+            height: 8,
+            decoration: BoxDecoration(
+              color: isActive
+                  ? (dark ? AppColors.goldLight : AppColors.goldDark)
+                  : (dark
+                      ? Colors.white.withValues(alpha: 0.35)
+                      : AppColors.navy.withValues(alpha: 0.2)),
+              borderRadius: AppRadius.brCircle,
+            ),
+          ),
+        );
+      }),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PAGE 0 — Welcome
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _WelcomePage extends StatelessWidget {
+  const _WelcomePage({required this.onExplore});
+
+  final VoidCallback onExplore;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final safeBottom = MediaQuery.of(context).padding.bottom;
+
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFF0A1628), // deepest navy
+            Color(0xFF0F172A), // navy
+            Color(0xFF1E3A8A), // royal blue
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
           stops: [0.0, 0.5, 1.0],
         ),
       ),
-    );
-  }
-}
-
-class _HeroVignette extends StatelessWidget {
-  const _HeroVignette();
-
-  @override
-  Widget build(BuildContext context) {
-    return const DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: RadialGradient(
-          radius: 1.1,
-          colors: [
-            Colors.transparent,
-            Color(0x660B1120),
-            Color(0xCC0B1120),
-          ],
-          stops: [0.55, 0.85, 1.0],
-        ),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Section header — used between hero and content sections
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.eyebrow, required this.title});
-
-  final String eyebrow;
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    final reducedMotion = MediaQuery.of(context).disableAnimations;
-    final header = Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        AppSpacing.massive,
-        AppSpacing.lg,
-        AppSpacing.lg,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          _Eyebrow(label: eyebrow, onDark: false),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            title,
-            style: AppTypography.textTheme.headlineMedium?.copyWith(
-              color: AppColors.navy,
-              fontWeight: FontWeight.w700,
-              height: 1.2,
+          // Decorative radial glow behind logo
+          Positioned(
+            top: size.height * 0.18,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Container(
+                width: 220,
+                height: 220,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      AppColors.gold.withValues(alpha: 0.18),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // Main content
+          SafeArea(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                AppSpacing.xl,
+                size.height * 0.08,
+                AppSpacing.xl,
+                safeBottom + 80,
+              ),
+              child: Column(
+                children: [
+                  // Church logo mark
+                  _ChurchLogoMark()
+                      .animate()
+                      .fadeIn(duration: AppMotion.reverent)
+                      .scale(
+                        begin: const Offset(0.8, 0.8),
+                        end: const Offset(1, 1),
+                        duration: AppMotion.reverent,
+                        curve: AppMotion.decelerate,
+                      ),
+
+                  SizedBox(height: size.height * 0.05),
+
+                  // Headline
+                  Text(
+                    'Welcome to\nKingdom Heirs',
+                    textAlign: TextAlign.center,
+                    style: AppTypography.textTheme.displaySmall?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      height: 1.15,
+                    ),
+                  )
+                      .animate()
+                      .fadeIn(delay: 300.ms, duration: 500.ms)
+                      .slideY(
+                        begin: 0.15,
+                        end: 0,
+                        delay: 300.ms,
+                        duration: 500.ms,
+                        curve: AppMotion.decelerate,
+                      ),
+
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // Mission statement
+                  Text(
+                    'A global family built on faith, love,\nand the Word of God.',
+                    textAlign: TextAlign.center,
+                    style: AppTypography.textTheme.bodyLarge?.copyWith(
+                      color: Colors.white.withValues(alpha: 0.75),
+                      height: 1.6,
+                      letterSpacing: 0.3,
+                    ),
+                  )
+                      .animate()
+                      .fadeIn(delay: 480.ms, duration: 500.ms)
+                      .slideY(
+                        begin: 0.1,
+                        end: 0,
+                        delay: 480.ms,
+                        duration: 500.ms,
+                        curve: AppMotion.decelerate,
+                      ),
+
+                  const Spacer(),
+
+                  // Gold separator
+                  Container(
+                    width: 48,
+                    height: 2,
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [AppColors.goldDark, AppColors.gold],
+                      ),
+                      borderRadius: AppRadius.brCircle,
+                    ),
+                  )
+                      .animate()
+                      .fadeIn(delay: 600.ms, duration: 400.ms)
+                      .scaleX(
+                        begin: 0,
+                        end: 1,
+                        delay: 600.ms,
+                        duration: 600.ms,
+                        curve: AppMotion.decelerate,
+                      ),
+
+                  const SizedBox(height: AppSpacing.xxl),
+
+                  // Primary CTA — Explore
+                  _GoldButton(
+                    label: 'Explore Kingdom Heirs',
+                    icon: Icons.arrow_forward_rounded,
+                    onTap: onExplore,
+                  ).animate().fadeIn(delay: 700.ms, duration: 400.ms).slideY(
+                        begin: 0.2,
+                        end: 0,
+                        delay: 700.ms,
+                        duration: 400.ms,
+                        curve: AppMotion.decelerate,
+                      ),
+
+                  const SizedBox(height: AppSpacing.md),
+
+                  // Secondary CTA — Sign In
+                  _OutlineButton(
+                    label: 'Sign In',
+                    onTap: () => context.push(RouteNames.login),
+                  ).animate().fadeIn(delay: 800.ms, duration: 400.ms),
+
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // Tertiary — Create Account
+                  GestureDetector(
+                    onTap: () => context.push(RouteNames.register),
+                    child: Text.rich(
+                      TextSpan(
+                        text: "Don't have an account? ",
+                        style: AppTypography.textTheme.bodyMedium?.copyWith(
+                          color: Colors.white.withValues(alpha: 0.55),
+                        ),
+                        children: [
+                          TextSpan(
+                            text: 'Create one',
+                            style: AppTypography.textTheme.bodyMedium?.copyWith(
+                              color: AppColors.goldLight,
+                              fontWeight: FontWeight.w700,
+                              decoration: TextDecoration.underline,
+                              decorationColor: AppColors.goldLight,
+                            ),
+                          ),
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ).animate().fadeIn(delay: 900.ms, duration: 400.ms),
+
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // Swipe hint
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.swipe_right_rounded,
+                        color: Colors.white.withValues(alpha: 0.3),
+                        size: 16,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Swipe to explore',
+                        style: AppTypography.textTheme.bodySmall?.copyWith(
+                          color: Colors.white.withValues(alpha: 0.35),
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ).animate().fadeIn(delay: 1100.ms, duration: 500.ms),
+                ],
+              ),
             ),
           ),
         ],
       ),
     );
-
-    if (reducedMotion) return header;
-
-    return header
-        .animate()
-        .fadeIn(duration: AppMotion.standard, curve: AppMotion.decelerate)
-        .slideY(begin: 0.06, end: 0, duration: AppMotion.standard);
-  }
-}
-
-class _Eyebrow extends StatelessWidget {
-  const _Eyebrow({required this.label, this.onDark = true});
-
-  final String label;
-  final bool onDark;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = onDark ? AppColors.gold : AppColors.goldDark;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: AppSpacing.xl,
-          height: 1.5,
-          color: color,
-        ),
-        const SizedBox(width: AppSpacing.sm),
-        Text(
-          label,
-          style: AppTypography.textTheme.labelSmall?.copyWith(
-            color: color,
-            letterSpacing: 2.5,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ],
-    );
   }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 2. VISION PREVIEW — horizontal scroll of pillar tiles
+// PAGE 1 — Discover Kingdom Heirs
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _VisionPreviewSection extends StatelessWidget {
-  const _VisionPreviewSection({required this.reduceMotion});
+class _DiscoverPage extends StatelessWidget {
+  const _DiscoverPage({required this.onNext, required this.onBack});
 
-  final bool reduceMotion;
+  final VoidCallback onNext;
+  final VoidCallback onBack;
 
-  static const _pillars = <_PillarData>[
-    _PillarData(
-      index: '01',
-      title: 'Kingdom',
-      body: 'Building lives that advance God’s rule on earth.',
-      icon: Icons.account_balance_rounded,
-      tint: AppColors.gold,
+  static const _cards = [
+    _DiscoverCardData(
+      icon: Icons.visibility_rounded,
+      color: Color(0xFF1E3A8A),
+      title: 'Our Vision',
+      description: 'Raising Kingdom Heirs who carry the glory of God to every nation on earth.',
+      route: RouteNames.startHereVision,
     ),
-    _PillarData(
-      index: '02',
-      title: 'Excellence',
-      body: 'Worship rendered with skill, beauty, and integrity.',
-      icon: Icons.auto_awesome_rounded,
-      tint: AppColors.goldLight,
+    _DiscoverCardData(
+      icon: Icons.history_edu_rounded,
+      color: Color(0xFFA88B1D),
+      title: 'Our Story',
+      description: "From a small prayer meeting to a global movement — God's faithfulness on display.",
+      route: RouteNames.startHereStory,
     ),
-    _PillarData(
-      index: '03',
-      title: 'Reverence',
-      body: 'Awe for the Holy that shapes everything we do.',
-      icon: Icons.local_fire_department_rounded,
-      tint: AppColors.goldDark,
+    _DiscoverCardData(
+      icon: Icons.auto_stories_rounded,
+      color: Color(0xFF15803D),
+      title: 'What We Believe',
+      description: 'Rooted in Scripture. Our statement of faith defines who we are and how we live.',
+      route: RouteNames.startHereStatementOfFaith,
     ),
-    _PillarData(
-      index: '04',
-      title: 'Modernity',
-      body: 'Timeless truth, expressed through contemporary design.',
-      icon: Icons.bolt_rounded,
-      tint: AppColors.gold,
+    _DiscoverCardData(
+      icon: Icons.person_rounded,
+      color: Color(0xFF7C3AED),
+      title: 'Meet Our Founder',
+      description: 'A personal letter from the spiritual father of Kingdom Heirs Church.',
+      route: RouteNames.startHereFounder,
+    ),
+    _DiscoverCardData(
+      icon: Icons.church_rounded,
+      color: Color(0xFFDC2626),
+      title: 'Join Us This Sunday',
+      description: 'Sunday Worship at 9 AM · In-person & Online. Come experience church family.',
+      route: null,
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 280,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-        itemCount: _pillars.length,
-        separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.md),
-        itemBuilder: (context, i) {
-          final p = _pillars[i];
-          return _PillarTile(
-            data: p,
-            onTap: () => context.push(RouteNames.startHereVision),
-            delay: Duration(milliseconds: 60 * i),
-            reduceMotion: reduceMotion,
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _PillarData {
-  const _PillarData({
-    required this.index,
-    required this.title,
-    required this.body,
-    required this.icon,
-    required this.tint,
-  });
-
-  final String index;
-  final String title;
-  final String body;
-  final IconData icon;
-  final Color tint;
-}
-
-class _PillarTile extends StatelessWidget {
-  const _PillarTile({
-    required this.data,
-    required this.onTap,
-    required this.delay,
-    required this.reduceMotion,
-  });
-
-  final _PillarData data;
-  final VoidCallback onTap;
-  final Duration delay;
-  final bool reduceMotion;
-
-  @override
-  Widget build(BuildContext context) {
-    final tileWidth =
-        (MediaQuery.of(context).size.width * 0.74).clamp(240.0, 320.0);
-
-    final Widget card = Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: AppRadius.brXl,
-        splashColor: data.tint.withValues(alpha: 0.10),
-        highlightColor: data.tint.withValues(alpha: 0.06),
-        child: Ink(
-          decoration: BoxDecoration(
-            borderRadius: AppRadius.brXl,
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppColors.navyMid,
-                AppColors.navy,
-              ],
-            ),
-            boxShadow: AppElevation.shadowFor(AppElevation.level2),
-          ),
-          padding: const EdgeInsets.all(AppSpacing.xl),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Index pill
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.xs,
-                ),
-                decoration: BoxDecoration(
-                  color: data.tint.withValues(alpha: 0.15),
-                  borderRadius: AppRadius.brFull,
-                  border: Border.all(
-                    color: data.tint.withValues(alpha: 0.5),
-                    width: 0.5,
-                  ),
-                ),
-                child: Text(
-                  data.index,
-                  style: AppTypography.textTheme.labelSmall?.copyWith(
-                    color: data.tint,
-                    letterSpacing: 2,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
-              // Icon medallion
-              Container(
-                width: AppSpacing.iconLg,
-                height: AppSpacing.iconLg,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: data.tint.withValues(alpha: 0.18),
-                  border: Border.all(
-                    color: data.tint.withValues(alpha: 0.6),
-                  ),
-                ),
-                child:
-                    Icon(data.icon, color: data.tint, size: AppSpacing.iconMd),
-              ),
-              // Title + body
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    data.title,
-                    style: AppTypography.textTheme.headlineSmall?.copyWith(
-                      color: AppColors.warmWhite,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    data.body,
-                    style: AppTypography.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.warmWhite.withValues(alpha: 0.72),
-                      height: 1.45,
-                    ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-
-    final sized = SizedBox(
-      width: tileWidth,
-      height: 280,
-      child: card,
-    );
-
-    if (reduceMotion) return sized;
-    return sized
-        .animate()
-        .fadeIn(delay: delay, duration: AppMotion.standard)
-        .slideX(begin: 0.06, end: 0, duration: AppMotion.standard);
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 3. FOUNDER STORY — editorial layout
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _FounderStorySection extends StatelessWidget {
-  const _FounderStorySection();
-
-  @override
-  Widget build(BuildContext context) {
-    final mq = MediaQuery.of(context);
-    final isWide = mq.size.width >= 720;
-    const padding = EdgeInsets.symmetric(horizontal: AppSpacing.lg);
-
-    const portrait = _FounderPortrait();
-    final body = _FounderBody(
-      onReadLetter: () => context.push(RouteNames.startHereFounder),
-    );
-
-    final children = isWide
-        ? <Widget>[
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Expanded(child: portrait),
-                const SizedBox(width: AppSpacing.xl),
-                Expanded(child: body),
-              ],
-            ),
-          ]
-        : <Widget>[
-            portrait,
-            const SizedBox(height: AppSpacing.xl),
-            body,
-          ];
-
-    return Padding(
-      padding: padding.add(const EdgeInsets.only(bottom: AppSpacing.massive)),
-      child: Column(children: children),
-    );
-  }
-}
-
-class _FounderPortrait extends StatelessWidget {
-  const _FounderPortrait();
-
-  @override
-  Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 4 / 5,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: AppRadius.brXl,
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.navy,
-              AppColors.navyMid,
-            ],
-          ),
-          boxShadow: AppElevation.shadowFor(AppElevation.level3),
-        ),
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Stack(
-          children: [
-            // Decorative gold frame
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: AppRadius.brXl,
-                  border: Border.all(
-                    color: AppColors.gold.withValues(alpha: 0.5),
-                    width: 0.5,
-                  ),
-                ),
-              ),
-            ),
-            // Center content (placeholder until asset exists)
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: AppSpacing.avatarXl,
-                    height: AppSpacing.avatarXl,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColors.gold.withValues(alpha: 0.2),
-                      border: Border.all(
-                        color: AppColors.gold,
-                        width: 1.5,
-                      ),
-                    ),
-                    child: const Icon(
-                      Icons.person_rounded,
-                      size: AppSpacing.iconXl,
-                      color: AppColors.gold,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    'Pastor J. Mwila',
-                    style: AppTypography.textTheme.titleMedium?.copyWith(
-                      color: AppColors.warmWhite,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.xxs),
-                  Text(
-                    'FOUNDER & SENIOR PASTOR',
-                    style: AppTypography.textTheme.labelSmall?.copyWith(
-                      color: AppColors.gold,
-                      letterSpacing: 2,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _FounderBody extends StatelessWidget {
-  const _FounderBody({required this.onReadLetter});
-
-  final VoidCallback onReadLetter;
-
-  @override
-  Widget build(BuildContext context) {
-    final reducedMotion = MediaQuery.of(context).disableAnimations;
-
-    final content = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Pull quote
-        Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.lg,
-            vertical: AppSpacing.md,
-          ),
-          decoration: BoxDecoration(
-            color: AppColors.goldContainer.withValues(alpha: 0.6),
-            border: const Border(
-              left: BorderSide(
-                color: AppColors.gold,
-                width: 3,
-              ),
-            ),
-            borderRadius: AppRadius.brSm,
-          ),
-          child: Text(
-            '"We did not build this for ourselves — we built it for the next '
-            'generation of heirs."',
-            style: AppTypography.textTheme.titleMedium?.copyWith(
-              fontStyle: FontStyle.italic,
-              color: AppColors.navy,
-              height: 1.5,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-
-        const SizedBox(height: AppSpacing.xl),
-
-        Text(
-          'Kingdom Heirs began with a single conviction: that excellence is a '
-          'form of worship. From a small Bible study in 2014 to a global '
-          'family across continents, our story is one of faith, craft, and '
-          'covenant.',
-          style: AppTypography.textTheme.bodyLarge?.copyWith(
-            color: AppColors.navy.withValues(alpha: 0.85),
-            height: 1.6,
-          ),
-        ),
-
-        const SizedBox(height: AppSpacing.lg),
-
-        Text(
-          'Today, we continue that work — discipling leaders, planting '
-          'communities, and stewarding the inheritance passed to us.',
-          style: AppTypography.textTheme.bodyLarge?.copyWith(
-            color: AppColors.navy.withValues(alpha: 0.85),
-            height: 1.6,
-          ),
-        ),
-
-        const SizedBox(height: AppSpacing.xl),
-
-        _GhostPillButton(
-          label: 'Read the full letter',
-          icon: Icons.arrow_forward_rounded,
-          onPressed: onReadLetter,
-        ),
-      ],
-    );
-
-    if (reducedMotion) return content;
-
-    return content
-        .animate()
-        .fadeIn(duration: AppMotion.standard, curve: AppMotion.decelerate)
-        .slideY(begin: 0.06, end: 0, duration: AppMotion.standard);
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 4. STATEMENT OF FAITH — numbered accordion
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _StatementOfFaithSection extends StatefulWidget {
-  const _StatementOfFaithSection();
-
-  @override
-  State<_StatementOfFaithSection> createState() =>
-      _StatementOfFaithSectionState();
-}
-
-class _StatementOfFaithSectionState extends State<_StatementOfFaithSection> {
-  int? _expanded;
-
-  static const _pillars = <_FaithPillar>[
-    _FaithPillar(
-      number: 'I',
-      title: 'The Bible',
-      body: 'We believe the Scriptures are God-breathed, infallible, and the '
-          'final authority for faith and practice.',
-      icon: Icons.menu_book_rounded,
-    ),
-    _FaithPillar(
-      number: 'II',
-      title: 'The Triune God',
-      body: 'One God, eternally existent in three Persons — Father, Son, and '
-          'Holy Spirit — co-equal and co-eternal.',
-      icon: Icons.workspace_premium_rounded,
-    ),
-    _FaithPillar(
-      number: 'III',
-      title: 'Salvation by Grace',
-      body: 'Salvation is the gift of grace, received through faith in Jesus '
-          'Christ — not by works, but unto good works.',
-      icon: Icons.favorite_rounded,
-    ),
-    _FaithPillar(
-      number: 'IV',
-      title: 'The Church',
-      body: 'The Church is the body of Christ, called to worship, to disciple '
-          'the nations, and to serve the poor.',
-      icon: Icons.diversity_3_rounded,
-    ),
-    _FaithPillar(
-      number: 'V',
-      title: 'The Return of Christ',
-      body: 'We await the glorious return of our Lord, the resurrection of the '
-          'dead, and the renewal of all things.',
-      icon: Icons.public_rounded,
-    ),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    final reduceMotion = MediaQuery.of(context).disableAnimations;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-      child: Material(
-        color: AppColors.white,
-        elevation: AppElevation.level1,
-        shadowColor: AppColors.navy.withValues(alpha: 0.06),
-        borderRadius: AppRadius.brXl,
-        clipBehavior: Clip.antiAlias,
+    return ColoredBox(
+      color: AppColors.backgroundLight,
+      child: SafeArea(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            for (var i = 0; i < _pillars.length; i++) ...[
-              _FaithRow(
-                pillar: _pillars[i],
-                expanded: _expanded == i,
-                onTap: () =>
-                    setState(() => _expanded = _expanded == i ? null : i),
-                reduceMotion: reduceMotion,
-                delay: Duration(milliseconds: 40 * i),
-              ),
-              if (i != _pillars.length - 1)
-                const Divider(
-                  height: 0,
-                  thickness: 0.5,
-                  indent: AppSpacing.lg,
-                  endIndent: AppSpacing.lg,
-                  color: AppColors.dividerLight,
+            // Top bar
+            _PageTopBar(
+              eyebrow: 'DISCOVER',
+              title: 'Know who we are.',
+              onBack: onBack,
+            ),
+            // Cards
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  0,
+                  AppSpacing.lg,
+                  100, // space for dot indicator
                 ),
-            ],
+                physics: const BouncingScrollPhysics(),
+                itemCount: _cards.length,
+                itemBuilder: (context, i) {
+                  final card = _cards[i];
+                  return _DiscoverCard(
+                    data: card,
+                    index: i,
+                  );
+                },
+              ),
+            ),
+            // Next
+            _BottomNav(onNext: onNext, onBack: onBack, label: 'Experience Life'),
           ],
         ),
       ),
-    )
-        .animate()
-        .fadeIn(duration: AppMotion.standard, curve: AppMotion.decelerate)
-        .slideY(begin: 0.04, end: 0, duration: AppMotion.standard);
+    );
   }
 }
 
-class _FaithPillar {
-  const _FaithPillar({
-    required this.number,
-    required this.title,
-    required this.body,
+class _DiscoverCardData {
+  const _DiscoverCardData({
     required this.icon,
+    required this.color,
+    required this.title,
+    required this.description,
+    required this.route,
   });
 
-  final String number;
-  final String title;
-  final String body;
   final IconData icon;
+  final Color color;
+  final String title;
+  final String description;
+  final String? route;
 }
 
-class _FaithRow extends StatelessWidget {
-  const _FaithRow({
-    required this.pillar,
-    required this.expanded,
-    required this.onTap,
-    required this.reduceMotion,
-    required this.delay,
-  });
+class _DiscoverCard extends StatelessWidget {
+  const _DiscoverCard({required this.data, required this.index});
 
-  final _FaithPillar pillar;
-  final bool expanded;
-  final VoidCallback onTap;
-  final bool reduceMotion;
-  final Duration delay;
+  final _DiscoverCardData data;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
-    final Widget content = InkWell(
-      onTap: onTap,
-      borderRadius: AppRadius.brMd,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg,
-          vertical: AppSpacing.md,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: Material(
+        color: Colors.white,
+        borderRadius: AppRadius.brLg,
+        child: InkWell(
+          onTap: data.route != null
+              ? () => context.push(data.route!)
+              : null,
+          borderRadius: AppRadius.brLg,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: AppRadius.brLg,
+              border: Border.all(color: AppColors.dividerLight),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.navy.withValues(alpha: 0.06),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                // Color accent bar
+                Container(
+                  width: 4,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: data.color,
+                    borderRadius: const BorderRadius.horizontal(
+                      left: Radius.circular(AppRadius.lg),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                // Icon
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: data.color.withValues(alpha: 0.1),
+                    borderRadius: AppRadius.brMd,
+                  ),
+                  child: Icon(data.icon, color: data.color, size: 22),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                // Text
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.md,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          data.title,
+                          style: AppTypography.textTheme.titleSmall?.copyWith(
+                            color: AppColors.navy,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          data.description,
+                          style: AppTypography.textTheme.bodySmall?.copyWith(
+                            color: AppColors.textSecondary,
+                            height: 1.5,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // Arrow
+                Padding(
+                  padding: const EdgeInsets.only(right: AppSpacing.md),
+                  child: Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 13,
+                    color: data.route != null
+                        ? data.color
+                        : AppColors.textDisabled,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      )
+          .animate()
+          .fadeIn(
+            delay: Duration(milliseconds: 80 + index * 70),
+            duration: AppMotion.standard,
+          )
+          .slideX(
+            begin: 0.06,
+            end: 0,
+            delay: Duration(milliseconds: 80 + index * 70),
+            duration: AppMotion.standard,
+            curve: AppMotion.decelerate,
+          ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PAGE 2 — Experience Church Life
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _ExperiencePage extends StatelessWidget {
+  const _ExperiencePage({required this.onNext, required this.onBack});
+
+  final VoidCallback onNext;
+  final VoidCallback onBack;
+
+  static const _features = [
+    _FeatureData(
+      emoji: '📖',
+      color: Color(0xFF1E3A8A),
+      title: 'Daily Bible Reading',
+      benefit: 'Follow curated Bible plans and grow your knowledge of Scripture every day.',
+    ),
+    _FeatureData(
+      emoji: '🎧',
+      color: Color(0xFF7C3AED),
+      title: 'Sermons & Podcasts',
+      benefit: 'Access powerful messages from our pastors, anytime, anywhere.',
+    ),
+    _FeatureData(
+      emoji: '🙏',
+      color: Color(0xFF0EA5E9),
+      title: 'Prayer Community',
+      benefit: 'Submit requests and stand in faith with thousands who pray together.',
+    ),
+    _FeatureData(
+      emoji: '👥',
+      color: Color(0xFF15803D),
+      title: 'Community Groups',
+      benefit: 'Connect in small groups for deeper fellowship, growth, and accountability.',
+    ),
+    _FeatureData(
+      emoji: '📅',
+      color: Color(0xFFA88B1D),
+      title: 'Church Events',
+      benefit: 'Never miss a service, conference, or special gathering near you.',
+    ),
+    _FeatureData(
+      emoji: '❤️',
+      color: Color(0xFFDC2626),
+      title: 'Giving & Stewardship',
+      benefit: 'Give securely and track your faithfulness toward Kingdom purposes.',
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: AppColors.backgroundLight,
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _PageTopBar(
+              eyebrow: 'EXPERIENCE',
+              title: 'What awaits you.',
+              onBack: onBack,
+            ),
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  0,
+                  AppSpacing.lg,
+                  100,
+                ),
+                physics: const BouncingScrollPhysics(),
+                itemCount: _features.length,
+                itemBuilder: (context, i) {
+                  return _FeatureRow(data: _features[i], index: i);
+                },
+              ),
+            ),
+            _BottomNav(
+              onNext: onNext,
+              onBack: onBack,
+              label: 'Join the Family',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FeatureData {
+  const _FeatureData({
+    required this.emoji,
+    required this.color,
+    required this.title,
+    required this.benefit,
+  });
+
+  final String emoji;
+  final Color color;
+  final String title;
+  final String benefit;
+}
+
+class _FeatureRow extends StatelessWidget {
+  const _FeatureRow({required this.data, required this.index});
+
+  final _FeatureData data;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: AppRadius.brLg,
+          border: Border.all(color: AppColors.dividerLight),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.navy.withValues(alpha: 0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Emoji badge
             Container(
-              width: AppSpacing.iconXl,
-              height: AppSpacing.iconXl,
+              width: 48,
+              height: 48,
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.goldContainer,
-                border: Border.all(
-                  color: AppColors.gold.withValues(alpha: 0.6),
-                  width: 0.5,
+                color: data.color.withValues(alpha: 0.08),
+                borderRadius: AppRadius.brMd,
+              ),
+              child: Center(
+                child: Text(
+                  data.emoji,
+                  style: const TextStyle(fontSize: 22),
                 ),
               ),
-              alignment: Alignment.center,
-              child: Icon(pillar.icon,
-                  color: AppColors.goldDark, size: AppSpacing.iconMd,),
             ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    pillar.number,
-                    style: AppTypography.textTheme.labelSmall?.copyWith(
-                      color: AppColors.goldDark,
-                      letterSpacing: 2,
-                      fontWeight: FontWeight.w700,
+                    data.title,
+                    style: AppTypography.textTheme.titleSmall?.copyWith(
+                      color: AppColors.navy,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.xxs),
+                  const SizedBox(height: 4),
                   Text(
-                    pillar.title,
-                    style: AppTypography.textTheme.titleMedium?.copyWith(
-                      color: AppColors.navy,
-                      fontWeight: FontWeight.w700,
+                    data.benefit,
+                    style: AppTypography.textTheme.bodySmall?.copyWith(
+                      color: AppColors.textSecondary,
+                      height: 1.55,
                     ),
                   ),
                 ],
               ),
             ),
-            AnimatedRotation(
-              turns: expanded ? 0.5 : 0,
-              duration: AppMotion.standard,
-              curve: AppMotion.standardCurve,
-              child: const Icon(
-                Icons.expand_more_rounded,
-                color: AppColors.goldDark,
-                size: AppSpacing.iconMd,
+          ],
+        ),
+      )
+          .animate()
+          .fadeIn(
+            delay: Duration(milliseconds: 60 + index * 60),
+            duration: AppMotion.standard,
+          )
+          .slideY(
+            begin: 0.06,
+            end: 0,
+            delay: Duration(milliseconds: 60 + index * 60),
+            duration: AppMotion.standard,
+            curve: AppMotion.decelerate,
+          ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PAGE 3 — Join the Family
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _JoinFamilyPage extends StatelessWidget {
+  const _JoinFamilyPage({required this.onBack});
+
+  final VoidCallback onBack;
+
+  static const _benefits = [
+    (icon: Icons.menu_book_rounded, text: 'Save Bible progress'),
+    (icon: Icons.groups_rounded, text: 'Join community groups'),
+    (icon: Icons.wb_sunny_rounded, text: 'Daily devotionals'),
+    (icon: Icons.live_tv_rounded, text: 'Watch live services'),
+    (icon: Icons.self_improvement_rounded, text: 'Submit prayer requests'),
+    (icon: Icons.handshake_rounded, text: 'Connect with leaders'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final safeBottom = MediaQuery.of(context).padding.bottom;
+
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFF0F172A),
+            Color(0xFF1E3A8A),
+            Color(0xFF1E40AF),
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          stops: [0.0, 0.6, 1.0],
+        ),
+      ),
+      child: Stack(
+        children: [
+          // Top decorative orb
+          Positioned(
+            top: -60,
+            right: -40,
+            child: Container(
+              width: 220,
+              height: 220,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.gold.withValues(alpha: 0.07),
+              ),
+            ),
+          ),
+          // Bottom orb
+          Positioned(
+            bottom: -40,
+            left: -30,
+            child: Container(
+              width: 160,
+              height: 160,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.04),
+              ),
+            ),
+          ),
+
+          SafeArea(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: EdgeInsets.fromLTRB(
+                AppSpacing.xl,
+                AppSpacing.lg,
+                AppSpacing.xl,
+                safeBottom + 80,
+              ),
+              child: Column(
+                children: [
+                  // Back arrow
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: GestureDetector(
+                      onTap: onBack,
+                      child: Container(
+                        padding: const EdgeInsets.all(AppSpacing.sm),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.1),
+                          borderRadius: AppRadius.brCircle,
+                        ),
+                        child: const Icon(
+                          Icons.arrow_back_ios_rounded,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(height: size.height * 0.04),
+
+                  // Gold crown / cross mark
+                  Container(
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [AppColors.goldDark, AppColors.gold],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.gold.withValues(alpha: 0.45),
+                          blurRadius: 20,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.volunteer_activism_rounded,
+                      color: AppColors.ink,
+                      size: 32,
+                    ),
+                  )
+                      .animate()
+                      .fadeIn(duration: 500.ms)
+                      .scale(
+                        begin: const Offset(0.8, 0.8),
+                        end: const Offset(1, 1),
+                        duration: 500.ms,
+                        curve: Curves.easeOutBack,
+                      ),
+
+                  const SizedBox(height: AppSpacing.xl),
+
+                  // Headline
+                  Text(
+                    'Become Part of the\nKingdom Heirs Family',
+                    textAlign: TextAlign.center,
+                    style: AppTypography.textTheme.headlineSmall?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      height: 1.25,
+                    ),
+                  )
+                      .animate()
+                      .fadeIn(delay: 150.ms, duration: 450.ms)
+                      .slideY(
+                        begin: 0.1,
+                        end: 0,
+                        delay: 150.ms,
+                        duration: 450.ms,
+                        curve: AppMotion.decelerate,
+                      ),
+
+                  const SizedBox(height: AppSpacing.sm),
+
+                  Text(
+                    'Create an account to unlock everything God has prepared for you here.',
+                    textAlign: TextAlign.center,
+                    style: AppTypography.textTheme.bodyMedium?.copyWith(
+                      color: Colors.white.withValues(alpha: 0.7),
+                      height: 1.6,
+                    ),
+                  ).animate().fadeIn(delay: 250.ms, duration: 400.ms),
+
+                  const SizedBox(height: AppSpacing.xxl),
+
+                  // Benefits grid
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: AppSpacing.md,
+                      mainAxisSpacing: AppSpacing.md,
+                      childAspectRatio: 2.8,
+                    ),
+                    itemCount: _benefits.length,
+                    itemBuilder: (context, i) {
+                      final b = _benefits[i];
+                      return _BenefitChip(
+                        icon: b.icon,
+                        text: b.text,
+                        index: i,
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: AppSpacing.xxl),
+
+                  // Divider
+                  Container(
+                    width: 48,
+                    height: 1.5,
+                    color: AppColors.gold.withValues(alpha: 0.4),
+                  ).animate().fadeIn(delay: 600.ms, duration: 400.ms),
+
+                  const SizedBox(height: AppSpacing.xxl),
+
+                  // Primary CTA — Create Account
+                  _GoldButton(
+                    label: 'Create Account',
+                    icon: Icons.person_add_rounded,
+                    onTap: () => context.push(RouteNames.register),
+                  ).animate().fadeIn(delay: 700.ms, duration: 400.ms).slideY(
+                        begin: 0.15,
+                        end: 0,
+                        delay: 700.ms,
+                        duration: 400.ms,
+                        curve: AppMotion.decelerate,
+                      ),
+
+                  const SizedBox(height: AppSpacing.md),
+
+                  // Secondary CTA — Sign In
+                  _OutlineButton(
+                    label: 'Sign In',
+                    onTap: () => context.push(RouteNames.login),
+                  ).animate().fadeIn(delay: 820.ms, duration: 400.ms),
+
+                  const SizedBox(height: AppSpacing.xl),
+
+                  Text(
+                    'Already have an account? Sign in above.',
+                    textAlign: TextAlign.center,
+                    style: AppTypography.textTheme.bodySmall?.copyWith(
+                      color: Colors.white.withValues(alpha: 0.35),
+                    ),
+                  ).animate().fadeIn(delay: 950.ms, duration: 400.ms),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BenefitChip extends StatelessWidget {
+  const _BenefitChip({
+    required this.icon,
+    required this.text,
+    required this.index,
+  });
+
+  final IconData icon;
+  final String text;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.08),
+        borderRadius: AppRadius.brMd,
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.12),
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: AppColors.goldLight, size: 16),
+          const SizedBox(width: AppSpacing.xs),
+          Expanded(
+            child: Text(
+              text,
+              style: AppTypography.textTheme.labelSmall?.copyWith(
+                color: Colors.white.withValues(alpha: 0.85),
+                height: 1.4,
+                fontSize: 11,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    )
+        .animate()
+        .fadeIn(
+          delay: Duration(milliseconds: 350 + index * 50),
+          duration: AppMotion.standard,
+        )
+        .scale(
+          begin: const Offset(0.92, 0.92),
+          end: const Offset(1, 1),
+          delay: Duration(milliseconds: 350 + index * 50),
+          duration: AppMotion.standard,
+          curve: Curves.easeOutBack,
+        );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Shared Components
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Church logo mark (KH initials in gold serif on navy circle)
+class _ChurchLogoMark extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 120,
+      height: 120,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: AppColors.gold.withValues(alpha: 0.4),
+          width: 1.5,
+        ),
+        color: Colors.white.withValues(alpha: 0.06),
+      ),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'KH',
+              style: AppTypography.textTheme.displaySmall?.copyWith(
+                color: AppColors.goldLight,
+                fontWeight: FontWeight.w700,
+                height: 1,
+                fontSize: 38,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              'KINGDOM HEIRS',
+              style: AppTypography.scriptureRef.copyWith(
+                color: AppColors.goldLight.withValues(alpha: 0.7),
+                fontSize: 7,
+                letterSpacing: 2,
               ),
             ),
           ],
         ),
       ),
     );
-
-    final Widget wrapped = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        content,
-        AnimatedSize(
-          duration: AppMotion.standard,
-          curve: AppMotion.standardCurve,
-          child: expanded
-              ? Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    // 24 (icon) + 12 (gap) + 16 (lg) = icon + gap + screen lg
-                    AppSpacing.iconXl + AppSpacing.md + AppSpacing.lg,
-                    0,
-                    AppSpacing.lg,
-                    AppSpacing.lg,
-                  ),
-                  child: Text(
-                    pillar.body,
-                    style: AppTypography.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.navy.withValues(alpha: 0.78),
-                      height: 1.55,
-                    ),
-                  ),
-                )
-              : const SizedBox.shrink(),
-        ),
-      ],
-    );
-
-    if (reduceMotion) return wrapped;
-    return wrapped
-        .animate()
-        .fadeIn(delay: delay, duration: AppMotion.standard)
-        .slideX(begin: 0.04, end: 0, duration: AppMotion.standard);
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// 5. IMPACT — animated stat tiles
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _ImpactSection extends StatelessWidget {
-  const _ImpactSection();
-
-  static const _stats = <_StatData>[
-    _StatData(
-        label: 'Nations', value: '42', suffix: '+', icon: Icons.public_rounded,),
-    _StatData(
-        label: 'Members',
-        value: '12K',
-        suffix: '',
-        icon: Icons.people_alt_rounded,),
-    _StatData(
-        label: 'Lives Changed',
-        value: '8.4',
-        suffix: 'K',
-        icon: Icons.favorite_rounded,),
-    _StatData(
-        label: 'Years of Faith',
-        value: '11',
-        suffix: '',
-        icon: Icons.calendar_month_rounded,),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    final mq = MediaQuery.of(context);
-    final crossAxisCount = mq.size.width >= 720 ? 4 : 2;
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        AppSpacing.md,
-        AppSpacing.lg,
-        AppSpacing.massive,
-      ),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: _stats.length,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: crossAxisCount,
-          mainAxisSpacing: AppSpacing.md,
-          crossAxisSpacing: AppSpacing.md,
-          childAspectRatio: 1.05,
-        ),
-        itemBuilder: (context, i) {
-          final s = _stats[i];
-          return _StatTile(
-            data: s,
-            delay: Duration(milliseconds: 80 * i),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _StatData {
-  const _StatData({
+/// Gold pill primary button
+class _GoldButton extends StatefulWidget {
+  const _GoldButton({
     required this.label,
-    required this.value,
-    required this.suffix,
-    required this.icon,
+    required this.onTap,
+    this.icon,
   });
 
   final String label;
-  final String value;
-  final String suffix;
-  final IconData icon;
-}
-
-class _StatTile extends StatefulWidget {
-  const _StatTile({required this.data, required this.delay});
-
-  final _StatData data;
-  final Duration delay;
+  final VoidCallback onTap;
+  final IconData? icon;
 
   @override
-  State<_StatTile> createState() => _StatTileState();
+  State<_GoldButton> createState() => _GoldButtonState();
 }
 
-class _StatTileState extends State<_StatTile>
+class _GoldButtonState extends State<_GoldButton>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
+  late final AnimationController _press;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+    _press = AnimationController(
       vsync: this,
-      duration: AppMotion.expressive,
+      duration: AppMotion.instant,
+      lowerBound: 0.95,
+      value: 1,
     );
-    Future<void>.delayed(widget.delay, () {
-      if (mounted) _controller.forward();
-    });
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _press.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final reduceMotion = MediaQuery.of(context).disableAnimations;
-    return RepaintBoundary(
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: AppRadius.brLg,
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [AppColors.navy, AppColors.navyMid],
-          ),
-          boxShadow: AppElevation.shadowFor(AppElevation.level2),
+    return GestureDetector(
+      onTapDown: (_) => _press.reverse(),
+      onTapUp: (_) {
+        _press.forward();
+        widget.onTap();
+      },
+      onTapCancel: () => _press.forward(),
+      child: AnimatedBuilder(
+        animation: _press,
+        builder: (context, child) => Transform.scale(
+          scale: _press.value,
+          child: child,
         ),
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Container(
-              width: AppSpacing.iconLg,
-              height: AppSpacing.iconLg,
-              decoration: BoxDecoration(
-                color: AppColors.gold.withValues(alpha: 0.18),
-                borderRadius: AppRadius.brSm,
+        child: Container(
+          width: double.infinity,
+          height: 52,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [AppColors.goldDark, AppColors.gold],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: AppRadius.brFull,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.gold.withValues(alpha: 0.4),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
               ),
-              child: Icon(widget.data.icon,
-                  color: AppColors.gold, size: AppSpacing.iconSm,),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    if (reduceMotion)
-                      Text(
-                        widget.data.value,
-                        style: AppTypography.textTheme.displaySmall?.copyWith(
-                          color: AppColors.gold,
-                          fontWeight: FontWeight.w800,
-                          height: 1,
-                        ),
-                      )
-                    else
-                      AnimatedBuilder(
-                        animation: _controller,
-                        builder: (_, __) {
-                          // Eased count from 0 → target value.
-                          final t =
-                              Curves.easeOutCubic.transform(_controller.value);
-                          final displayed = _formatValue(widget.data.value, t);
-                          return Text(
-                            displayed,
-                            style:
-                                AppTypography.textTheme.displaySmall?.copyWith(
-                              color: AppColors.gold,
-                              fontWeight: FontWeight.w800,
-                              height: 1,
-                            ),
-                          );
-                        },
-                      ),
-                    if (widget.data.suffix.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            left: 2, bottom: AppSpacing.xs,),
-                        child: Text(
-                          widget.data.suffix,
-                          style: AppTypography.textTheme.titleLarge?.copyWith(
-                            color: AppColors.gold,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.xxs),
-                Text(
-                  widget.data.label.toUpperCase(),
-                  style: AppTypography.textTheme.labelSmall?.copyWith(
-                    color: AppColors.warmWhite.withValues(alpha: 0.7),
-                    letterSpacing: 2,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    ).animate().fadeIn(delay: widget.delay, duration: AppMotion.standard).scale(
-          begin: const Offset(0.95, 0.95),
-          end: const Offset(1, 1),
-          duration: AppMotion.standard,
-          curve: AppMotion.overshoot,
-        );
-  }
-
-  /// Interpolates the displayed text from the empty string to the target
-  /// value as [t] progresses 0→1.
-  String _formatValue(String target, double t) {
-    // Try to parse as a number with optional decimal.
-    final numeric = double.tryParse(target);
-    if (numeric == null) {
-      // Non-numeric (e.g. "12K") — reveal at the end of the animation.
-      if (t > 0.85) return target;
-      // Show a placeholder fade-in.
-      return target.replaceAll(RegExp('[A-Za-z]'), '·');
-    }
-    final v = numeric * t;
-    if (target.contains('.')) {
-      return v.toStringAsFixed(1);
-    }
-    return v.round().toString();
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 6. JOIN COMMUNITY CTA — gold gradient panel
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _JoinCommunityCta extends StatelessWidget {
-  const _JoinCommunityCta();
-
-  @override
-  Widget build(BuildContext context) {
-    final mq = MediaQuery.of(context);
-    final isWide = mq.size.width >= 720;
-
-    final children = <Widget>[
-      const _Eyebrow(label: '05 — JOIN US'),
-      const SizedBox(height: AppSpacing.md),
-      Text(
-        'Become part of\nthe story.',
-        style: AppTypography.textTheme.displaySmall?.copyWith(
-          color: AppColors.ink,
-          fontWeight: FontWeight.w700,
-          height: 1.1,
-        ),
-        textAlign: TextAlign.left,
-      ),
-      const SizedBox(height: AppSpacing.lg),
-      Text(
-        'Create your account in under a minute. We will walk with you through '
-        'every next step — community, prayer, Bible, and growth.',
-        style: AppTypography.textTheme.bodyLarge?.copyWith(
-          color: AppColors.ink.withValues(alpha: 0.78),
-          height: 1.55,
-        ),
-      ),
-      const SizedBox(height: AppSpacing.xxl),
-      Wrap(
-        spacing: AppSpacing.md,
-        runSpacing: AppSpacing.md,
-        children: [
-          _PrimaryPillButton(
-            label: 'Create account',
-            icon: Icons.person_add_rounded,
-            onPressed: () => context.push(RouteNames.register),
-            dark: true,
+            ],
           ),
-          _GhostPillButton(
-            label: 'Sign in',
-            dark: true,
-            onPressed: () => context.push(RouteNames.login),
-          ),
-        ],
-      ),
-    ];
-
-    final Widget panel = Container(
-      margin: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        AppSpacing.massive,
-        AppSpacing.lg,
-        AppSpacing.massive,
-      ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.xl,
-        vertical: AppSpacing.massive,
-      ),
-      decoration: BoxDecoration(
-        borderRadius: AppRadius.brXxl,
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            AppColors.goldLight,
-            AppColors.gold,
-            AppColors.goldDark,
-          ],
-          stops: [0.0, 0.55, 1.0],
-        ),
-        boxShadow: AppElevation.shadowGold,
-      ),
-      child: isWide
-          ? Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: children,
-                  ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                widget.label,
+                style: AppTypography.textTheme.labelLarge?.copyWith(
+                  color: AppColors.ink,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 15,
                 ),
-                const SizedBox(width: AppSpacing.xl),
-                const _CtaOrnament(),
+              ),
+              if (widget.icon != null) ...[
+                const SizedBox(width: AppSpacing.sm),
+                Icon(widget.icon, color: AppColors.ink, size: 18),
               ],
-            )
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: children,
-            ),
+            ],
+          ),
+        ),
+      ),
     );
-
-    return panel
-        .animate()
-        .fadeIn(duration: AppMotion.standard, curve: AppMotion.decelerate)
-        .slideY(begin: 0.06, end: 0, duration: AppMotion.standard);
   }
 }
 
-class _CtaOrnament extends StatelessWidget {
-  const _CtaOrnament();
+/// White-outline secondary button
+class _OutlineButton extends StatelessWidget {
+  const _OutlineButton({required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 1,
+    return GestureDetector(
+      onTap: onTap,
       child: Container(
+        width: double.infinity,
+        height: 52,
         decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: AppColors.ink.withValues(alpha: 0.10),
           border: Border.all(
-            color: AppColors.ink.withValues(alpha: 0.25),
+            color: Colors.white.withValues(alpha: 0.35),
+            width: 1.5,
           ),
+          borderRadius: AppRadius.brFull,
         ),
-        child: const Center(
-          child: Icon(
-            Icons.church_rounded,
-            size: AppSpacing.iconXl * 1.4,
-            color: AppColors.ink,
+        child: Center(
+          child: Text(
+            label,
+            style: AppTypography.textTheme.labelLarge?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+              fontSize: 15,
+            ),
           ),
         ),
       ),
@@ -1342,161 +1285,171 @@ class _CtaOrnament extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Footer mark
-// ─────────────────────────────────────────────────────────────────────────────
+/// Shared page top bar with eyebrow, headline, and back button
+class _PageTopBar extends StatelessWidget {
+  const _PageTopBar({
+    required this.eyebrow,
+    required this.title,
+    required this.onBack,
+  });
 
-class _FooterMark extends StatelessWidget {
-  const _FooterMark();
+  final String eyebrow;
+  final String title;
+  final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.lg,
-        0,
+        AppSpacing.md,
         AppSpacing.lg,
-        AppSpacing.massive,
+        AppSpacing.lg,
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: AppSpacing.huge,
-            height: 1,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppColors.gold.withValues(alpha: 0),
-                  AppColors.gold.withValues(alpha: 0.6),
-                  AppColors.gold.withValues(alpha: 0),
+          // Back button row
+          GestureDetector(
+            onTap: onBack,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.arrow_back_ios_rounded,
+                  size: 14,
+                  color: AppColors.goldDark,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  'Back',
+                  style: AppTypography.textTheme.labelMedium?.copyWith(
+                    color: AppColors.goldDark,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          // Eyebrow
+          Text(
+            eyebrow,
+            style: AppTypography.scriptureRef.copyWith(
+              color: AppColors.goldDark,
+              letterSpacing: 2,
+              fontSize: 10,
+            ),
+          ),
+          const SizedBox(height: 6),
+          // Title
+          Text(
+            title,
+            style: AppTypography.textTheme.headlineSmall?.copyWith(
+              color: AppColors.navy,
+              fontWeight: FontWeight.w800,
+              height: 1.2,
+            ),
+          ),
+        ],
+      )
+          .animate()
+          .fadeIn(duration: AppMotion.emphasized)
+          .slideY(
+            begin: -0.05,
+            end: 0,
+            duration: AppMotion.emphasized,
+            curve: AppMotion.decelerate,
+          ),
+    );
+  }
+}
+
+/// Bottom navigation bar for pages 1-2 (Next + Back shortcut)
+class _BottomNav extends StatelessWidget {
+  const _BottomNav({
+    required this.onNext,
+    required this.onBack,
+    required this.label,
+  });
+
+  final VoidCallback onNext;
+  final VoidCallback onBack;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final safeBottom = MediaQuery.of(context).padding.bottom;
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.md,
+        AppSpacing.lg,
+        safeBottom + 56, // accounts for dot indicator
+      ),
+      decoration: const BoxDecoration(
+        color: AppColors.backgroundLight,
+        border: Border(
+          top: BorderSide(color: AppColors.dividerLight, width: 0.5),
+        ),
+      ),
+      child: Row(
+        children: [
+          // Skip / Sign In shortcut
+          GestureDetector(
+            onTap: () => context.push(RouteNames.login),
+            child: Text(
+              'Sign In',
+              style: AppTypography.textTheme.labelMedium?.copyWith(
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          const Spacer(),
+          // Next button
+          GestureDetector(
+            onTap: onNext,
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.xl,
+                vertical: AppSpacing.sm,
+              ),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [AppColors.goldDark, AppColors.gold],
+                ),
+                borderRadius: AppRadius.brFull,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.gold.withValues(alpha: 0.35),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    label,
+                    style: AppTypography.textTheme.labelLarge?.copyWith(
+                      color: AppColors.ink,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  const Icon(
+                    Icons.arrow_forward_rounded,
+                    color: AppColors.ink,
+                    size: 16,
+                  ),
                 ],
               ),
             ),
           ),
-          const SizedBox(height: AppSpacing.lg),
-          Text(
-            '© KINGDOM HEIRS',
-            style: AppTypography.textTheme.labelSmall?.copyWith(
-              color: AppColors.goldDark,
-              letterSpacing: 3,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
         ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Shared buttons
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _PrimaryPillButton extends StatelessWidget {
-  const _PrimaryPillButton({
-    required this.label,
-    required this.onPressed,
-    this.icon,
-    this.dark = false,
-  });
-
-  final String label;
-  final VoidCallback onPressed;
-  final IconData? icon;
-  final bool dark;
-
-  @override
-  Widget build(BuildContext context) {
-    final bg = dark ? AppColors.ink : AppColors.gold;
-    final fg = dark ? AppColors.gold : AppColors.ink;
-    return Material(
-      color: bg,
-      borderRadius: AppRadius.brFull,
-      elevation: dark ? AppElevation.level0 : AppElevation.level2,
-      shadowColor: AppColors.gold.withValues(alpha: 0.4),
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: AppRadius.brFull,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.xl,
-            vertical: AppSpacing.md,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                label,
-                style: AppTypography.textTheme.labelLarge?.copyWith(
-                  color: fg,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              if (icon != null) ...[
-                const SizedBox(width: AppSpacing.sm),
-                Icon(icon, color: fg, size: AppSpacing.iconSm),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _GhostPillButton extends StatelessWidget {
-  const _GhostPillButton({
-    required this.label,
-    required this.onPressed,
-    this.icon,
-    this.dark = false,
-  });
-
-  final String label;
-  final VoidCallback onPressed;
-  final IconData? icon;
-  final bool dark;
-
-  @override
-  Widget build(BuildContext context) {
-    final fg = dark ? AppColors.ink : AppColors.warmWhite;
-    final border = dark
-        ? AppColors.ink.withValues(alpha: 0.4)
-        : AppColors.warmWhite.withValues(alpha: 0.6);
-    return Material(
-      color: Colors.transparent,
-      borderRadius: AppRadius.brFull,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: AppRadius.brFull,
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.xl,
-            vertical: AppSpacing.md,
-          ),
-          decoration: BoxDecoration(
-            borderRadius: AppRadius.brFull,
-            border: Border.all(color: border, width: 1.2),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                label,
-                style: AppTypography.textTheme.labelLarge?.copyWith(
-                  color: fg,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              if (icon != null) ...[
-                const SizedBox(width: AppSpacing.sm),
-                Icon(icon, color: fg, size: AppSpacing.iconSm),
-              ],
-            ],
-          ),
-        ),
       ),
     );
   }

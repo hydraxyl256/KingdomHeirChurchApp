@@ -17,7 +17,10 @@ class DownloadsNotifier extends AsyncNotifier<List<SermonDownload>> {
   @override
   Future<List<SermonDownload>> build() async {
     final result = await ref.read(sermonsRepositoryProvider).getDownloads();
-    return result.fold((_) => <SermonDownload>[], (r) => r);
+    return result.fold(
+      (_) => throw Exception('Failed to load downloads'),
+      (r) => r,
+    );
   }
 
   Future<void> addDownload({
@@ -33,7 +36,10 @@ class DownloadsNotifier extends AsyncNotifier<List<SermonDownload>> {
             sizeBytes: sizeBytes,
           );
       final result = await ref.read(sermonsRepositoryProvider).getDownloads();
-      return result.fold((_) => <SermonDownload>[], (r) => r);
+      return result.fold(
+        (_) => throw Exception('Failed to get downloads'),
+        (r) => r,
+      );
     });
   }
 
@@ -42,7 +48,10 @@ class DownloadsNotifier extends AsyncNotifier<List<SermonDownload>> {
     state = await AsyncValue.guard(() async {
       await ref.read(sermonsRepositoryProvider).removeDownload(sermonId);
       final result = await ref.read(sermonsRepositoryProvider).getDownloads();
-      return result.fold((_) => <SermonDownload>[], (r) => r);
+      return result.fold(
+        (_) => throw Exception('Failed to get downloads'),
+        (r) => r,
+      );
     });
   }
 }

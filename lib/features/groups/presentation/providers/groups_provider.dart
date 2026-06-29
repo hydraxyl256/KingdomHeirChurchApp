@@ -102,34 +102,49 @@ final recentlyActiveGroupsProvider =
     FutureProvider<List<CommunityGroup>>((ref) async {
   final repo = ref.watch(groupsRepositoryProvider);
   final result = await repo.getRecentlyActiveGroups();
-  return result.fold((err) => <CommunityGroup>[], (groups) => groups);
+  return result.fold(
+    (err) => throw Exception(err),
+    (groups) => groups,
+  );
 });
 
 final upcomingMeetingsProvider = FutureProvider<List<GroupEvent>>((ref) async {
   final repo = ref.watch(groupsRepositoryProvider);
   final result = await repo.getUpcomingMeetingsForUser();
-  return result.fold((err) => <GroupEvent>[], (events) => events);
+  return result.fold(
+    (err) => throw Exception(err),
+    (events) => events,
+  );
 });
 
 final prayerFeedForUserProvider =
     FutureProvider<List<GroupPrayerRequest>>((ref) async {
   final repo = ref.watch(groupsRepositoryProvider);
   final result = await repo.getPrayerFeedForUser();
-  return result.fold((err) => <GroupPrayerRequest>[], (list) => list);
+  return result.fold(
+    (err) => throw Exception(err),
+    (list) => list,
+  );
 });
 
 final announcementsFeedForUserProvider =
     FutureProvider<List<GroupAnnouncement>>((ref) async {
   final repo = ref.watch(groupsRepositoryProvider);
   final result = await repo.getAnnouncementsFeedForUser();
-  return result.fold((err) => <GroupAnnouncement>[], (list) => list);
+  return result.fold(
+    (err) => throw Exception(err),
+    (list) => list,
+  );
 });
 
 final suggestedGroupsProvider =
     FutureProvider<List<CommunityGroup>>((ref) async {
   final repo = ref.watch(groupsRepositoryProvider);
   final result = await repo.getSuggestedGroups();
-  return result.fold((err) => <CommunityGroup>[], (list) => list);
+  return result.fold(
+    (err) => throw Exception(err),
+    (list) => list,
+  );
 });
 
 /// Aggregate bundle — used by the Community Home screen to load all

@@ -101,7 +101,7 @@ abstract final class AppTheme {
           disabledForegroundColor: AppColors.ink.withValues(alpha: 0.38),
           elevation: AppSpacing.elevation1,
           shadowColor: AppColors.gold.withValues(alpha: 0.4),
-          minimumSize: const Size(double.infinity, AppSpacing.buttonHeight),
+          minimumSize: const Size(64, AppSpacing.buttonHeight),
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.xl,
             vertical: AppSpacing.md,
@@ -121,7 +121,7 @@ abstract final class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.gold,
           disabledForegroundColor: AppColors.gold.withValues(alpha: 0.38),
-          minimumSize: const Size(double.infinity, AppSpacing.buttonHeight),
+          minimumSize: const Size(64, AppSpacing.buttonHeight),
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.xl,
             vertical: AppSpacing.md,
@@ -155,7 +155,7 @@ abstract final class AppTheme {
         style: FilledButton.styleFrom(
           backgroundColor: AppColors.gold,
           foregroundColor: AppColors.ink,
-          minimumSize: const Size(double.infinity, AppSpacing.buttonHeight),
+          minimumSize: const Size(64, AppSpacing.buttonHeight),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
           ),

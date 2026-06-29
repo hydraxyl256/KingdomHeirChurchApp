@@ -29,11 +29,12 @@ class _AppBootstrapperState extends State<AppBootstrapper> {
     final containerFuture = bootstrap();
 
     // Wait for both to complete concurrently
-    final results = await Future.wait([containerFuture, splashTimer]);
+    await splashTimer;
+    final container = await containerFuture;
     
     if (mounted) {
       setState(() {
-        _container = results[0] as ProviderContainer;
+        _container = container;
         _minSplashDurationElapsed = true;
       });
     }

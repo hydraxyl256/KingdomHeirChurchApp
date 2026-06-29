@@ -70,6 +70,34 @@ class AuthRemoteDataSource {
     return _fetchProfile(user);
   }
 
+  Future<UserModel> signInWithGoogle() async {
+    try {
+      // Start the sign-in process
+      await _client.auth.signInWithOAuth(
+        OAuthProvider.google,
+        redirectTo: 'kingdomheir://login-callback',
+      );
+
+      // Wait for the auth state to change to a non-null user
+      final user = await _client.auth.onAuthStateChange
+          .where((event) => event.session != null)
+          .map((event) => event.session?.user)
+          .where((user) => user != null)
+          .map((user) => user!)
+          .timeout(const Duration(seconds: 30))
+          .first;
+
+      // Ensure the profile exists
+      await _ensureProfileForCurrentUser();
+
+      // Fetch the user again to get the updated profile (if we just created it)
+      return _fetchProfile(user);
+    } on Exception catch (e) {
+      throw AuthException('Google sign-in failed: $e');
+    }
+  }
+
+
   Future<void> signOut() => _client.auth.signOut();
 
   Future<void> resetPassword(String email) =>
@@ -80,24 +108,6 @@ class AuthRemoteDataSource {
 
   Future<void> updatePassword(String newPassword) =>
       _client.auth.updateUser(UserAttributes(password: newPassword));
-
-  Future<bool> signInWithGoogle() async {
-    final result = await _client.auth.signInWithOAuth(
-      OAuthProvider.google,
-      redirectTo: 'kingdomheir://login-callback',
-    );
-    if (result) await _ensureProfileForCurrentUser();
-    return result;
-  }
-
-  Future<bool> signInWithApple() async {
-    final result = await _client.auth.signInWithOAuth(
-      OAuthProvider.apple,
-      redirectTo: 'kingdomheir://login-callback',
-    );
-    if (result) await _ensureProfileForCurrentUser();
-    return result;
-  }
 
   Future<UserModel> updateProfile(Map<String, dynamic> data) async {
     final userId = _client.auth.currentUser!.id;

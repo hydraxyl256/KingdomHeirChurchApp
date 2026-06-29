@@ -71,7 +71,10 @@ class SermonsNotifier extends AsyncNotifier<List<Sermon>> {
 
   Future<List<Sermon>> _loadSermons() async {
     final result = await ref.read(sermonsRepositoryProvider).getSermons();
-    return result.fold((l) => <Sermon>[], (r) => r);
+    return result.fold(
+      (l) => throw Exception(l),
+      (r) => r,
+    );
   }
 
   Future<void> toggleFavourite(String id) async {

@@ -19,5 +19,57 @@
   "givingTab": "Giving",
   "prayerTab": "Prayer",
   "settingsLanguage": "Language",
-  "settingsLanguageDesc": "Change app language"
+  "settingsLanguageDesc": "Change app language",
+  "goodMorning": "Good Morning",
+  "@goodMorning": {
+    "description": "Greeting for morning time"
+  },
+  "goodAfternoon": "Good Afternoon",
+  "@goodAfternoon": {
+    "description": "Greeting for afternoon time"
+  },
+  "goodEvening": "Good Evening",
+  "@goodEvening": {
+    "description": "Greeting for evening time"
+  },
+  "goodNight": "Good Night",
+  "@goodNight": {
+    "description": "Greeting for night time"
+  },
+  "morningTagline": "Begin your day in the Word.",
+  "@morningTagline": {
+    "description": "Tagline for morning greeting"
+  },
+  "afternoonTagline": "Walk boldly in Christ today.",
+  "@afternoonTagline": {
+    "description": "Tagline for afternoon greeting"
+  },
+  "eveningTagline": "Reflect on His goodness today.",
+  "@eveningTagline": {
+    "description": "Tagline for evening greeting"
+  },
+  "nightTagline": "Rest in His peace tonight.",
+  "@nightTagline": {
+    "description": "Tagline for night greeting"
+  },
+  "scriptureSave": "Save",
+  "@scriptureSave": {
+    "description": "Label for save scripture button"
+  },
+  "scriptureShare": "Share",
+  "@scriptureShare": {
+    "description": "Label for share scripture button"
+  },
+  "scriptureListen": "Listen",
+  "@scriptureListen": {
+    "description": "Label for listen scriptore button"
+  },
+  "scriptureReflect": "Reflect",
+  "@scriptureReflect": {
+    "description": "Label for reflect scripture button"
+  },
+  "scriptureToday": "TODAY'S VERSE",
+  "@scriptureToday": {
+    "description": "Label for today's verse header"
+  }
 }

@@ -7,5 +7,18 @@
   "givingTab": "Ukupeela",
   "prayerTab": "Ipepo",
   "settingsLanguage": "Ulwimi",
-  "settingsLanguageDesc": "Cinja ulwimi"
+  "settingsLanguageDesc": "Cinja ulwimi",
+  "goodMorning": "Mwauka wabombwe",
+  "goodAfternoon": "Mwauka waaluchimi",
+  "goodEvening": "Mwauka waaluchimi",
+  "goodNight": "Mwauka waaluchimi",
+  "morningTagline": "Bweni lyo cinshi pa Palo.",
+  "afternoonTagline": "Tende na ubushingi ne Kristo lelo.",
+  "eveningTagline": "Cellesele na bwilabenye ba Yehoowa lelo.",
+  "nightTagline": "Pepuka pa cinshi lyako lelo.",
+  "scriptureSave": "Cinga",
+  "scriptureShare": "Shаника",
+  "scriptureListen": "Yanganda",
+  "scriptureReflect": "Cellesele",
+  "scriptureToday": "VICHI LYA LESUKU"
 }

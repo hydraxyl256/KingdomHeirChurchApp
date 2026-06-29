@@ -155,6 +155,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Change app language'**
   String get settingsLanguageDesc;
+
+  /// Greeting for morning time
+  ///
+  /// In en, this message translates to:
+  /// **'Good Morning'**
+  String get goodMorning;
+
+  /// Greeting for afternoon time
+  ///
+  /// In en, this message translates to:
+  /// **'Good Afternoon'**
+  String get goodAfternoon;
+
+  /// Greeting for evening time
+  ///
+  /// In en, this message translates to:
+  /// **'Good Evening'**
+  String get goodEvening;
+
+  /// Greeting for night time
+  ///
+  /// In en, this message translates to:
+  /// **'Good Night'**
+  String get goodNight;
+
+  /// Tagline for morning greeting
+  ///
+  /// In en, this message translates to:
+  /// **'Begin your day in the Word.'**
+  String get morningTagline;
+
+  /// Tagline for afternoon greeting
+  ///
+  /// In en, this message translates to:
+  /// **'Walk boldly in Christ today.'**
+  String get afternoonTagline;
+
+  /// Tagline for evening greeting
+  ///
+  /// In en, this message translates to:
+  /// **'Reflect on His goodness today.'**
+  String get eveningTagline;
+
+  /// Tagline for night greeting
+  ///
+  /// In en, this message translates to:
+  /// **'Rest in His peace tonight.'**
+  String get nightTagline;
+
+  /// Label for save scripture button
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get scriptureSave;
+
+  /// Label for share scripture button
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get scriptureShare;
+
+  /// Label for listen scriptore button
+  ///
+  /// In en, this message translates to:
+  /// **'Listen'**
+  String get scriptureListen;
+
+  /// Label for reflect scripture button
+  ///
+  /// In en, this message translates to:
+  /// **'Reflect'**
+  String get scriptureReflect;
+
+  /// Label for today's verse header
+  ///
+  /// In en, this message translates to:
+  /// **'TODAY\'S VERSE'**
+  String get scriptureToday;
 }
 
 class _AppLocalizationsDelegate

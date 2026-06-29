@@ -74,6 +74,15 @@ abstract final class RouteNames {
   static const groupLeader = '/home/groups/:id/leader';
   static const devotionals = '/home/devotionals';
   static const journal = '/home/devotionals/journal';
+
+  // ── Devotional Journey (7-step flow) ──────────────────────────────────────
+  static const devotionalReader = '/home/devotionals/:id';
+  static const devotionalScripture = '/home/devotionals/:id/scripture';
+  static const devotionalContent = '/home/devotionals/:id/content';
+  static const devotionalReflection = '/home/devotionals/:id/reflection';
+  static const devotionalPrayer = '/home/devotionals/:id/prayer';
+  static const devotionalJournal = '/home/devotionals/:id/journal';
+  static const devotionalComplete = '/home/devotionals/:id/complete';
   static const podcasts = '/home/podcasts';
   static const kids = '/home/kids';
   static const bookstore = '/home/bookstore';

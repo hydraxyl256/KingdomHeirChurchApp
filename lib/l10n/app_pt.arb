@@ -7,5 +7,18 @@
   "givingTab": "Doações",
   "prayerTab": "Oração",
   "settingsLanguage": "Idioma",
-  "settingsLanguageDesc": "Mudar idioma do aplicativo"
+  "settingsLanguageDesc": "Mudar idioma do aplicativo",
+  "goodMorning": "Bom Dia",
+  "goodAfternoon": "Boa Tarde",
+  "goodEvening": "Boa Noite",
+  "goodNight": "Boa Noite",
+  "morningTagline": "Comece seu dia na Palavra.",
+  "afternoonTagline": "Ande com ousadia em Cristo hoje.",
+  "eveningTagline": "Reflita sobre sua bondade hoje.",
+  "nightTagline": "Descanso em sua paz esta noite.",
+  "scriptureSave": "Salvar",
+  "scriptureShare": "Compartilhar",
+  "scriptureListen": "Ouvir",
+  "scriptureReflect": "Refletir",
+  "scriptureToday": "VERSO DO DIA"
 }

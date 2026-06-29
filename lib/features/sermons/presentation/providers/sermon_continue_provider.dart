@@ -18,7 +18,10 @@ class ContinueWatchingNotifier extends AsyncNotifier<List<SermonContinueItem>> {
   Future<List<SermonContinueItem>> build() async {
     final result =
         await ref.read(sermonsRepositoryProvider).getContinueWatching();
-    return result.fold((_) => <SermonContinueItem>[], (r) => r);
+    return result.fold(
+      (_) => throw Exception('Failed to load continue watching'),
+      (r) => r,
+    );
   }
 
   /// Record the latest playback position. Inserts a new entry or
@@ -37,7 +40,10 @@ class ContinueWatchingNotifier extends AsyncNotifier<List<SermonContinueItem>> {
           );
       final result =
           await ref.read(sermonsRepositoryProvider).getContinueWatching();
-      return result.fold((_) => <SermonContinueItem>[], (r) => r);
+      return result.fold(
+        (_) => throw Exception('Failed to get continue watching'),
+        (r) => r,
+      );
     });
   }
 
@@ -52,7 +58,10 @@ class ContinueWatchingNotifier extends AsyncNotifier<List<SermonContinueItem>> {
           );
       final result =
           await ref.read(sermonsRepositoryProvider).getContinueWatching();
-      return result.fold((_) => <SermonContinueItem>[], (r) => r);
+      return result.fold(
+        (_) => throw Exception('Failed to get continue watching'),
+        (r) => r,
+      );
     });
   }
 }

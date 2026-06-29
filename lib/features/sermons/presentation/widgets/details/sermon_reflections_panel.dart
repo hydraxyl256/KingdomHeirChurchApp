@@ -164,8 +164,41 @@ class _SermonReflectionsPanelState
                             .map((r) => _ReflectionTile(reflection: r))
                             .toList(),
                       ),
-                loading: () => const SizedBox.shrink(),
-                error: (_, __) => const SizedBox.shrink(),
+                loading: () => const Padding(
+                      padding: EdgeInsets.all(AppSpacing.md),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                error: (_, __) => Padding(
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.cloud_off_rounded,
+                              color: AppColors.error, size: 32,),
+                          const SizedBox(height: AppSpacing.md),
+                          const Text(
+                            'Could not load reflections.',
+                            style: TextStyle(
+                              color: AppColors.error,
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+                          FilledButton(
+                            onPressed: () => ref
+                                .refresh(reflectionsBySermonProvider(
+                                    widget.sermon.id,),),
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  WidgetStateProperty.all(AppColors.gold),
+                              foregroundColor:
+                                  WidgetStateProperty.all(AppColors.ink),
+                            ),
+                            child: const Text('Try Again'),
+                          ),
+                        ],
+                      ),
+                    ),
               ),
             ],
           ),

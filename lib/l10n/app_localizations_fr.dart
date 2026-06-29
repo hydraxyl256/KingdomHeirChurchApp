@@ -33,4 +33,43 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settingsLanguageDesc => 'Changer la langue de l\'application';
+
+  @override
+  String get goodMorning => 'Bonjour';
+
+  @override
+  String get goodAfternoon => 'Bonsoir';
+
+  @override
+  String get goodEvening => 'Bonsoir';
+
+  @override
+  String get goodNight => 'Bonne nuit';
+
+  @override
+  String get morningTagline => 'Commencez votre journée dans la Parole.';
+
+  @override
+  String get afternoonTagline => 'Marchez avec audace en Christ aujourd\'hui.';
+
+  @override
+  String get eveningTagline => 'Réfléchissez à sa bonté aujourd\'hui.';
+
+  @override
+  String get nightTagline => 'Reposez-vous dans sa paix ce soir.';
+
+  @override
+  String get scriptureSave => 'Sauvegarder';
+
+  @override
+  String get scriptureShare => 'Partager';
+
+  @override
+  String get scriptureListen => 'Écouter';
+
+  @override
+  String get scriptureReflect => 'Réfléchir';
+
+  @override
+  String get scriptureToday => 'VERSET DU JOUR';
 }

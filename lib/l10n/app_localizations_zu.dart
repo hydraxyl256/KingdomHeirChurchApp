@@ -13,24 +13,63 @@ class AppLocalizationsZu extends AppLocalizations {
 
   @override
   String welcomeMessage(String name) {
-    return 'Siyakwemukela, $name';
+    return 'Sawubona, $name';
   }
 
   @override
-  String get sermonsTab => 'Izintshumayelo';
+  String get sermonsTab => 'Izilumko';
 
   @override
-  String get eventsTab => 'Imicimbi';
+  String get eventsTab => 'Izizathu';
 
   @override
-  String get givingTab => 'Ukunikela';
+  String get givingTab => 'Ukunika';
 
   @override
-  String get prayerTab => 'Umkhuleko';
+  String get prayerTab => 'Ukuthandaza';
 
   @override
   String get settingsLanguage => 'Ulimi';
 
   @override
   String get settingsLanguageDesc => 'Shintsha ulimi';
+
+  @override
+  String get goodMorning => 'Sawubona';
+
+  @override
+  String get goodAfternoon => 'Sawubona';
+
+  @override
+  String get goodEvening => 'Sawubona';
+
+  @override
+  String get goodNight => 'Lilahleka kakhulu';
+
+  @override
+  String get morningTagline => 'Qala lakho usuku nomoya oNgcwele.';
+
+  @override
+  String get afternoonTagline => 'Hambela ngamandla noKristu namuhla.';
+
+  @override
+  String get eveningTagline => 'Yibonisane ngoqobo kwaKhe namuhla.';
+
+  @override
+  String get nightTagline => 'Phela ngoThixo owaphile namuhla.';
+
+  @override
+  String get scriptureSave => 'Gcina';
+
+  @override
+  String get scriptureShare => 'Sharel';
+
+  @override
+  String get scriptureListen => 'Khuluma';
+
+  @override
+  String get scriptureReflect => 'Qeqesha';
+
+  @override
+  String get scriptureToday => 'UMBHALO WOLUSUKO';
 }

@@ -243,9 +243,8 @@ class _SplashHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Logo size is responsive: clamped between 96 and 200 logical pixels.
-    final size = MediaQuery.of(context).size;
-    final logoSize = (size.shortestSide * 0.34).clamp(96.0, 200.0);
+    // Match the native splash screen dimensions exactly.
+    const logoSize = 200.0;
 
     // Reserve vertical room above the bottom progress so nothing overlaps.
     const reservedBottom = AppSpacing.huge + AppSpacing.xxxl;
@@ -253,7 +252,7 @@ class _SplashHero extends StatelessWidget {
     final logo = Semantics(
       label: 'Kingdom Heirs logo',
       image: true,
-      child: SizedBox(
+      child: const SizedBox(
         width: logoSize,
         height: logoSize,
         child: _LogoMark(size: logoSize),
@@ -322,9 +321,7 @@ class _SplashHero extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.only(bottom: reservedBottom),
-      child: content.animate().fadeIn(duration: AppMotion.emphasized).scale(
-            begin: const Offset(0.96, 0.96),
-            end: const Offset(1, 1),
+      child: content.animate().fadeIn(
             duration: const Duration(milliseconds: 1200),
             curve: AppMotion.decelerate,
           ),

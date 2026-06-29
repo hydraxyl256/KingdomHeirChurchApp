@@ -211,17 +211,19 @@ class TodaysFocusCard extends StatelessWidget {
             );
 
             final body = isSideBySide
-                ? Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      iconBlock,
-                      Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.all(insets.lg),
-                          child: content,
+                ? IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        iconBlock,
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.all(insets.lg),
+                            child: content,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   )
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,

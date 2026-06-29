@@ -152,23 +152,6 @@ class AuthNotifier extends AsyncNotifier<void> {
       state = AsyncError(e, st);
     }
   }
-
-  /// Sign in with Apple OAuth.
-  Future<void> signInWithApple() async {
-    state = const AsyncLoading();
-    try {
-      await ref.read(authRemoteDataSourceProvider).signInWithApple();
-      final user = ref.read(currentUserProvider);
-      if (user != null) {
-        unawaited(ref.read(analyticsServiceProvider).setUserId(user.id));
-        unawaited(ref.read(analyticsServiceProvider).logLogin(method: 'apple'));
-        unawaited(ref.read(pushNotificationServiceProvider).syncToken());
-      }
-      state = const AsyncData(null);
-    } catch (e, st) {
-      state = AsyncError(e, st);
-    }
-  }
 }
 
 final authNotifierProvider =

@@ -1,11 +1,24 @@
 {
   "@@locale": "ur",
-  "appTitle": "کنگڈم ہیئر",
+  "appTitle": "Kingdom Heir",
   "welcomeMessage": "خوش آمدید، {name}",
-  "sermonsTab": "خطبات",
+  "sermonsTab": "เทศเทศ",
   "eventsTab": "تقریبات",
-  "givingTab": "عطیہ",
+  "givingTab": "donations",
   "prayerTab": "دعا",
   "settingsLanguage": "زبان",
-  "settingsLanguageDesc": "ایپ کی زبان تبدیل کریں"
+  "settingsLanguageDesc": "زبان تبدیل کریں",
+  "goodMorning": "صبح بخیر",
+  "goodAfternoon": "عصر بخیر",
+  "goodEvening": "شام بخیر",
+  "goodNight": "شب بخیر",
+  "morningTagline": "اپنا دن قرآن کی آواز سے شروع کریں۔",
+  "afternoonTagline": "مسيح میں بدھلی کے ساتھ چلو۔",
+  "eveningTagline": "اس کی بھلائی پر غور کریں۔",
+  "nightTagline": "اس کی aman میں آرام کریں۔",
+  "scriptureSave": "محفوظ کریں",
+  "scriptureShare": "اشتراک کریں",
+  "scriptureListen": "سنیں",
+  "scriptureReflect": "سوچیں",
+  "scriptureToday": "آج کی آیت"
 }

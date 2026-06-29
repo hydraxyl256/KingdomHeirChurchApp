@@ -53,13 +53,8 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, AppUser>> signInWithGoogle() =>
       ErrorHandler.guard(() async {
-        throw UnimplementedError('Google sign-in — wire up Supabase OAuth');
-      });
-
-  @override
-  Future<Either<Failure, AppUser>> signInWithApple() =>
-      ErrorHandler.guard(() async {
-        throw UnimplementedError('Apple sign-in — wire up Supabase OAuth');
+        final model = await _remote.signInWithGoogle();
+        return model.toEntity();
       });
 
   @override
@@ -78,13 +73,15 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, AppUser>> updateProfile(AppUser user) =>
       ErrorHandler.guard(() async {
-        final model = await _remote.updateProfile({
+        final data = {
+          'email': user.email,
           'full_name': user.fullName,
           'avatar_url': user.avatarUrl,
           'role': user.role?.name,
           'phone': user.phone,
           'bio': user.bio,
-        });
-        return model.toEntity();
+        };
+        final updatedModel = await _remote.updateProfile(data);
+        return updatedModel.toEntity();
       });
 }

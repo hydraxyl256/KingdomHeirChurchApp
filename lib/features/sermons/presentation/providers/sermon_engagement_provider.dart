@@ -15,7 +15,10 @@ import 'package:kingdom_heir/features/sermons/presentation/providers/sermons_pro
 final notesBySermonProvider =
     FutureProvider.family<List<SermonNote>, String>((ref, sermonId) async {
   final result = await ref.watch(sermonsRepositoryProvider).getNotes(sermonId);
-  return result.fold((_) => <SermonNote>[], (r) => r);
+  return result.fold(
+    (_) => throw Exception('Failed to load notes'),
+    (r) => r,
+  );
 });
 
 class NotesController {
@@ -60,7 +63,10 @@ final reflectionsBySermonProvider =
         (ref, sermonId) async {
   final result =
       await ref.watch(sermonsRepositoryProvider).getReflections(sermonId);
-  return result.fold((_) => <SermonReflection>[], (r) => r);
+  return result.fold(
+    (_) => throw Exception('Failed to load reflections'),
+    (r) => r,
+  );
 });
 
 class ReflectionsController {
@@ -94,7 +100,10 @@ final prayerResponseBySermonProvider =
     FutureProvider.family<SermonPrayerResponse?, String>((ref, sermonId) async {
   final result =
       await ref.watch(sermonsRepositoryProvider).getPrayerResponse(sermonId);
-  return result.fold((_) => null, (r) => r);
+  return result.fold(
+    (_) => throw Exception('Failed to load prayer response'),
+    (r) => r,
+  );
 });
 
 class PrayerController {

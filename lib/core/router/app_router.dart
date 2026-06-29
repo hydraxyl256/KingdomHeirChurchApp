@@ -29,8 +29,13 @@ import 'package:kingdom_heir/features/challenge/presentation/screens/challenge_h
 import 'package:kingdom_heir/features/challenge/presentation/screens/group_reporting_screen.dart';
 import 'package:kingdom_heir/features/challenge/presentation/screens/participant_journey_screen.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/screens/dashboard_screen.dart';
+import 'package:kingdom_heir/features/devotionals/presentation/screens/devotional_prayer_screen.dart';
+import 'package:kingdom_heir/features/devotionals/presentation/screens/devotional_reader_screen.dart';
 import 'package:kingdom_heir/features/devotionals/presentation/screens/devotionals_screen.dart';
-import 'package:kingdom_heir/features/devotionals/presentation/screens/reflection_journal_screen.dart';
+import 'package:kingdom_heir/features/devotionals/presentation/screens/journal_screen.dart';
+import 'package:kingdom_heir/features/devotionals/presentation/screens/journey_complete_screen.dart';
+import 'package:kingdom_heir/features/devotionals/presentation/screens/reflection_screen.dart';
+import 'package:kingdom_heir/features/devotionals/presentation/screens/scripture_reader_screen.dart';
 import 'package:kingdom_heir/features/events/presentation/screens/event_details_screen.dart';
 import 'package:kingdom_heir/features/events/presentation/screens/event_listing_screen.dart';
 import 'package:kingdom_heir/features/events/presentation/screens/events_calendar_screen.dart';
@@ -96,7 +101,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final localStorage = ref.read(localStorageServiceProvider);
       final onboardingDone =
           localStorage.getBool(LocalStorageKeys.onboardingComplete) ?? false;
-      final roleSelected =
+      final user = authState.valueOrNull;
+      final roleSelected = user?.role != null ||
           localStorage.getString(LocalStorageKeys.userRole) != null;
 
       final location = state.uri.toString();
@@ -371,14 +377,55 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             ],
           ),
 
-          // Devotionals
+          // Devotionals — 7-Step Journey
           GoRoute(
             path: RouteNames.devotionals,
             builder: (_, __) => const DevotionalsScreen(),
             routes: [
+              // Standalone journal (from AppBar shortcut)
               GoRoute(
                 path: 'journal',
-                builder: (_, __) => const ReflectionJournalScreen(),
+                builder: (_, state) => JournalScreen(
+                  devotionalId: state.pathParameters['id'] ?? 'standalone',
+                  standalone: true,
+                ),
+              ),
+              // Journey steps — all keyed by :id
+              GoRoute(
+                path: ':id/scripture',
+                builder: (_, state) => ScriptureReaderScreen(
+                  devotionalId: state.pathParameters['id']!,
+                ),
+              ),
+              GoRoute(
+                path: ':id/content',
+                builder: (_, state) => DevotionalReaderScreen(
+                  devotionalId: state.pathParameters['id']!,
+                ),
+              ),
+              GoRoute(
+                path: ':id/reflection',
+                builder: (_, state) => ReflectionScreen(
+                  devotionalId: state.pathParameters['id']!,
+                ),
+              ),
+              GoRoute(
+                path: ':id/prayer',
+                builder: (_, state) => DevotionalPrayerScreen(
+                  devotionalId: state.pathParameters['id']!,
+                ),
+              ),
+              GoRoute(
+                path: ':id/journal',
+                builder: (_, state) => JournalScreen(
+                  devotionalId: state.pathParameters['id']!,
+                ),
+              ),
+              GoRoute(
+                path: ':id/complete',
+                builder: (_, state) => JourneyCompleteScreen(
+                  devotionalId: state.pathParameters['id']!,
+                ),
               ),
             ],
           ),

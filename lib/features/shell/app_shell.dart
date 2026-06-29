@@ -143,9 +143,6 @@ class _CompactShell extends StatelessWidget {
           top: false,
           child: LayoutBuilder(
             builder: (context, constraints) {
-              // Temporary debug logging
-              debugPrint('BottomNav Constraints: $constraints');
-              
               return ConstrainedBox(
                 constraints: const BoxConstraints(
                   minHeight: AppSpacing.navBarHeight,

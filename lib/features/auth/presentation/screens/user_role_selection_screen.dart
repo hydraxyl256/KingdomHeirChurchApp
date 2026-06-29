@@ -15,6 +15,7 @@ import 'package:kingdom_heir/core/theme/elevation.dart';
 import 'package:kingdom_heir/core/theme/motion.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/features/auth/domain/entities/app_user.dart';
+import 'package:kingdom_heir/features/auth/presentation/providers/auth_provider.dart';
 
 /// Kingdom Heirs — Premium Role Selection
 ///
@@ -125,6 +126,13 @@ class _UserRoleSelectionScreenState
           key: LocalStorageKeys.userRole,
           value: role.name,
         );
+    
+    try {
+      await ref.read(authRemoteDataSourceProvider).updateProfile({'role': role.name});
+    } catch (_) {
+      // Fallback to local storage if RLS blocks update
+    }
+
     if (!mounted) return;
     context.go(RouteNames.dashboard);
   }

@@ -22,7 +22,7 @@ import 'package:kingdom_heir/features/auth/presentation/providers/auth_provider.
 ///   2. Welcome heading + helper text.
 ///   3. Form card — email + password (with forgot-password).
 ///   4. Primary sign-in CTA.
-///   5. Social login — Google + Apple (equal weight).
+///   5. Social login — Google.
 ///   6. Register CTA — pinned to safe-area bottom, always visible.
 ///
 /// Tested against viewport widths: 320, 360, 390, 430, and up.
@@ -83,13 +83,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (state.hasError) _showError(state.error.toString());
   }
 
-  Future<void> _signInWithApple() async {
-    await ref.read(authNotifierProvider.notifier).signInWithApple();
-    if (!mounted) return;
-    final state = ref.read(authNotifierProvider);
-    if (state.hasError) _showError(state.error.toString());
-  }
-
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -139,7 +132,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     isLoading: isLoading,
                     onSignIn: _signIn,
                     onGoogle: _signInWithGoogle,
-                    onApple: _signInWithApple,
                     onForgot: () => context.push(RouteNames.forgotPassword),
                     reduceMotion: reduceMotion,
                   ),
@@ -245,7 +237,6 @@ class _LoginScrollable extends StatelessWidget {
     required this.isLoading,
     required this.onSignIn,
     required this.onGoogle,
-    required this.onApple,
     required this.onForgot,
     required this.reduceMotion,
   });
@@ -260,7 +251,6 @@ class _LoginScrollable extends StatelessWidget {
   final bool isLoading;
   final VoidCallback onSignIn;
   final VoidCallback onGoogle;
-  final VoidCallback onApple;
   final VoidCallback onForgot;
   final bool reduceMotion;
 
@@ -381,7 +371,6 @@ class _LoginScrollable extends StatelessWidget {
               _SocialLoginRow(
                 isLoading: isLoading,
                 onGoogle: onGoogle,
-                onApple: onApple,
               ),
               const SizedBox(height: AppSpacing.lg),
 
@@ -867,12 +856,10 @@ class _SocialLoginRow extends StatelessWidget {
   const _SocialLoginRow({
     required this.isLoading,
     required this.onGoogle,
-    required this.onApple,
   });
 
   final bool isLoading;
   final VoidCallback onGoogle;
-  final VoidCallback onApple;
 
   @override
   Widget build(BuildContext context) {
@@ -883,18 +870,6 @@ class _SocialLoginRow extends StatelessWidget {
             label: 'Google',
             iconWidget: const _GoogleIcon(),
             onPressed: isLoading ? null : onGoogle,
-          ),
-        ),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: _SocialButton(
-            label: 'Apple',
-            iconWidget: const Icon(
-              Icons.apple_rounded,
-              color: AppColors.warmWhite,
-              size: AppSpacing.iconSm + 2,
-            ),
-            onPressed: isLoading ? null : onApple,
           ),
         ),
       ],
