@@ -1,5 +1,10 @@
-// Kingdom Heir — Section 6: Church Today
-// Shows only today's and tomorrow's events. Never displays past events.
+// Kingdom Heir — Section 6: Premium Church Today Timeline
+//
+// Vertical timeline (similar in spirit to the Daily Journey) but for
+// events. Each event has a category-tinted dot (prayer, bible study,
+// youth, sunday service, outreach, choir, other). Shows today +
+// tomorrow's events only — never past. Falls back to a friendly empty
+// state when there's nothing on the schedule.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -7,7 +12,10 @@ import 'package:intl/intl.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
+import 'package:kingdom_heir/core/theme/iconography.dart';
+import 'package:kingdom_heir/features/dashboard/domain/dashboard_categories.dart';
 import 'package:kingdom_heir/features/dashboard/domain/home_dashboard_models.dart';
+import 'package:kingdom_heir/core/widgets/app_empty_state.dart';
 
 class ChurchTodaySection extends StatelessWidget {
   const ChurchTodaySection({
@@ -25,16 +33,13 @@ class ChurchTodaySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (events.isEmpty) return const SizedBox.shrink();
-
     final now = DateTime.now();
     final shown = events
-        .where((e) =>
-            e.startsAt.isAfter(now.subtract(const Duration(hours: 1))),)
-        .take(3)
+        .where(
+          (e) => e.startsAt.isAfter(now.subtract(const Duration(hours: 1))),
+        )
+        .take(4)
         .toList();
-
-    if (shown.isEmpty) return const SizedBox.shrink();
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -47,40 +52,71 @@ class ChurchTodaySection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
+          // Header
           Row(
             children: [
-              Text(
-                'Church Today',
-                style: AppTypography.textTheme.titleMedium?.copyWith(
-                  color: AppColors.navy,
-                  fontWeight: FontWeight.w800,
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: AppColors.goldContainer,
+                  borderRadius:
+                      BorderRadius.circular(AppSpacing.radiusSm),
+                ),
+                child: const Icon(
+                  Iconography.events,
+                  color: AppColors.goldDark,
+                  size: 20,
                 ),
               ),
-              const Spacer(),
-              GestureDetector(
-                onTap: onSeeAll,
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
                 child: Text(
-                  'See all',
-                  style: AppTypography.textTheme.labelMedium?.copyWith(
-                    color: AppColors.goldDark,
-                    fontWeight: FontWeight.w700,
+                  'Church Today',
+                  style: AppTypography.textTheme.titleMedium?.copyWith(
+                    color: AppColors.navy,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
               ),
+              if (onSeeAll != null)
+                GestureDetector(
+                  onTap: onSeeAll,
+                  child: Text(
+                    'See all',
+                    style: AppTypography.textTheme.labelMedium?.copyWith(
+                      color: AppColors.goldDark,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-          ...shown.asMap().entries.map((entry) {
-            final i = entry.key;
-            final event = entry.value;
-            return _EventRow(
-              event: event,
-              index: i,
-              isLast: i == shown.length - 1,
-              onJoin: () => onJoin?.call(event),
-              onReminder: () => onReminder?.call(event),
-            );
-          }),
+          if (shown.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+              child: AppEmptyState(
+                isCompact: true,
+                icon: Iconography.events,
+                title: 'No events today',
+                description: 'The week is open — explore upcoming services.',
+                actionLabel: onSeeAll != null ? 'Browse Events' : null,
+                onAction: onSeeAll,
+              ),
+            )
+          else
+            ...shown.asMap().entries.map((entry) {
+              final i = entry.key;
+              final event = entry.value;
+              return _EventRow(
+                event: event,
+                index: i,
+                isLast: i == shown.length - 1,
+                onJoin: () => onJoin?.call(event),
+                onReminder: () => onReminder?.call(event),
+              );
+            }),
         ],
       ),
     ).animate().fadeIn(delay: 440.ms, duration: 400.ms);
@@ -106,6 +142,9 @@ class _EventRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final timeStr = DateFormat('h:mm a').format(event.startsAt);
     final isToday = event.isToday;
+    final style = EventCategory.forCategory(event.category);
+    final color = style.color;
+    final label = style.label;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
@@ -117,6 +156,7 @@ class _EventRow extends StatelessWidget {
             width: 58,
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   isToday ? 'TODAY' : 'TOMORROW',
@@ -126,6 +166,7 @@ class _EventRow extends StatelessWidget {
                         : AppColors.textSecondary,
                     fontSize: 8,
                     letterSpacing: 1,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
                 Text(
@@ -141,28 +182,36 @@ class _EventRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.xs),
-          // Timeline dot + line
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 4),
-              Container(
-                width: 10,
-                height: 10,
-                decoration: BoxDecoration(
-                  color: isToday
-                      ? AppColors.goldDark
-                      : AppColors.textDisabled,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              if (!isLast)
+          // Timeline rail with category-colored dot
+          SizedBox(
+            width: 24,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 4),
                 Container(
-                  width: 1.5,
-                  height: 40,
-                  color: AppColors.dividerLight,
+                  width: 14,
+                  height: 14,
+                  decoration: BoxDecoration(
+                    color: color,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: color.withValues(alpha: 0.4),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
                 ),
-            ],
+                if (!isLast)
+                  Container(
+                    width: 2,
+                    height: 64,
+                    color: AppColors.dividerLight,
+                  ),
+              ],
+            ),
           ),
           const SizedBox(width: AppSpacing.sm),
           // Event info
@@ -171,24 +220,63 @@ class _EventRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  event.title,
-                  style: AppTypography.textTheme.titleSmall?.copyWith(
-                    color: AppColors.navy,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        event.title,
+                        style: AppTypography.textTheme.titleSmall?.copyWith(
+                          color: AppColors.navy,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    // Category badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.12),
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.radiusSm),
+                      ),
+                      child: Text(
+                        label,
+                        style: AppTypography.scriptureRef.copyWith(
+                          color: color,
+                          fontSize: 8,
+                          letterSpacing: 0.8,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 3),
+                if (event.leaderName != null) ...[
+                  Text(
+                    'with ${event.leaderName}',
+                    style: AppTypography.textTheme.bodySmall?.copyWith(
+                      color: AppColors.textSecondary,
+                      fontSize: 11,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                ],
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
                       event.isOnline
-                          ? Icons.videocam_rounded
-                          : Icons.location_on_rounded,
-                      size: 11,
+                          ? Iconography.live
+                          : Iconography.directions,
+                      size: 12,
                       color: AppColors.textSecondary,
                     ),
                     const SizedBox(width: 3),
@@ -210,32 +298,37 @@ class _EventRow extends StatelessWidget {
           ),
           const SizedBox(width: AppSpacing.xs),
           // CTA button
-          GestureDetector(
-            onTap: event.isOnline ? onJoin : onReminder,
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.sm,
-                vertical: AppSpacing.xxs,
-              ),
-              decoration: BoxDecoration(
-                color: event.isOnline
-                    ? AppColors.navyAccent.withValues(alpha: 0.1)
-                    : AppColors.goldContainer,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
-                border: Border.all(
-                  color: event.isOnline
-                      ? AppColors.navyAccent.withValues(alpha: 0.2)
-                      : AppColors.gold.withValues(alpha: 0.3),
+          Semantics(
+            button: true,
+            label: event.isOnline ? 'Join online' : 'Set reminder',
+            child: GestureDetector(
+              onTap: event.isOnline ? onJoin : onReminder,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: AppSpacing.xxs + 1,
                 ),
-              ),
-              child: Text(
-                event.isOnline ? 'Join' : 'Remind',
-                style: AppTypography.textTheme.labelSmall?.copyWith(
+                decoration: BoxDecoration(
                   color: event.isOnline
-                      ? AppColors.navyAccent
-                      : AppColors.goldDark,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 11,
+                      ? AppColors.navyAccent.withValues(alpha: 0.1)
+                      : AppColors.goldContainer,
+                  borderRadius:
+                      BorderRadius.circular(AppSpacing.radiusFull),
+                  border: Border.all(
+                    color: event.isOnline
+                        ? AppColors.navyAccent.withValues(alpha: 0.2)
+                        : AppColors.gold.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Text(
+                  event.isOnline ? 'Join' : 'Remind',
+                  style: AppTypography.textTheme.labelSmall?.copyWith(
+                    color: event.isOnline
+                        ? AppColors.navyAccent
+                        : AppColors.goldDark,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 11,
+                  ),
                 ),
               ),
             ),

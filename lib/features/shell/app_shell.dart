@@ -70,6 +70,20 @@ const _navItems = [
 
 /// Shell widget providing bottom navigation bar (mobile) or
 /// navigation rail (tablet / desktop) via [ResponsiveLayout].
+///
+/// Architecture (hard requirement from design):
+///   MaterialApp.router
+///     ↓
+///   ShellRoute
+///     ↓
+///   Scaffold
+///        body: full-screen child
+///        bottomNavigationBar: NavigationBar(...)
+///
+/// Nothing wraps the Scaffold except MaterialApp / ShellRoute.
+/// The body is NOT a Column around the child — it is the child, full screen.
+/// The global mini-player is overlaid above the nav bar via [Stack]
+/// inside the body so it never distorts Scaffold layout.
 class AppShell extends StatelessWidget {
   const AppShell({required this.child, super.key});
 
@@ -105,6 +119,15 @@ class AppShell extends StatelessWidget {
 
 // ─── Compact (Mobile) Shell ────────────────────────────────────────────────────
 
+/// Mobile (compact) variant.
+///
+/// Scaffold layout:
+///   body:               child (fills remaining height, full width)
+///   bottomNavigationBar: edge-to-edge nav bar with SafeArea bottom inset
+///
+/// The global sermon mini-player is overlaid using [Stack] above the
+/// bottom of the body (not as a Column sibling) so the Scaffold's
+/// intrinsic sizing is never disturbed.
 class _CompactShell extends StatelessWidget {
   const _CompactShell({required this.child, required this.currentIndex});
 
@@ -116,60 +139,76 @@ class _CompactShell extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      body: Column(
+      // Body fills the entire remaining height; the mini-player is
+      // stacked above the bottom of the body via Positioned.
+      body: Stack(
         children: [
-          Expanded(child: child),
-          const GlobalSermonMiniPlayer(),
+          Positioned.fill(child: child),
+          const Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: GlobalSermonMiniPlayer(),
+          ),
         ],
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: isDark ? AppColors.navyMid : AppColors.white,
-          border: Border(
-            top: BorderSide(
-              color: isDark ? AppColors.dividerDark : AppColors.dividerLight,
-              width: 0.5,
-            ),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.navy.withValues(alpha: 0.08),
-              blurRadius: 12,
-              offset: const Offset(0, -2),
-            ),
-          ],
-        ),
-        child: SafeArea(
-          top: false,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return ConstrainedBox(
-                constraints: const BoxConstraints(
-                  minHeight: AppSpacing.navBarHeight,
-                ),
-                child: Row(
-                  children: _navItems.asMap().entries.map((entry) {
-                    final i = entry.key;
-                    final item = entry.value;
-                    final isSelected = i == currentIndex;
+      bottomNavigationBar: _BottomNavBar(
+        isDark: isDark,
+        currentIndex: currentIndex,
+      ),
+    );
+  }
+}
 
-                    return Expanded(
-                      child: _NavBarItem(
-                        item: item,
-                        isSelected: isSelected,
-                        onTap: () {
-                          if (item.isMore) {
-                            context.go(RouteNames.more);
-                          } else {
-                            context.go(item.route);
-                          }
-                        },
-                      ),
-                    );
-                  }).toList(),
+class _BottomNavBar extends StatelessWidget {
+  const _BottomNavBar({required this.isDark, required this.currentIndex});
+
+  final bool isDark;
+  final int currentIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.navyMid : AppColors.white,
+        border: Border(
+          top: BorderSide(
+            color: isDark ? AppColors.dividerDark : AppColors.dividerLight,
+            width: 0.5,
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.navy.withValues(alpha: 0.08),
+            blurRadius: 12,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: AppSpacing.navBarHeight,
+          child: Row(
+            children: _navItems.asMap().entries.map((entry) {
+              final i = entry.key;
+              final item = entry.value;
+              final isSelected = i == currentIndex;
+
+              return Expanded(
+                child: _NavBarItem(
+                  item: item,
+                  isSelected: isSelected,
+                  onTap: () {
+                    if (item.isMore) {
+                      context.go(RouteNames.more);
+                    } else {
+                      context.go(item.route);
+                    }
+                  },
                 ),
               );
-            },
+            }).toList(),
           ),
         ),
       ),
@@ -191,92 +230,42 @@ class _NavBarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final selectedColor = isDark ? AppColors.goldLight : AppColors.gold;
+    final unselectedColor =
+        Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55);
 
     return InkWell(
       onTap: onTap,
       splashColor: AppColors.gold.withValues(alpha: 0.1),
       highlightColor: Colors.transparent,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        alignment: Alignment.center,
-        padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.xs,
+          vertical: AppSpacing.xxs,
+        ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // Animated indicator pill
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeOutBack,
-              width: 56,
-              height: 32,
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? AppColors.gold.withValues(alpha: isDark ? 0.2 : 0.12)
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
-              ),
-              child: Center(
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Icon(
-                      isSelected ? item.activeIcon : item.icon,
-                      size: AppSpacing.iconMd,
-                      color: isSelected
-                          ? AppColors.gold
-                          : Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withValues(alpha: 0.5),
-                    ),
-                    if (item.badge != null && item.badge! > 0)
-                      Positioned(
-                        top: -4,
-                        right: -4,
-                        child: Container(
-                          padding: const EdgeInsets.all(2),
-                          decoration: const BoxDecoration(
-                            color: AppColors.error,
-                            shape: BoxShape.circle,
-                          ),
-                          constraints: const BoxConstraints(
-                            minWidth: 14,
-                            minHeight: 14,
-                          ),
-                          child: Text(
-                            '${item.badge}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 9,
-                              fontWeight: FontWeight.w700,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
+            Icon(
+              isSelected ? item.activeIcon : item.icon,
+              size: 24,
+              color: isSelected ? selectedColor : unselectedColor,
             ),
-            const SizedBox(height: AppSpacing.xxxs),
+            const SizedBox(height: 2),
             AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 200),
               style: AppTypography.textTheme.labelSmall!.copyWith(
-                color: isSelected
-                    ? AppColors.gold
-                    : Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.5),
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
+                color: isSelected ? selectedColor : unselectedColor,
+                fontWeight:
+                    isSelected ? FontWeight.w700 : FontWeight.w400,
                 fontSize: 10,
               ),
               child: Text(
                 item.label,
                 textAlign: TextAlign.center,
                 maxLines: 1,
-                overflow: TextOverflow.visible,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
@@ -306,7 +295,7 @@ class _RailShell extends StatelessWidget {
     return Scaffold(
       body: Row(
         children: [
-          Container(
+          DecoratedBox(
             decoration: BoxDecoration(
               color: isDark ? AppColors.navyMid : AppColors.white,
               border: Border(
@@ -356,7 +345,8 @@ class _RailShell extends StatelessWidget {
                           const SizedBox(width: AppSpacing.sm),
                           Text(
                             'Kingdom Heir',
-                            style: AppTypography.textTheme.titleSmall?.copyWith(
+                            style:
+                                AppTypography.textTheme.titleSmall?.copyWith(
                               color:
                                   isDark ? AppColors.warmWhite : AppColors.navy,
                               fontWeight: FontWeight.w700,
@@ -391,10 +381,15 @@ class _RailShell extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: Column(
+            child: Stack(
               children: [
-                Expanded(child: child),
-                const GlobalSermonMiniPlayer(),
+                Positioned.fill(child: child),
+                const Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: GlobalSermonMiniPlayer(),
+                ),
               ],
             ),
           ),

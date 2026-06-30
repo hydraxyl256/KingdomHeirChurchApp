@@ -15,6 +15,7 @@ import 'package:kingdom_heir/features/admin/presentation/screens/admin_moderatio
 import 'package:kingdom_heir/features/admin/presentation/screens/admin_sermons_screen.dart';
 import 'package:kingdom_heir/features/admin/presentation/screens/admin_shell.dart';
 import 'package:kingdom_heir/features/auth/presentation/providers/auth_provider.dart';
+import 'package:kingdom_heir/features/auth/presentation/screens/check_your_email_screen.dart';
 import 'package:kingdom_heir/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:kingdom_heir/features/auth/presentation/screens/login_screen.dart';
 import 'package:kingdom_heir/features/auth/presentation/screens/register_screen.dart';
@@ -196,6 +197,28 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RouteNames.resetPassword,
         builder: (_, __) => const ResetPasswordScreen(),
+      ),
+
+      // ── Email Verification Deep-Link Landing ──────────────────────────
+      // Reached when the user taps the verification link in their email.
+      // The custom-scheme form (kingdomheir://verify) is mapped to this
+      // path by GoRouter's path matcher — the universal-link form
+      // (https://https://kingdomheirsfoundation.com/verify) is delivered to the
+      // app by Android's App Links / iOS Universal Links.
+      GoRoute(
+        path: RouteNames.verifyEmail,
+        builder: (context, state) {
+          final storage = ref.read(localStorageServiceProvider);
+          final pending = storage.getString(
+            LocalStorageKeys.pendingVerificationEmail,
+          );
+          final fromQuery = state.uri.queryParameters['email'];
+          return CheckYourEmailScreen(
+            email: (fromQuery != null && fromQuery.isNotEmpty)
+                ? fromQuery
+                : (pending ?? ''),
+          );
+        },
       ),
 
       // ── Shell (Bottom Nav) ─────────────────────────────────────────

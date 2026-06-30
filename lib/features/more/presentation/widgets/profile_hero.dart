@@ -14,18 +14,17 @@
 //     to the top row so the name doesn't fight for horizontal space.
 //
 // Animation:
-//   • Hero enters with a 400ms fade+slide via flutter_animate
-//   • Avatar ring scales in 200ms after the card lands
+//   • Self-contained 400ms opacity + Y-translate fade-in via
+//     `TweenAnimationBuilder` (no flutter_animate — its internal Builder
+//     crashed inside SliverToBoxAdapter).
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kingdom_heir/core/responsive/breakpoints.dart';
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/router/route_names.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
-import 'package:kingdom_heir/core/theme/motion.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/core/widgets/app_avatar.dart';
 import 'package:kingdom_heir/core/widgets/glass_card.dart';
@@ -157,13 +156,7 @@ class ProfileHeroSection extends StatelessWidget {
                   ),
           );
 
-          return content
-              .animate()
-              .fadeIn(
-                duration: AppMotion.emphasized,
-                curve: AppMotion.decelerate,
-              )
-              .slideY(begin: 0.06, end: 0, duration: AppMotion.emphasized);
+          return _ProfileHeroFadeIn(child: content);
         },
       ),
     );
@@ -176,6 +169,34 @@ class ProfileHeroSection extends StatelessWidget {
     if (hour < 17) return 'GOOD AFTERNOON';
     if (hour < 21) return 'GOOD EVENING';
     return 'GOOD NIGHT';
+  }
+}
+
+/// Self-contained opacity + Y-translate fade-in for the profile hero.
+/// Replaces flutter_animate's chain so SliverToBoxAdapter measurement
+/// never sees an internal Builder.
+class _ProfileHeroFadeIn extends StatelessWidget {
+  const _ProfileHeroFadeIn({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.decelerate,
+      builder: (context, value, animatedChild) {
+        return Opacity(
+          opacity: value.clamp(0.0, 1.0),
+          child: Transform.translate(
+            offset: Offset(0, (1 - value) * 16),
+            child: animatedChild,
+          ),
+        );
+      },
+      child: child,
+    );
   }
 }
 

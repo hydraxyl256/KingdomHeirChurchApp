@@ -42,13 +42,11 @@
 // restructure the section so it fits in a single bounded box.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
-import 'package:kingdom_heir/core/theme/motion.dart';
 import 'package:kingdom_heir/core/widgets/app_error_widget.dart';
 import 'package:kingdom_heir/features/more/domain/more_models.dart';
 import 'package:kingdom_heir/features/more/presentation/providers/more_providers.dart';
@@ -111,77 +109,142 @@ class MoreScreen extends ConsumerWidget {
   }
 
   // ── DATA ───────────────────────────────────────────────────────────
-  // Each section is its own `SliverToBoxAdapter`. The staggered entrance
-  // animation is applied per-section so each child still gets a
-  // bounded context and can `mainAxisSize: MainAxisSize.max` if needed.
+  // Each section is its own `SliverToBoxAdapter`.
+  //
+  // Safety invariants enforced for every sliver child:
+  //   1. Returns a non-null `Widget`. Never `null`.
+  //   2. Uses bounded constraints (no nested unbounded `ListView`).
+  //   3. Avoids unsafe null assertions (`!`). If a feature section is
+  //      empty for any reason we fall back to a safe placeholder.
+  //   4. Animations only use opacity + translate via a self-contained
+  //      `TweenAnimationBuilder` (no `flutter_animate` chains and no
+  //      `Builder`/`LayoutBuilder` inside the animation wrapper) so the
+  //      child is always measurable on the first frame. This eliminates
+  //      the `RenderViewport → SliverToBoxAdapter → RenderBox.size`
+  //      null-deref exception that the previous `child.animate().fadeIn()
+  //      .slideY()` chain produced.
   List<Widget> _dataSlivers(BuildContext context, MoreData data) {
     final insets = Insets.of(context);
 
     // Local helper — every section goes through the same animation +
     // sliver wrapping. Centralised so adding/removing sections is a
     // one-line change and every entry point handles motion consistently.
-    Widget section(Widget child) {
+    Widget section(Widget child, {int delayMs = 40}) {
       return SliverToBoxAdapter(
-        child: child
-            .animate(delay: const Duration(milliseconds: 40))
-            .fadeIn(duration: AppMotion.emphasized, curve: AppMotion.decelerate)
-            .slideY(begin: 0.04, end: 0),
+        child: _StaggeredFadeIn(
+          delay: Duration(milliseconds: delayMs),
+          child: child,
+        ),
       );
+    }
+
+    // Safe feature lookup. The const map always contains the requested
+    // keys, but we never use `!` — return an empty list as a fallback.
+    List<MoreFeature> safeFeatures(MoreSection key) {
+      final list = FeatureCatalog.sections[key];
+      if (list == null) return const <MoreFeature>[];
+      return list;
     }
 
     return [
       // SECTION 1 — Profile hero
-      section(ProfileHeroSection(hero: data.profile)),
+      section(ProfileHeroSection(hero: data.profile), delayMs: 0),
 
       // SECTION 2 — Smart features (search / continue / pinned)
-      section(const MoreSmartFeatures()),
+      section(const MoreSmartFeatures(), delayMs: 20),
 
-      section(SizedBox(height: insets.md)),
+      // Spacer
+      section(SizedBox(height: insets.md), delayMs: 30),
 
       // SECTION 3 — My Journey
-      section(
-        FeatureGridSection(
-          title: 'My Journey',
-          subtitle: 'Daily spiritual practices',
-          icon: Icons.auto_awesome_rounded,
-          features: FeatureCatalog.sections[MoreSection.journey]!,
+      if (safeFeatures(MoreSection.journey).isNotEmpty)
+        section(
+          FeatureGridSection(
+            title: 'My Journey',
+            subtitle: 'Daily spiritual practices',
+            icon: Icons.auto_awesome_rounded,
+            features: safeFeatures(MoreSection.journey),
+          ),
         ),
-      ),
 
       // SECTION 4 — Community
-      section(
-        FeatureGridSection(
-          title: 'Community',
-          subtitle: 'Connect and grow together',
-          icon: Icons.groups_rounded,
-          features: FeatureCatalog.sections[MoreSection.community]!,
+      if (safeFeatures(MoreSection.community).isNotEmpty)
+        section(
+          FeatureGridSection(
+            title: 'Community',
+            subtitle: 'Connect and grow together',
+            icon: Icons.groups_rounded,
+            features: safeFeatures(MoreSection.community),
+          ),
+          delayMs: 60,
         ),
-      ),
 
       // SECTION 5 — Kingdom Giving
-      section(KingdomGivingCard(summary: data.giving)),
+      section(KingdomGivingCard(summary: data.giving), delayMs: 80),
 
       // SECTION 6 — Family & Events
-      section(FamilyEventsCard(data: data.familyEvents)),
+      section(FamilyEventsCard(data: data.familyEvents), delayMs: 100),
 
       // SECTION 7 — Kingdom Service
-      section(
-        FeatureGridSection(
-          title: 'Kingdom Service',
-          subtitle: 'Volunteer, lead, and grow',
-          icon: Icons.handshake_rounded,
-          features: FeatureCatalog.sections[MoreSection.service]!,
+      if (safeFeatures(MoreSection.service).isNotEmpty)
+        section(
+          FeatureGridSection(
+            title: 'Kingdom Service',
+            subtitle: 'Volunteer, lead, and grow',
+            icon: Icons.handshake_rounded,
+            features: safeFeatures(MoreSection.service),
+          ),
+          delayMs: 120,
         ),
-      ),
 
       // SECTION 8 — Resources (expandable)
-      section(const ResourcesExpandableSection()),
+      section(const ResourcesExpandableSection(), delayMs: 140),
 
       // SECTION 9 — Account
-      section(const AccountSection()),
+      section(const AccountSection(), delayMs: 160),
 
-      section(SizedBox(height: insets.xl)),
+      // Bottom safe-area / mini-player breathing room.
+      const SliverToBoxAdapter(child: SizedBox(height: 96)),
     ];
+  }
+}
+
+/// A minimal, predictable entrance animation that animates **opacity** and
+/// a **Y translation** using `TweenAnimationBuilder` — no `flutter_animate`
+/// chain, no internal `Builder`. This sidesteps the
+/// `RenderViewport → SliverToBoxAdapter → RenderBox.size` crash that
+/// occurred when `flutter_animate`'s animations interacted with
+/// `LayoutBuilder` widgets mounted inside `SliverToBoxAdapter`.
+///
+/// The child is always laid out with full size; only `Opacity` and
+/// `Transform.translate` wrap it. Both have intrinsic sizes of
+/// (child's size + 0) so the sliver never sees a null/invalid size.
+class _StaggeredFadeIn extends StatelessWidget {
+  const _StaggeredFadeIn({required this.child, required this.delay});
+
+  final Widget child;
+  final Duration delay;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 320),
+      curve: Curves.decelerate,
+      builder: (context, value, animatedChild) {
+        // Both Opacity and Transform.translate report the child's intrinsic
+        // size, so the sliver can always measure them. No LayoutBuilder,
+        // no Builder — measure is deterministic.
+        return Opacity(
+          opacity: value.clamp(0.0, 1.0),
+          child: Transform.translate(
+            offset: Offset(0, (1 - value) * 12),
+            child: animatedChild,
+          ),
+        );
+      },
+      child: child,
+    );
   }
 }
 

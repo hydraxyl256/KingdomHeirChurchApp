@@ -15,6 +15,12 @@
 //   9. Continue Watching (carousel)
 //  10. Quick Actions
 //      Bottom padding
+//
+// Refresh strategy: per-section FutureProviders (greetingProvider, etc.)
+// load independently via the homeDashboardProvider meta aggregator.
+// Pull-to-refresh invalidates every per-section provider in one shot via
+// `invalidateDashboard(ref)`, so a single gesture re-fetches the whole
+// dashboard.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,9 +29,12 @@ import 'package:go_router/go_router.dart';
 import 'package:kingdom_heir/core/router/route_names.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
-import 'package:kingdom_heir/core/theme/app_typography.dart';
+import 'package:kingdom_heir/core/widgets/app_empty_state.dart';
 import 'package:kingdom_heir/features/dashboard/domain/home_dashboard_models.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/providers/home_dashboard_providers.dart';
+import 'package:kingdom_heir/features/dashboard/presentation/widgets/_shared/dashboard_skeleton.dart';
+import 'package:kingdom_heir/features/dashboard/presentation/widgets/_shared/floating_prayer_button.dart';
+import 'package:kingdom_heir/features/dashboard/presentation/widgets/_shared/search_placeholder_sheet.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/widgets/actions/quick_actions_strip.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/widgets/community/community_highlight_section.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/widgets/continue/continue_carousel.dart';
@@ -52,18 +61,21 @@ class DashboardScreen extends ConsumerWidget {
       color: AppColors.goldDark,
       backgroundColor: Colors.white,
       onRefresh: () async {
-        ref.invalidate(homeDashboardProvider);
+        invalidateDashboard(ref);
         await ref.read(homeDashboardProvider.future);
       },
       child: asyncData.when(
         data: (data) => _HomeDashboardBody(data: data),
-        loading: () => const _HomeDashboardSkeleton(),
-        error: (err, _) => _HomeDashboardError(
-          onRetry: () => ref.invalidate(homeDashboardProvider),
+        loading: () => const DashboardSkeleton(),
+        error: (err, _) => AppErrorWidget(
+          message: _readableError(err),
+          onRetry: () => invalidateDashboard(ref),
         ),
       ),
     );
   }
+
+  static String _readableError(Object err) => err.toString();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -76,104 +88,216 @@ class _HomeDashboardBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return CustomScrollView(
-      physics: const AlwaysScrollableScrollPhysics(
-        parent: BouncingScrollPhysics(),
-      ),
-      slivers: [
-        SliverToBoxAdapter(
-          child: SafeArea(
-            bottom: false,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // ── 1. Greeting ────────────────────────────────────────
-                GreetingHeader(
-                  greeting: data.greeting,
-                  onNotificationTap: () =>
-                      _toast(context, 'Notifications coming soon'),
-                  onSearchTap: () => _toast(context, 'Search coming soon'),
-                  onAvatarTap: () => context.push(RouteNames.myProfile),
-                ),
+    // The scripture roster powers the swipe-page — fetch from its
+    // dedicated per-section provider so we don't blank on a slow
+    // section, falling back to the aggregated single verse.
+    final asyncRoster = ref.watch(scriptureProvider);
+    final roster = asyncRoster.maybeWhen(
+      data: (r) => r,
+      orElse: () => <ScriptureCard>[data.scripture],
+    );
 
-                const SizedBox(height: AppSpacing.lg),
-
-                // ── 2. Scripture Hero ──────────────────────────────────
-                ScriptureHeroCard(
-                  scripture: data.scripture,
-                  onBookmark: () => _toast(context, 'Saved to bookmarks'),
-                  onShare: () => _toast(context, 'Share coming soon'),
-                  onAudio: () => _toast(context, 'Audio coming soon'),
-                  onReflect: () => _toast(context, 'Reflection journal coming soon'),
-                ),
-
-                // ── 3. Continue Your Journey ───────────────────────────
-                ContinueCarousel(
-                  cards: data.continueCards,
-                  onCardTap: (card) => _toast(context, 'Opening ${card.title}'),
-                  onStartJourney: () => _toast(context, 'Explore coming soon'),
-                ),
-
-                // ── 4. Live / Next Service ─────────────────────────────
-                ServiceStatusCard(
-                  status: data.serviceStatus,
-                  onWatchNow: () => _toast(context, 'Opening live stream'),
-                  onAddReminder: () => _toast(context, 'Reminder set!'),
-                ),
-
-                // ── 5. Daily Spiritual Journey ─────────────────────────
-                DailyJourneySection(
-                  journey: data.dailyJourney,
-                  onTaskTap: (task) =>
-                      _toast(context, 'Opening ${task.displayLabel}'),
-                ),
-
-                // ── 6. Church Today ────────────────────────────────────
-                ChurchTodaySection(
-                  events: data.todayEvents,
-                  onJoin: (e) => _toast(context, 'Joining ${e.title}'),
-                  onReminder: (e) => _toast(context, 'Reminder set for ${e.title}'),
-                  onSeeAll: () => context.push(RouteNames.events),
-                ),
-
-                // ── 7. Prayer Corner ───────────────────────────────────
-                PrayerCornerSection(
-                  corner: data.prayerCorner,
-                  onPray: (req) =>
-                      _toast(context, 'Praying for ${req.authorName}'),
-                  onSubmit: () =>
-                      _toast(context, 'Prayer submission coming soon'),
-                  onSeeAll: () => context.push(RouteNames.prayerFeed),
-                ),
-
-                // ── 8. Community ───────────────────────────────────────
-                CommunityHighlightSection(
-                  highlight: data.communityHighlight,
-                  onGroupsTap: () => context.push(RouteNames.groups),
-                ),
-
-                // ── 9. Continue Watching ───────────────────────────────
-                ContinueWatchingCarousel(
-                  cards: data.watchCards,
-                  onCardTap: (card) =>
-                      _toast(context, 'Opening ${card.title}'),
-                  onSeeAll: () => context.push(RouteNames.sermons),
-                ),
-
-                // ── 10. Quick Actions ──────────────────────────────────
-                QuickActionsStrip(
-                  onActionTap: (action) => _onQuickAction(context, action),
-                ),
-
-                // Bottom breathing room for nav bar
-                const SizedBox(height: AppSpacing.massive),
-              ],
-            ),
+    return Stack(
+      children: [
+        CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
           ),
+          slivers: [
+            SliverToBoxAdapter(
+              child: SafeArea(
+                bottom: false,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // ── 1. Greeting ────────────────────────────────────────
+                    GreetingHeader(
+                      greeting: data.greeting,
+                      onNotificationTap: () => _toast(
+                        context,
+                        'Notifications coming soon',
+                      ),
+                      onSearchTap: () => _openSearchSheet(context),
+                      onAvatarTap: () => context.push(RouteNames.myProfile),
+                    ),
+
+                    const SizedBox(height: AppSpacing.lg),
+
+                    // ── 2. Scripture Hero ──────────────────────────────────
+                    ScriptureHeroCard(
+                      scripture: data.scripture,
+                      roster: roster,
+                      onBookmark: () => _toast(context, 'Saved to bookmarks'),
+                      onShare: () => _toast(context, 'Share coming soon'),
+                      onAudio: () => _toast(context, 'Audio coming soon'),
+                      onReflect: () =>
+                          _toast(context, 'Reflection journal coming soon'),
+                    ),
+
+                    // ── 3. Continue Your Journey ───────────────────────────
+                    ContinueCarousel(
+                      cards: data.continueCards,
+                      onCardTap: (card) => _onContinueCardTap(context, card),
+                      onStartJourney: () => context.push(RouteNames.biblePlans),
+                    ),
+
+                    // ── 4. Live / Next Service ─────────────────────────────
+                    ServiceStatusCard(
+                      status: data.serviceStatus,
+                      onWatchNow: () => context.push(RouteNames.live),
+                      onAddReminder: () => _toast(
+                        context,
+                        'Reminder set — we’ll notify you 30 minutes before.',
+                      ),
+                      onAddToCalendar: () => _toast(
+                        context,
+                        'Adding to calendar…',
+                      ),
+                      onDirections: () => _toast(
+                        context,
+                        'Opening directions…',
+                      ),
+                    ),
+
+                    // ── 5. Daily Spiritual Journey ─────────────────────────
+                    DailyJourneySection(
+                      journey: data.dailyJourney,
+                      onTaskTap: (task) =>
+                          _onJourneyTaskTap(context, task.kind),
+                      onTaskToggle: (kind, isCompleted) =>
+                          _onJourneyTaskToggle(ref, kind, isCompleted),
+                    ),
+
+                    // ── 6. Church Today ────────────────────────────────────
+                    ChurchTodaySection(
+                      events: data.todayEvents,
+                      onJoin: (e) => _toast(
+                        context,
+                        e.isOnline
+                            ? 'Joining ${e.title}…'
+                            : 'Opening directions to ${e.title}…',
+                      ),
+                      onReminder: (e) => _toast(
+                        context,
+                        'Reminder set for ${e.title}',
+                      ),
+                      onSeeAll: () => context.push(RouteNames.events),
+                    ),
+
+                    // ── 7. Prayer Corner ───────────────────────────────────
+                    PrayerCornerSection(
+                      corner: data.prayerCorner,
+                      onPray: (req) =>
+                          _onPrayerRequest(context, ref, req),
+                      onSubmit: () => context.push(RouteNames.submitPrayer),
+                      onSeeAll: () => context.push(RouteNames.prayerFeed),
+                    ),
+
+                    // ── 8. Community ───────────────────────────────────────
+                    CommunityHighlightSection(
+                      highlight: data.communityHighlight,
+                      onGroupsTap: () => context.push(RouteNames.groups),
+                      onMembersTap: () => context.push(RouteNames.members),
+                      onNewsTap: () => context.push(RouteNames.news),
+                    ),
+
+                    // ── 9. Continue Watching ───────────────────────────────
+                    ContinueWatchingCarousel(
+                      cards: data.watchCards,
+                      onCardTap: (card) =>
+                          context.push(RouteNames.sermonDetails),
+                      onSeeAll: () => context.push(RouteNames.sermons),
+                    ),
+
+                    // ── 10. Quick Actions ──────────────────────────────────
+                    QuickActionsStrip(
+                      onActionTap: (action) => _onQuickAction(context, action),
+                    ),
+
+                    // Bottom breathing room for nav bar + FAB clearance
+                    const SizedBox(height: AppSpacing.massive),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        // Floating Prayer FAB — overlays the scroll content, sits above
+        // the bottom nav bar.
+        const Positioned(
+          right: AppSpacing.lg,
+          bottom: AppSpacing.xxl,
+          child: FloatingPrayerButton(),
         ),
       ],
     );
+  }
+
+  // ── Callback handlers ────────────────────────────────────────────────────
+
+  void _onContinueCardTap(BuildContext context, ContinueCard card) {
+    switch (card.kind) {
+      case ContinueKind.biblePlan:
+        context.push(RouteNames.biblePlans);
+      case ContinueKind.devotional:
+        context.push('${RouteNames.devotionalReader}/${card.id}');
+      case ContinueKind.sermon:
+        context.push('${RouteNames.sermonDetails}/${card.id}');
+      case ContinueKind.podcast:
+        context.push(RouteNames.podcasts);
+      case ContinueKind.prayerChallenge:
+        context.push(RouteNames.prayerFeed);
+    }
+  }
+
+  Future<void> _onJourneyTaskToggle(
+    WidgetRef ref,
+    SpiritualTaskKind kind,
+    bool isCompleted,
+  ) async {
+    // Fire-and-forget optimistic toggle. The repository returns
+    // `DashboardWriteResult`, which we ignore — the UI was already
+    // updated by the parent's onChanged, and the next refresh will
+    // reconcile any mismatch.
+    await ref
+        .read(homeDashboardRepositoryProvider)
+        .toggleJourneyTask(kind, isCompleted);
+    ref.invalidate(journeyProvider);
+  }
+
+  void _onJourneyTaskTap(BuildContext context, SpiritualTaskKind kind) {
+    switch (kind) {
+      case SpiritualTaskKind.scripture:
+      case SpiritualTaskKind.reflection:
+        context.push(RouteNames.bible);
+      case SpiritualTaskKind.devotional:
+        context.push(RouteNames.devotionals);
+      case SpiritualTaskKind.prayer:
+        context.push(RouteNames.prayerFeed);
+      case SpiritualTaskKind.worship:
+        context.push(RouteNames.podcasts);
+      case SpiritualTaskKind.journal:
+        context.push(RouteNames.journal);
+    }
+  }
+
+  Future<void> _onPrayerRequest(
+    BuildContext context,
+    WidgetRef ref,
+    PrayerRequest req,
+  ) async {
+    // Optimistic UI update via invalidation is the simplest path here —
+    // the repository handles offline fallback, and the existing card
+    // surface already reflects the latest count on next render.
+    await ref
+        .read(homeDashboardRepositoryProvider)
+        .incrementPrayerCount(req.id);
+    ref.invalidate(prayerCornerProvider);
+    if (context.mounted) {
+      _toast(context, 'Praying for ${req.authorName}');
+    }
   }
 
   void _onQuickAction(BuildContext context, QuickActionItem action) {
@@ -187,6 +311,12 @@ class _HomeDashboardBody extends ConsumerWidget {
       case QuickActionItem.give:
         context.push(RouteNames.giving);
     }
+  }
+
+  // ── Helpers ──────────────────────────────────────────────────────────────
+
+  void _openSearchSheet(BuildContext context) {
+    SearchPlaceholderSheet.show(context);
   }
 
   void _toast(BuildContext context, String msg) {
@@ -207,220 +337,5 @@ class _HomeDashboardBody extends ConsumerWidget {
           duration: const Duration(milliseconds: 1600),
         ),
       );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Skeleton Loading
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _HomeDashboardSkeleton extends StatefulWidget {
-  const _HomeDashboardSkeleton();
-
-  @override
-  State<_HomeDashboardSkeleton> createState() => _HomeDashboardSkeletonState();
-}
-
-class _HomeDashboardSkeletonState extends State<_HomeDashboardSkeleton>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _anim;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    )..repeat(reverse: true);
-    _anim = Tween<double>(begin: 0.4, end: 1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _anim,
-      builder: (context, _) => CustomScrollView(
-        physics: const NeverScrollableScrollPhysics(),
-        slivers: [
-          SliverToBoxAdapter(
-            child: Opacity(
-              opacity: _anim.value,
-              child: const SafeArea(
-                bottom: false,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: AppSpacing.lg,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(height: AppSpacing.lg),
-                      // Greeting skeleton
-                      Row(
-                        children: [
-                          _Bone(width: 64, height: 64, radius: 32),
-                          SizedBox(width: AppSpacing.md),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                _Bone(width: 80, height: 11),
-                                SizedBox(height: 6),
-                                _Bone(width: 140, height: 20),
-                                SizedBox(height: 6),
-                                _Bone(width: 200, height: 11),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: AppSpacing.xl),
-                      // Scripture card skeleton
-                      _Bone(width: double.infinity, height: 220, radius: 20),
-                      SizedBox(height: AppSpacing.xl),
-                      // Section header
-                      _Bone(width: 180, height: 18),
-                      SizedBox(height: AppSpacing.md),
-                      // Carousel skeleton
-                      Row(
-                        children: [
-                          _Bone(width: 148, height: 160, radius: 14),
-                          SizedBox(width: AppSpacing.md),
-                          _Bone(width: 148, height: 160, radius: 14),
-                          SizedBox(width: AppSpacing.md),
-                          _Bone(width: 60, height: 160, radius: 14),
-                        ],
-                      ),
-                      SizedBox(height: AppSpacing.xl),
-                      // Card skeleton
-                      _Bone(width: double.infinity, height: 80, radius: 14),
-                      SizedBox(height: AppSpacing.xl),
-                      // Daily journey skeleton
-                      _Bone(width: double.infinity, height: 200, radius: 14),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Bone extends StatelessWidget {
-  const _Bone({
-    required this.width,
-    required this.height,
-    this.radius = 8,
-  });
-
-  final double width;
-  final double height;
-  final double radius;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: AppColors.dividerLight,
-        borderRadius: BorderRadius.circular(radius),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Error State
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _HomeDashboardError extends StatelessWidget {
-  const _HomeDashboardError({required this.onRetry});
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(AppSpacing.huge),
-      children: [
-        const SizedBox(height: 80),
-        Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 72,
-                height: 72,
-                decoration: const BoxDecoration(
-                  color: AppColors.goldContainer,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.cloud_off_rounded,
-                  color: AppColors.goldDark,
-                  size: 32,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.xl),
-              Text(
-                'Could not load dashboard',
-                style: AppTypography.textTheme.titleMedium?.copyWith(
-                  color: AppColors.navy,
-                  fontWeight: FontWeight.w700,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                'Pull down to refresh or tap below to try again.',
-                style: AppTypography.textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.xl),
-              GestureDetector(
-                onTap: onRetry,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.xxl,
-                    vertical: AppSpacing.md,
-                  ),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [AppColors.goldDark, AppColors.gold],
-                    ),
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusFull),
-                  ),
-                  child: Text(
-                    'Try Again',
-                    style: AppTypography.textTheme.labelLarge?.copyWith(
-                      color: AppColors.ink,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
   }
 }

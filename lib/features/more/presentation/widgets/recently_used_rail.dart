@@ -14,10 +14,11 @@
 //   • Empty state: a single, full-width "Nothing yet" card with a CTA
 //
 // Animation:
-//   • Staggered entrance via flutter_animate (50ms delay per card)
+//   • Per-card opacity + X-translate fade-in via a self-contained
+//     `TweenAnimationBuilder` (60ms stagger). Replaces flutter_animate
+//     whose internal Builder crashed inside SliverToBoxAdapter.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
 
 import 'package:kingdom_heir/core/responsive/breakpoints.dart';
@@ -69,13 +70,13 @@ class RecentlyUsedRail extends StatelessWidget {
               final item = items[i];
               return SizedBox(
                 width: cardWidth,
-                child: _RecentCard(item: item)
-                    .animate()
-                    .fadeIn(
-                      duration: AppMotion.standard,
-                      delay: Duration(milliseconds: i * 60),
-                    )
-                    .slideX(begin: 0.06, end: 0, duration: AppMotion.standard),
+                // Self-contained opacity+translate fade-in — no
+                // flutter_animate Builder, which can interfere with
+                // the surrounding LayoutBuilder / SliverToBoxAdapter.
+                child: _RailFadeIn(
+                  delayMs: i * 60,
+                  child: _RecentCard(item: item),
+                ),
               );
             },
           ),
@@ -181,8 +182,27 @@ class _RecentCard extends StatelessWidget {
                   color: palette.fg.withValues(alpha: 0.7),
                 ),
               ),
-              const Spacer(),
-              if (item.progress != null) _ProgressBar(value: item.progress!),
+              // Use a `SizedBox(height: 8)` spacer in place of `Spacer`.
+              // `Spacer` requires a flex parent to give it real space,
+              // and a `Column(mainAxisSize: MainAxisSize.min)` plus the
+              // height-bounded `SizedBox` host can interact badly with
+              // flutter_animate's `LayoutBuilder` wrappers, producing a
+              // `RenderBox.size` null-deref. A fixed gap is layout-stable
+              // and always returns a valid size.
+              const SizedBox(height: 8),
+              // Safe handling: never use `!` here. The `progress` field
+              // is nullable; we already checked `item.progress != null`
+              // before calling _ProgressBar with the value. We pass it
+              // through a local non-null binding so even if a hot-reload
+              // or async update somehow makes it null between the check
+              // and the read, we still get a defined layout.
+              Builder(
+                builder: (context) {
+                  final p = item.progress;
+                  if (p == null) return const SizedBox.shrink();
+                  return _ProgressBar(value: p);
+                },
+              ),
             ],
           ),
         ),
@@ -292,6 +312,35 @@ class _EmptyRecentCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Self-contained opacity + X-translate fade-in. Replaces
+/// `flutter_animate`'s `.animate().fadeIn().slideX()` chain, whose
+/// internal `Builder` interacted badly with `SliverToBoxAdapter`.
+class _RailFadeIn extends StatelessWidget {
+  const _RailFadeIn({required this.delayMs, required this.child});
+
+  final int delayMs;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 320),
+      curve: Curves.decelerate,
+      builder: (context, value, animatedChild) {
+        return Opacity(
+          opacity: value.clamp(0.0, 1.0),
+          child: Transform.translate(
+            offset: Offset((1 - value) * 12, 0),
+            child: animatedChild,
+          ),
+        );
+      },
+      child: child,
     );
   }
 }

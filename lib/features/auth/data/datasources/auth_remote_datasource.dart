@@ -1,3 +1,4 @@
+import 'package:kingdom_heir/core/auth/deep_links.dart';
 import 'package:kingdom_heir/features/auth/data/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -44,6 +45,11 @@ class AuthRemoteDataSource {
       email: email,
       password: password,
       data: {'full_name': fullName},
+      // Production redirect — universal link handled by AndroidManifest /
+      // Info.plist, then routed into the app via [DeepLinkHandler]. We
+      // intentionally use the universal link (not the custom scheme) so
+      // the App Links / Universal Links verification flows apply.
+      emailRedirectTo: DeepLinks.verifyEmailUrl(),
     );
     final user = response.user;
     if (user == null) throw const AuthException('Sign up failed.');
@@ -75,7 +81,9 @@ class AuthRemoteDataSource {
       // Start the sign-in process
       await _client.auth.signInWithOAuth(
         OAuthProvider.google,
-        redirectTo: 'kingdomheir://login-callback',
+        // Use the universal link so we get verified App Links / Universal
+        // Links routing on both platforms.
+        redirectTo: DeepLinks.loginCallbackUrl(),
       );
 
       // Wait for the auth state to change to a non-null user
@@ -103,8 +111,40 @@ class AuthRemoteDataSource {
   Future<void> resetPassword(String email) =>
       _client.auth.resetPasswordForEmail(
         email,
-        redirectTo: 'kingdomheir://reset-password',
+        redirectTo: DeepLinks.resetPasswordUrl(),
       );
+
+  /// Resends the email-verification message. Returns silently on success
+  /// so the caller can drive UI feedback. Throws [AuthException] on
+  /// failure (rate-limit, offline, etc.).
+  Future<void> resendVerificationEmail(String email) async {
+    try {
+      await _client.auth.resend(
+        type: OtpType.email,
+        email: email,
+        emailRedirectTo: DeepLinks.verifyEmailUrl(),
+      );
+    } on AuthException {
+      rethrow;
+    } catch (e) {
+      throw AuthException('Could not resend verification email: $e');
+    }
+  }
+
+  /// Refresh the current session and report whether the email is now
+  /// verified. Returns the current user (or null) — callers should
+  /// inspect `user.emailConfirmedAt != null` to detect verification.
+  Future<User?> refreshVerificationStatus() async {
+    final response = await _client.auth.refreshSession();
+    return response.session?.user;
+  }
+
+  /// Reports whether the currently-cached user has a verified email.
+  bool get isCurrentEmailVerified =>
+      _client.auth.currentUser?.emailConfirmedAt != null;
+
+  /// Returns the email of the currently-cached user, if any.
+  String? get currentEmail => _client.auth.currentUser?.email;
 
   Future<void> updatePassword(String newPassword) =>
       _client.auth.updateUser(UserAttributes(password: newPassword));

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kingdom_heir/core/router/route_names.dart';
@@ -113,7 +112,7 @@ class _PrayerFeedScreenState extends ConsumerState<PrayerFeedScreen> {
                             ),
                           ],
                         ),
-                      ).animate().fadeIn(),
+                      ),
 
                       // ── Category filters ─────────────────────────────────────────
                       Container(
@@ -151,19 +150,19 @@ class _PrayerFeedScreenState extends ConsumerState<PrayerFeedScreen> {
                             shape: const StadiumBorder(),
                           ),
                         ),
-                      ).animate().fadeIn(delay: 100.ms),
+                      ),
                     ],
                   ),
                 ),
 
                 // ── Request list ─────────────────────────────────────────────
                 if (filtered.isEmpty)
-                  const SliverFillRemaining(
-                    child: AppEmptyState(
-                      icon: Icons.self_improvement_rounded,
-                      title: 'No requests found',
-                      description:
-                          'Be the first to submit a prayer request in this category.',
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: _PrayerEmptyState(
+                      isFiltered: requests.isNotEmpty &&
+                          _selectedCategory != 0,
+                      onSubmit: () => context.go(RouteNames.submitPrayer),
                     ),
                   )
                 else
@@ -176,9 +175,7 @@ class _PrayerFeedScreenState extends ConsumerState<PrayerFeedScreen> {
                     ),
                     sliver: SliverList(
                       delegate: SliverChildBuilderDelegate(
-                        (context, i) => _PrayerCard(item: filtered[i])
-                            .animate()
-                            .fadeIn(delay: Duration(milliseconds: i * 50)),
+                        (context, i) => _PrayerCard(item: filtered[i]),
                         childCount: filtered.length,
                       ),
                     ),
@@ -188,6 +185,43 @@ class _PrayerFeedScreenState extends ConsumerState<PrayerFeedScreen> {
           );
         },
       ),
+    );
+  }
+}
+
+// ─── Empty state ───────────────────────────────────────────────────────────
+
+/// Two flavors of empty state:
+/// - When the DB is genuinely empty (no requests at all), invite the user
+///   to submit the first prayer request with a CTA.
+/// - When the user has filtered down to a category that has no matches,
+///   encourage them to broaden the filter or pray for others.
+class _PrayerEmptyState extends StatelessWidget {
+  const _PrayerEmptyState({
+    required this.isFiltered,
+    required this.onSubmit,
+  });
+
+  final bool isFiltered;
+  final VoidCallback onSubmit;
+
+  @override
+  Widget build(BuildContext context) {
+    if (isFiltered) {
+      return const AppEmptyState(
+        icon: Icons.filter_alt_off_rounded,
+        title: 'No requests in this category',
+        description:
+            'Try a different filter — or be the first to ask for prayer here.',
+      );
+    }
+    return AppEmptyState(
+      icon: Icons.self_improvement_rounded,
+      title: 'No prayer requests yet',
+      description:
+          'Be the first to share a prayer request. Our community is here to stand with you in prayer.',
+      actionLabel: 'Request Prayer',
+      onAction: onSubmit,
     );
   }
 }

@@ -15,7 +15,6 @@
 // vertical scroller in the screen is the root `CustomScrollView`.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:kingdom_heir/core/responsive/breakpoints.dart';
@@ -100,13 +99,13 @@ class _FavoritesRow extends StatelessWidget {
                 return _OverflowChip(count: overflow);
               }
               final f = shown[i];
-              return _FavoritePill(feature: f)
-                  .animate()
-                  .fadeIn(
-                    duration: const Duration(milliseconds: 320),
-                    delay: Duration(milliseconds: 40 * i),
-                  )
-                  .slideY(begin: 0.04, end: 0);
+              // Self-contained opacity + Y-translate fade-in. Replaces
+              // flutter_animate to avoid the Builder that crashed
+              // RenderBox.size inside SliverToBoxAdapter.
+              return _PillFadeIn(
+                delayMs: 40 * i,
+                child: _FavoritePill(feature: f),
+              );
             },
           ),
         );
@@ -213,6 +212,35 @@ class _EmptyFavorites extends StatelessWidget {
         description:
             'Tap the pin on any feature to bring it to the top of this list.',
       ),
+    );
+  }
+}
+
+/// Self-contained opacity + Y-translate fade-in for a single favorite
+/// pill. Replaces `flutter_animate`'s chain to keep the SliverToBoxAdapter
+/// measurement path free of internal `Builder` widgets.
+class _PillFadeIn extends StatelessWidget {
+  const _PillFadeIn({required this.delayMs, required this.child});
+
+  final int delayMs;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 320),
+      curve: Curves.decelerate,
+      builder: (context, value, animatedChild) {
+        return Opacity(
+          opacity: value.clamp(0.0, 1.0),
+          child: Transform.translate(
+            offset: Offset(0, (1 - value) * 8),
+            child: animatedChild,
+          ),
+        );
+      },
+      child: child,
     );
   }
 }

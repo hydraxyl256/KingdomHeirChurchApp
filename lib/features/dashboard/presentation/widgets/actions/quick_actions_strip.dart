@@ -1,11 +1,15 @@
-// Kingdom Heir — Section 10: Quick Actions Strip
-// Max 4 actions: Bible, Prayer, Sermons, Give — clean 2×2 grid.
+// Kingdom Heir — Section 10: Premium Quick Actions Strip
+//
+// Single-row 4-action rail (Bible, Prayer, Sermons, Give) rendered as
+// gradient cards with Phosphor icons. Each tile is a real navigation
+// entry — no decorative buttons.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
+import 'package:kingdom_heir/core/theme/iconography.dart';
 import 'package:kingdom_heir/features/dashboard/domain/home_dashboard_models.dart';
 
 class QuickActionsStrip extends StatelessWidget {
@@ -29,12 +33,31 @@ class QuickActionsStrip extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            'Quick Actions',
-            style: AppTypography.textTheme.titleMedium?.copyWith(
-              color: AppColors.navy,
-              fontWeight: FontWeight.w800,
-            ),
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: AppColors.goldContainer,
+                  borderRadius:
+                      BorderRadius.circular(AppSpacing.radiusSm),
+                ),
+                child: const Icon(
+                  Iconography.events,
+                  color: AppColors.goldDark,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Text(
+                'Quick Actions',
+                style: AppTypography.textTheme.titleMedium?.copyWith(
+                  color: AppColors.navy,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: AppSpacing.md),
           Row(
@@ -78,59 +101,68 @@ class _ActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final (icon, gradient, textColor) = _styleFor(action);
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          vertical: AppSpacing.md,
-          horizontal: AppSpacing.xs,
-        ),
-        decoration: BoxDecoration(
-          gradient: gradient,
+    return Semantics(
+      button: true,
+      label: action.label,
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        child: InkWell(
+          onTap: onTap,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-          boxShadow: [
-            BoxShadow(
-              color: _shadowColorFor(action),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              vertical: AppSpacing.md,
+              horizontal: AppSpacing.xs,
             ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: textColor, size: AppSpacing.iconMd),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              action.label,
-              style: AppTypography.textTheme.labelSmall?.copyWith(
-                color: textColor,
-                fontWeight: FontWeight.w700,
-                fontSize: 11,
-              ),
-              textAlign: TextAlign.center,
+            decoration: BoxDecoration(
+              gradient: gradient,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              boxShadow: [
+                BoxShadow(
+                  color: _shadowColorFor(action),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-          ],
-        ),
-      )
-          .animate()
-          .fadeIn(
-            delay: Duration(milliseconds: 700 + index * 40),
-            duration: 300.ms,
-          )
-          .scale(
-            begin: const Offset(0.9, 0.9),
-            end: const Offset(1, 1),
-            delay: Duration(milliseconds: 700 + index * 40),
-            duration: 300.ms,
-            curve: Curves.easeOutBack,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, color: textColor, size: AppSpacing.iconMd),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  action.label,
+                  style: AppTypography.textTheme.labelSmall?.copyWith(
+                    color: textColor,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 11,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
-    );
+        ),
+      ),
+    )
+        .animate()
+        .fadeIn(
+          delay: Duration(milliseconds: 700 + index * 40),
+          duration: 300.ms,
+        )
+        .scale(
+          begin: const Offset(0.9, 0.9),
+          end: const Offset(1, 1),
+          delay: Duration(milliseconds: 700 + index * 40),
+          duration: 300.ms,
+          curve: Curves.easeOutBack,
+        );
   }
 
   (IconData, Gradient, Color) _styleFor(QuickActionItem a) => switch (a) {
         QuickActionItem.bible => (
-            Icons.menu_book_rounded,
+            Iconography.bible,
             const LinearGradient(
               colors: [Color(0xFF1E3A8A), Color(0xFF1E40AF)],
               begin: Alignment.topLeft,
@@ -139,7 +171,7 @@ class _ActionButton extends StatelessWidget {
             Colors.white,
           ),
         QuickActionItem.prayer => (
-            Icons.self_improvement_rounded,
+            Iconography.taskPrayer,
             const LinearGradient(
               colors: [Color(0xFF6D28D9), Color(0xFF7C3AED)],
               begin: Alignment.topLeft,
@@ -148,7 +180,7 @@ class _ActionButton extends StatelessWidget {
             Colors.white,
           ),
         QuickActionItem.sermons => (
-            Icons.play_circle_rounded,
+            Iconography.sermon,
             const LinearGradient(
               colors: [AppColors.goldDark, AppColors.gold],
               begin: Alignment.topLeft,
@@ -157,7 +189,7 @@ class _ActionButton extends StatelessWidget {
             AppColors.ink,
           ),
         QuickActionItem.give => (
-            Icons.volunteer_activism_rounded,
+            Iconography.giving,
             const LinearGradient(
               colors: [Color(0xFF15803D), Color(0xFF16A34A)],
               begin: Alignment.topLeft,

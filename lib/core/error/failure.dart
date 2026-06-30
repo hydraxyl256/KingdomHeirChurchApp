@@ -7,6 +7,13 @@ sealed class Failure extends Equatable {
 
   @override
   List<Object?> get props => [message];
+
+  /// Returns just the human-readable message so call-sites that pass a
+  /// [Failure] to `AsyncError(failure, …)` and then `state.error.toString()`
+  /// surface the real reason (e.g. SnackBar text) instead of the default
+  /// `Instance of AuthFailure` placeholder from `Object.toString`.
+  @override
+  String toString() => message;
 }
 
 /// No internet connection or request timed out.

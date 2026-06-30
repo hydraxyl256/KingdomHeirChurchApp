@@ -40,4 +40,10 @@ abstract final class LocalStorageKeys {
   static const userRole = 'user_role';
   static const lastSeenNotification = 'last_seen_notification';
   static const selectedCurrency = 'selected_currency'; // defaults to UGX
+
+  /// Email of the user currently waiting on a Supabase email-verification
+  /// round-trip. Read by `CheckYourEmailScreen` when the screen is reached
+  /// via a deep link (so we still know which address the link was sent to).
+  /// Cleared once the user is verified or signs out.
+  static const pendingVerificationEmail = 'pending_verification_email';
 }

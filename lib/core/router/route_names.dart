@@ -19,6 +19,11 @@ abstract final class RouteNames {
   static const forgotPassword = '/auth/forgot-password';
   static const resetPassword = '/auth/reset-password';
 
+  // ── Email Verification Deep Links ────────────────────────────────────────
+  // Both the universal link (https://https://kingdomheirsfoundation.com/verify)
+  // and the custom-scheme form (kingdomheir://verify) resolve here.
+  static const verifyEmail = '/verify';
+
   // ── Home Shell ───────────────────────────────────────────────────────────
   static const home = '/home';
 

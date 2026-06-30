@@ -11,9 +11,14 @@
 //   • Stat strip across the top
 //   • Three colored action tiles in a `Wrap` so 320 dp phones don't
 //     overflow.
+//
+// Safety: card-level entrance animation is a self-contained
+// `TweenAnimationBuilder`, not `flutter_animate`'s `.animate().fadeIn()
+// .slideY()` chain. `flutter_animate` mounts an internal `Builder` that
+// interacted badly with `SliverToBoxAdapter`'s measurement, producing a
+// `RenderBox.size` null-deref in the More screen.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:kingdom_heir/core/responsive/breakpoints.dart';
@@ -21,7 +26,6 @@ import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/router/route_names.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
-import 'package:kingdom_heir/core/theme/motion.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/features/more/domain/more_models.dart';
 
@@ -37,7 +41,10 @@ class FamilyEventsCard extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.fromLTRB(insets.lg, insets.md, insets.lg, insets.lg),
-      child: Container(
+      // Self-contained fade-in. flutter_animate's internal Builder
+      // crashed inside SliverToBoxAdapter — avoided here.
+      child: _FamilyEventsFadeIn(
+        child: Container(
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(AppRadius.xxl),
@@ -253,10 +260,36 @@ class FamilyEventsCard extends StatelessWidget {
             ),
           ],
         ),
-      )
-          .animate()
-          .fadeIn(duration: AppMotion.emphasized, curve: AppMotion.decelerate)
-          .slideY(begin: 0.05, end: 0, duration: AppMotion.emphasized),
+      ),
+      ),
+    );
+  }
+}
+
+/// Self-contained opacity + Y-translate fade-in for the Family & Events
+/// card. Replaces flutter_animate's chain so SliverToBoxAdapter
+/// measurement never sees an internal Builder.
+class _FamilyEventsFadeIn extends StatelessWidget {
+  const _FamilyEventsFadeIn({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.decelerate,
+      builder: (context, value, animatedChild) {
+        return Opacity(
+          opacity: value.clamp(0.0, 1.0),
+          child: Transform.translate(
+            offset: Offset(0, (1 - value) * 12),
+            child: animatedChild,
+          ),
+        );
+      },
+      child: child,
     );
   }
 }

@@ -122,7 +122,7 @@ class ServiceStatus {
 // Daily Spiritual Journey
 // ─────────────────────────────────────────────────────────────────────────────
 
-enum SpiritualTaskKind { scripture, devotional, prayer, reflection, worship }
+enum SpiritualTaskKind { scripture, devotional, prayer, reflection, worship, journal }
 
 @immutable
 class SpiritualTask {
@@ -142,6 +142,7 @@ class SpiritualTask {
         SpiritualTaskKind.prayer => 'Prayer Time',
         SpiritualTaskKind.reflection => 'Reflection',
         SpiritualTaskKind.worship => 'Worship',
+        SpiritualTaskKind.journal => 'Journal',
       };
 
   String get displayLabel => label ?? defaultLabel;
@@ -166,6 +167,19 @@ class DailyJourney {
 // Church Today (Today + Tomorrow events only)
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// Premium timeline category for a Church Today event. Drives the colored
+/// dot and label badge on the redesigned Church Today timeline. Paired with
+/// the matching color palette in `dashboard_categories.dart`.
+enum TodayEventCategory {
+  prayer,
+  bibleStudy,
+  youth,
+  sundayService,
+  outreach,
+  choir,
+  other,
+}
+
 @immutable
 class TodayEvent {
   const TodayEvent({
@@ -176,6 +190,8 @@ class TodayEvent {
     this.isOnline = false,
     this.isToday = true,
     this.joinUrl,
+    this.leaderName,
+    this.category = TodayEventCategory.other,
   });
 
   final String id;
@@ -185,6 +201,12 @@ class TodayEvent {
   final bool isOnline;
   final bool isToday;
   final String? joinUrl;
+  final String? leaderName;
+
+  /// Premium timeline category — drives the colored dot and label badge
+  /// on the redesigned Church Today timeline. Defaults to [other] for
+  /// backward compatibility with existing data sources.
+  final TodayEventCategory category;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -262,6 +284,7 @@ class WatchCard {
     required this.progress,
     this.thumbnailUrl,
     this.durationLabel,
+    this.isDownloaded = false,
   });
 
   final String id;
@@ -271,6 +294,11 @@ class WatchCard {
   final double progress;
   final String? thumbnailUrl;
   final String? durationLabel;
+
+  /// `true` when the sermon/podcast is downloaded for offline playback.
+  /// Surfaced as a small Phosphor `downloadSimple` badge overlay on the
+  /// card thumbnail in the redesigned Continue Watching carousel.
+  final bool isDownloaded;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

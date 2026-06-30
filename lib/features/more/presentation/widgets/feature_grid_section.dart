@@ -11,9 +11,14 @@
 //     grid stays balanced regardless of screen size.
 //   • On `xl`/`xxl` bands we cap at 5 columns to keep tile labels
 //     readable; we never use a 6-column grid on phones.
+//
+// Safety: per-tile entrance uses a self-contained `TweenAnimationBuilder`
+// fade-in rather than `flutter_animate`'s chain. `flutter_animate` mounts
+// an internal `Builder` that interacted badly with `LayoutBuilder`
+// widgets inside `SliverToBoxAdapter`, producing a
+// `RenderViewport → SliverToBoxAdapter → RenderBox.size` null-deref.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 
 import 'package:kingdom_heir/core/responsive/breakpoints.dart';
 import 'package:kingdom_heir/core/responsive/insets.dart';
@@ -88,19 +93,45 @@ class FeatureGridSection extends StatelessWidget {
                 ),
                 itemBuilder: (context, i) {
                   final f = features[i];
-                  return FeatureTileWidget(feature: f, compact: compactTiles)
-                      .animate()
-                      .fadeIn(
-                        duration: const Duration(milliseconds: 320),
-                        delay: Duration(milliseconds: 30 * i),
-                      )
-                      .slideY(begin: 0.04, end: 0);
+                  return _TileFadeIn(
+                    delayMs: 30 * i,
+                    child: FeatureTileWidget(feature: f, compact: compactTiles),
+                  );
                 },
               ),
             );
           },
         ),
       ],
+    );
+  }
+}
+
+/// Self-contained opacity + translate fade-in used for each grid tile.
+/// Avoids `flutter_animate`'s internal `Builder` which crashed with
+/// `RenderBox.size` inside `SliverToBoxAdapter`.
+class _TileFadeIn extends StatelessWidget {
+  const _TileFadeIn({required this.delayMs, required this.child});
+
+  final int delayMs;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 320),
+      curve: Curves.decelerate,
+      builder: (context, value, animatedChild) {
+        return Opacity(
+          opacity: value.clamp(0.0, 1.0),
+          child: Transform.translate(
+            offset: Offset(0, (1 - value) * 8),
+            child: animatedChild,
+          ),
+        );
+      },
+      child: child,
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kingdom_heir/core/router/route_names.dart';
 import 'package:logger/logger.dart';
 
 class NotificationRouter {
@@ -8,6 +9,13 @@ class NotificationRouter {
       GlobalKey<NavigatorState>();
 
   /// Parses the data payload from FCM and navigates to the appropriate screen.
+  ///
+  /// Routes are looked up via [RouteNames] constants and resolved
+  /// through GoRouter's path-based `go`/`push` API. We intentionally
+  /// avoid `goNamed` / `pushNamed` because none of the routes in
+  /// `app_router.dart` define a `name:` parameter — calling those
+  /// would throw `GoException: no GoRoute named "sermonPlayer"` on
+  /// every notification tap.
   static void handleNotificationTap(Map<String, dynamic> data) {
     final logger = Logger(printer: PrettyPrinter(methodCount: 0))
       ..d('Handling deep link from notification payload: $data');
@@ -29,33 +37,34 @@ class NotificationRouter {
       switch (type) {
         case 'sermon':
           if (id != null) {
-            context.pushNamed('sermonPlayer', pathParameters: {'id': id});
+            // Sermon player lives at /home/sermons/:id/player
+            context.push('/home/sermons/$id/player');
           } else {
-            context.goNamed('sermons');
+            context.go(RouteNames.sermons);
           }
         case 'devotional':
           if (id != null) {
-            context.pushNamed('devotionalDetails', pathParameters: {'id': id});
+            // Devotional reader lives at /home/devotionals/:id/content
+            context.push('/home/devotionals/$id/content');
           } else {
-            context.goNamed('dashboard');
+            context.go(RouteNames.dashboard);
           }
         case 'event':
           if (id != null) {
-            context.pushNamed('eventDetails', pathParameters: {'id': id});
+            context.push('/home/events/$id');
           } else {
-            context.goNamed('events');
+            context.go(RouteNames.events);
           }
         case 'prayer':
-          if (id != null) {
-            context.pushNamed('prayerDetails', pathParameters: {'id': id});
-          } else {
-            context.goNamed('prayer');
-          }
+          // Prayer has no per-item detail route — drop into the feed
+          // either way. If we add one later, fall back to id-based path.
+          context.go(RouteNames.prayerFeed);
         case 'announcement':
-          // Can pop up a dialog or navigate to announcements feed
-          context.goNamed('dashboard');
+          // Land on the news feed — announcements live alongside
+          // regular news articles.
+          context.go(RouteNames.news);
         case 'giving':
-          context.goNamed('giving');
+          context.go(RouteNames.giving);
         default:
           logger.w('Unknown notification type: $type');
       }

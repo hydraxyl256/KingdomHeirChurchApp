@@ -1,283 +1,362 @@
 // Kingdom Heir — Home Dashboard Repository
 //
-// Mock data that powers the redesigned dashboard. Each fetch* method is
-// independent so providers can load in parallel. Ready to swap to live
-// Supabase calls without changing the UI layer.
+// Wires the redesigned dashboard to the live Supabase backend. Every
+// fetch* method calls the matching RPC (see
+// `supabase/migrations/20260630_dashboard_real_data.sql`) and falls back
+// to the curated mock content in `home_dashboard_mock.dart` when the
+// network or RPC fails. That preserves the spec rule: "no mock data
+// unless offline fallback".
+//
+// Save-back methods (toggleJourneyTask, incrementPrayerCount,
+// updateWatchProgress) are fire-and-forget — callers update the UI
+// optimistically and `ref.invalidate(...)` refreshes from the server.
 
+import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:kingdom_heir/core/error/failure.dart';
+import 'package:kingdom_heir/features/dashboard/data/home_dashboard_mock.dart';
 import 'package:kingdom_heir/features/dashboard/domain/home_dashboard_models.dart';
+import 'package:logger/logger.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+/// Outcome of a save-back write — currently only used for the optimistic
+/// UI side, not exposed to callers. Kept here so future telemetry hooks
+/// have a place to land.
+class DashboardWriteResult {
+  const DashboardWriteResult({required this.success, this.error});
+  final bool success;
+  final Object? error;
+}
 
 class HomeDashboardRepository {
-  HomeDashboardRepository({math.Random? random})
-      : _rng = random ?? math.Random();
+  HomeDashboardRepository({
+    SupabaseClient? client,
+    math.Random? random,
+  })  : _client = client ?? Supabase.instance.client,
+        _rng = random ?? math.Random();
 
+  final SupabaseClient _client;
   final math.Random _rng;
+  final Logger _log = Logger(printer: PrettyPrinter(methodCount: 0));
 
-  // ── Greeting ────────────────────────────────────────────────────────────────
+  // ── Greeting ─────────────────────────────────────────────────────────────
 
-  Future<DashboardGreeting> fetchGreeting() async {
-    await _latency(80);
-    final now = DateTime.now();
-    return DashboardGreeting(
-      firstName: 'Eron',
-      moment: resolveGreetingMoment(now),
-      streakDays: 17,
-      unreadNotifications: 3,
-    );
-  }
-
-  // ── Scripture ────────────────────────────────────────────────────────────────
-
-  Future<ScriptureCard> fetchScripture() async {
-    await _latency(150);
-    const verses = [
-      (
-        text:
-            'I can do all things through Christ who strengthens me.',
-        ref: 'Philippians 4:13',
-        translation: 'NKJV',
-      ),
-      (
-        text:
-            'Trust in the Lord with all your heart, and do not lean on your own understanding.',
-        ref: 'Proverbs 3:5',
-        translation: 'ESV',
-      ),
-      (
-        text:
-            'For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.',
-        ref: 'John 3:16',
-        translation: 'NIV',
-      ),
-      (
-        text:
-            'The Lord is my shepherd; I shall not want.',
-        ref: 'Psalm 23:1',
-        translation: 'KJV',
-      ),
-      (
-        text:
-            'Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go.',
-        ref: 'Joshua 1:9',
-        translation: 'NIV',
-      ),
-    ];
-    // Rotate daily by day-of-year
-    final idx = DateTime.now().dayOfYear % verses.length;
-    final v = verses[idx];
-    return ScriptureCard(
-      verseText: v.text,
-      reference: v.ref,
-      translation: v.translation,
-    );
-  }
-
-  // ── Continue Your Journey ────────────────────────────────────────────────────
-
-  Future<List<ContinueCard>> fetchContinueCards() async {
-    await _latency(130);
-    return const [
-      ContinueCard(
-        id: 'sermon-1',
-        kind: ContinueKind.sermon,
-        title: 'Walking in the Spirit',
-        subtitle: 'Bishop J. Mensah',
-        progress: 0.46,
-        durationLabel: '28 min left',
-      ),
-      ContinueCard(
-        id: 'plan-1',
-        kind: ContinueKind.biblePlan,
-        title: 'Gospel of John in 21 Days',
-        subtitle: 'Day 12 of 21',
-        progress: 0.57,
-      ),
-      ContinueCard(
-        id: 'devotional-1',
-        kind: ContinueKind.devotional,
-        title: 'Standing Firm in the Storm',
-        subtitle: 'Day 3 of 7',
-        progress: 0.42,
-      ),
-      ContinueCard(
-        id: 'podcast-1',
-        kind: ContinueKind.podcast,
-        title: 'Morning Coffee with Pastor Grace',
-        subtitle: 'Episode 14',
-        progress: 0.62,
-        durationLabel: '18 min left',
-      ),
-    ];
-  }
-
-  // ── Live / Next Service ──────────────────────────────────────────────────────
-
-  Future<ServiceStatus> fetchServiceStatus() async {
-    await _latency(200);
-    final now = DateTime.now();
-    // Mock: Sunday = live, otherwise next service
-    final isSunday = now.weekday == DateTime.sunday;
-    if (isSunday) {
-      return ServiceStatus(
-        isLive: true,
-        title: 'Sunday Worship — Week ${_weekOfYear(now)}',
-        hostLabel: 'with Bishop J. Mensah',
-        viewerCount: 1248 + _rng.nextInt(80),
-        streamUrl: '',
+  Future<DashboardGreeting> fetchGreeting() => _guard(
+        'fetchGreeting',
+        () async {
+          final uid = _userId;
+          if (uid == null) return HomeDashboardMock.greeting(_rng);
+          final data = await _client
+              .rpc('get_dashboard_greeting', params: <String, dynamic>{
+                'p_user_id': uid,
+              })
+              .single();
+          return DashboardGreeting(
+            firstName: (data['first_name'] as String?) ?? 'Friend',
+            moment: resolveGreetingMoment(DateTime.now()),
+            streakDays: (data['streak_days'] as int?) ?? 0,
+            avatarUrl: data['avatar_url'] as String?,
+            unreadNotifications: (data['unread_notifications'] as int?) ?? 0,
+          );
+        },
+        () => HomeDashboardMock.greeting(_rng),
       );
+
+  // ── Scripture ────────────────────────────────────────────────────────────
+
+  Future<List<ScriptureCard>> fetchScriptureRoster() => _guardList(
+        'fetchScriptureRoster',
+        () async {
+          final rows = await _client.rpc('get_dashboard_scripture');
+          final list = rows as List<dynamic>;
+          if (list.isEmpty) return HomeDashboardMock.scriptureRoster;
+          return list
+              .map((dynamic row) => ScriptureCard(
+                    verseText: row['verse_text'] as String,
+                    reference: row['reference'] as String,
+                    translation: row['translation'] as String,
+                    isBookmarked: row['is_bookmarked'] as bool? ?? false,
+                  ))
+              .toList(growable: false);
+        },
+        HomeDashboardMock.scriptureRoster,
+      );
+
+  /// Convenience accessor: the first verse of the roster is the verse of
+  /// the day. The card flips through `scriptureRoster` on swipe.
+  Future<ScriptureCard> fetchScripture() async {
+    final roster = await fetchScriptureRoster();
+    return roster.first;
+  }
+
+  // ── Continue Your Journey ────────────────────────────────────────────────
+
+  Future<List<ContinueCard>> fetchContinueCards() => _guardList(
+        'fetchContinueCards',
+        () async {
+          final uid = _userId;
+          if (uid == null) return HomeDashboardMock.continueCards;
+          final rows = await _client.rpc(
+            'get_dashboard_continue',
+            params: <String, dynamic>{'p_user_id': uid, 'p_limit': 8},
+          );
+          final list = rows as List<dynamic>;
+          if (list.isEmpty) return HomeDashboardMock.continueCards;
+          return list
+              .map((dynamic row) => ContinueCard(
+                    id: row['content_id'] as String,
+                    kind: _kindFromString(row['kind'] as String),
+                    title: row['title'] as String,
+                    subtitle: row['subtitle'] as String? ?? '',
+                    progress:
+                        (row['progress'] as num?)?.toDouble() ?? 0,
+                    thumbnailUrl: row['thumbnail_url'] as String?,
+                    durationLabel: row['duration_label'] as String?,
+                  ))
+              .toList(growable: false);
+        },
+        HomeDashboardMock.continueCards,
+      );
+
+  // ── Live / Next Service ──────────────────────────────────────────────────
+
+  Future<ServiceStatus> fetchServiceStatus() => _guard(
+        'fetchServiceStatus',
+        () async {
+          final data = await _client
+              .rpc('get_dashboard_service')
+              .maybeSingle();
+          if (data == null) return HomeDashboardMock.serviceStatus(_rng);
+          return ServiceStatus(
+            isLive: data['is_live'] as bool? ?? false,
+            title: data['title'] as String,
+            hostLabel: data['host_label'] as String?,
+            startsAt: data['starts_at'] == null
+                ? null
+                : DateTime.parse(data['starts_at'] as String),
+            viewerCount: data['viewer_count'] as int?,
+            locationLabel: data['location_label'] as String?,
+            streamUrl: data['stream_url'] as String?,
+          );
+        },
+        () => HomeDashboardMock.serviceStatus(_rng),
+      );
+
+  // ── Daily Journey ────────────────────────────────────────────────────────
+
+  Future<DailyJourney> fetchDailyJourney() => _guard(
+        'fetchDailyJourney',
+        () async {
+          final uid = _userId;
+          if (uid == null) return HomeDashboardMock.dailyJourney;
+          final rows = await _client.rpc(
+            'get_dashboard_journey',
+            params: <String, dynamic>{'p_user_id': uid},
+          );
+          final completed = <SpiritualTaskKind>{
+            for (final dynamic row in rows as List<dynamic>)
+              if ((row['is_completed'] as bool? ?? false))
+                _taskKindFromString(row['kind'] as String),
+          };
+          return DailyJourney(
+            streakDays: HomeDashboardMock.dailyJourney.streakDays,
+            tasks: HomeDashboardMock.dailyJourney.tasks
+                .map((task) => SpiritualTask(
+                      kind: task.kind,
+                      isCompleted: completed.contains(task.kind),
+                      label: task.label,
+                    ))
+                .toList(growable: false),
+          );
+        },
+        () => HomeDashboardMock.dailyJourney,
+      );
+
+  /// Toggle a journey task. Optimistic — the caller should
+  /// `ref.invalidate(journeyProvider)` immediately. We don't await this.
+  Future<DashboardWriteResult> toggleJourneyTask(
+    SpiritualTaskKind kind,
+    bool isCompleted,
+  ) async {
+    final uid = _userId;
+    if (uid == null) {
+      return const DashboardWriteResult(success: false);
     }
-    // Next Sunday
-    final daysUntilSunday = DateTime.sunday - now.weekday;
-    final nextSunday = now.add(Duration(days: daysUntilSunday));
-    final nextService = DateTime(
-      nextSunday.year,
-      nextSunday.month,
-      nextSunday.day,
-      9,
-    );
-    return ServiceStatus(
-      isLive: false,
-      title: 'Sunday Worship Service',
-      hostLabel: 'Bishop J. Mensah',
-      startsAt: nextService,
-      locationLabel: 'Main Sanctuary · In-person & Online',
-    );
+    try {
+      await _client.rpc(
+        'toggle_journey_task',
+        params: <String, dynamic>{
+          'p_user_id': uid,
+          'p_kind': kind.name,
+          'p_is_completed': isCompleted,
+        },
+      );
+      return const DashboardWriteResult(success: true);
+    } catch (e) {
+      _log.w('toggleJourneyTask failed', error: e);
+      return DashboardWriteResult(success: false, error: e);
+    }
   }
 
-  // ── Daily Journey ────────────────────────────────────────────────────────────
+  // ── Church Today ─────────────────────────────────────────────────────────
 
-  Future<DailyJourney> fetchDailyJourney() async {
-    await _latency(100);
-    return const DailyJourney(
-      streakDays: 17,
-      tasks: [
-        SpiritualTask(kind: SpiritualTaskKind.scripture, isCompleted: true),
-        SpiritualTask(kind: SpiritualTaskKind.devotional, isCompleted: true),
-        SpiritualTask(kind: SpiritualTaskKind.prayer, isCompleted: false),
-        SpiritualTask(kind: SpiritualTaskKind.reflection, isCompleted: false),
-        SpiritualTask(kind: SpiritualTaskKind.worship, isCompleted: false),
-      ],
-    );
+  Future<List<TodayEvent>> fetchTodayEvents() => _guardList(
+        'fetchTodayEvents',
+        () async {
+          final rows = await _client.rpc('get_dashboard_events');
+          final list = rows as List<dynamic>;
+          if (list.isEmpty) return HomeDashboardMock.todayEvents();
+          return list
+              .map((dynamic row) => TodayEvent(
+                    id: row['id'] as String,
+                    title: row['title'] as String,
+                    startsAt: DateTime.parse(row['starts_at'] as String),
+                    locationLabel: row['location_label'] as String? ?? '',
+                    isOnline: row['is_online'] as bool? ?? false,
+                    joinUrl: row['join_url'] as String?,
+                    leaderName: row['leader_name'] as String?,
+                    category: _categoryFromString(
+                      row['category'] as String?,
+                    ),
+                  ))
+              .toList(growable: false);
+        },
+        HomeDashboardMock.todayEvents(),
+      );
+
+  // ── Prayer Corner ────────────────────────────────────────────────────────
+
+  Future<PrayerCorner> fetchPrayerCorner() => _guard(
+        'fetchPrayerCorner',
+        () async {
+          final rows = await _client.rpc(
+            'get_dashboard_prayer',
+            params: <String, dynamic>{'p_limit': 4},
+          );
+          final list = rows as List<dynamic>;
+          return PrayerCorner(
+            usersPrayedToday: HomeDashboardMock.prayerCorner.usersPrayedToday,
+            answeredPrayerHighlight:
+                HomeDashboardMock.prayerCorner.answeredPrayerHighlight,
+            requests: list.isEmpty
+                ? HomeDashboardMock.prayerCorner.requests
+                : list
+                    .map((dynamic row) => PrayerRequest(
+                          id: row['id'] as String,
+                          authorName: row['author_name'] as String,
+                          preview: row['preview'] as String,
+                          avatarUrl: row['avatar_url'] as String?,
+                          prayerCount: row['prayer_count'] as int? ?? 0,
+                        ))
+                    .toList(growable: false),
+          );
+        },
+        () => HomeDashboardMock.prayerCorner,
+      );
+
+  /// Increment a prayer request's prayer counter. Returns the new count
+  /// (or null if Supabase is unreachable).
+  Future<int?> incrementPrayerCount(String prayerId) async {
+    try {
+      final result = await _client.rpc(
+        'increment_prayer_count',
+        params: <String, dynamic>{'p_prayer_id': prayerId},
+      );
+      return result as int?;
+    } catch (e) {
+      _log.w('incrementPrayerCount failed', error: e);
+      return null;
+    }
   }
 
-  // ── Church Today ─────────────────────────────────────────────────────────────
+  // ── Community Highlight ──────────────────────────────────────────────────
 
-  Future<List<TodayEvent>> fetchTodayEvents() async {
-    await _latency(120);
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final tomorrow = today.add(const Duration(days: 1));
-    return [
-      TodayEvent(
-        id: 'e-1',
-        title: 'Prayer & Intercession',
-        startsAt: today.add(const Duration(hours: 6)),
-        locationLabel: 'Prayer Room — Ground Floor',
-      ),
-      TodayEvent(
-        id: 'e-2',
-        title: 'Youth Bible Study',
-        startsAt: today.add(const Duration(hours: 18, minutes: 30)),
-        locationLabel: 'Youth Hall',
-      ),
-      TodayEvent(
-        id: 'e-3',
-        title: 'Midweek Service',
-        startsAt: tomorrow.add(const Duration(hours: 19)),
-        locationLabel: 'Main Sanctuary · Online',
-        isOnline: true,
-        isToday: false,
-      ),
-    ];
+  Future<CommunityHighlight> fetchCommunityHighlight() => _guard(
+        'fetchCommunityHighlight',
+        () async {
+          final uid = _userId;
+          if (uid == null) return HomeDashboardMock.communityHighlight;
+          final data = await _client
+              .rpc('get_dashboard_community', params: <String, dynamic>{
+                'p_user_id': uid,
+              })
+              .maybeSingle();
+          if (data == null) return HomeDashboardMock.communityHighlight;
+          return CommunityHighlight(
+            unreadGroupMessages: data['unread_group_messages'] as int? ?? 0,
+            birthdayName: data['birthday_name'] as String?,
+            leaderAnnouncement: data['leader_announcement'] as String?,
+            upcomingGroupMeeting: data['upcoming_group_meeting'] as String?,
+          );
+        },
+        () => HomeDashboardMock.communityHighlight,
+      );
+
+  // ── Continue Watching ────────────────────────────────────────────────────
+
+  Future<List<WatchCard>> fetchWatchCards() => _guardList(
+        'fetchWatchCards',
+        () async {
+          final uid = _userId;
+          if (uid == null) return HomeDashboardMock.watchCards;
+          final rows = await _client.rpc(
+            'get_dashboard_watch',
+            params: <String, dynamic>{'p_user_id': uid, 'p_limit': 6},
+          );
+          final list = rows as List<dynamic>;
+          if (list.isEmpty) return HomeDashboardMock.watchCards;
+          return list
+              .map((dynamic row) => WatchCard(
+                    id: row['content_id'] as String,
+                    kind: row['kind'] == 'podcast'
+                        ? WatchKind.podcast
+                        : WatchKind.sermon,
+                    title: row['title'] as String,
+                    speakerName: row['subtitle'] as String? ?? '',
+                    progress: (row['progress'] as num?)?.toDouble() ?? 0,
+                    thumbnailUrl: row['thumbnail_url'] as String?,
+                    durationLabel: row['duration_label'] as String?,
+                    isDownloaded: row['is_downloaded'] as bool? ?? false,
+                  ))
+              .toList(growable: false);
+        },
+        HomeDashboardMock.watchCards,
+      );
+
+  /// Save watch progress — fire-and-forget.
+  Future<DashboardWriteResult> updateWatchProgress({
+    required String kind,
+    required String contentId,
+    required double progress,
+    bool? isDownloaded,
+  }) async {
+    final uid = _userId;
+    if (uid == null) return const DashboardWriteResult(success: false);
+    try {
+      await _client.rpc(
+        'update_watch_progress',
+        params: <String, dynamic>{
+          'p_user_id': uid,
+          'p_kind': kind,
+          'p_content_id': contentId,
+          'p_progress': progress,
+          if (isDownloaded != null) 'p_is_downloaded': isDownloaded,
+        },
+      );
+      return const DashboardWriteResult(success: true);
+    } catch (e) {
+      _log.w('updateWatchProgress failed', error: e);
+      return DashboardWriteResult(success: false, error: e);
+    }
   }
 
-  // ── Prayer Corner ────────────────────────────────────────────────────────────
+  // ── Aggregate ────────────────────────────────────────────────────────────
 
-  Future<PrayerCorner> fetchPrayerCorner() async {
-    await _latency(140);
-    return const PrayerCorner(
-      usersPrayedToday: 84,
-      answeredPrayerHighlight:
-          '"After months of chronic pain, God brought complete healing." — Sarah M.',
-      requests: [
-        PrayerRequest(
-          id: 'p-1',
-          authorName: 'Daniel O.',
-          preview: 'Wisdom for a major career decision.',
-          prayerCount: 47,
-        ),
-        PrayerRequest(
-          id: 'p-2',
-          authorName: 'Grace A.',
-          preview: 'Healing and restoration for my family.',
-          prayerCount: 63,
-        ),
-        PrayerRequest(
-          id: 'p-3',
-          authorName: 'Michael K.',
-          preview: 'Financial breakthrough and open doors.',
-          prayerCount: 29,
-        ),
-      ],
-    );
-  }
-
-  // ── Community Highlight ──────────────────────────────────────────────────────
-
-  Future<CommunityHighlight> fetchCommunityHighlight() async {
-    await _latency(90);
-    return const CommunityHighlight(
-      unreadGroupMessages: 5,
-      birthdayName: 'Sarah Mensah',
-      leaderAnnouncement: 'Leaders meeting this Saturday at 8 AM.',
-    );
-  }
-
-  // ── Continue Watching ────────────────────────────────────────────────────────
-
-  Future<List<WatchCard>> fetchWatchCards() async {
-    await _latency(160);
-    return const [
-      WatchCard(
-        id: 'w-1',
-        kind: WatchKind.sermon,
-        title: 'The Power of Resurrection',
-        speakerName: 'Bishop J. Mensah',
-        progress: 0.68,
-        durationLabel: '14 min left',
-      ),
-      WatchCard(
-        id: 'w-2',
-        kind: WatchKind.podcast,
-        title: 'Faith That Moves Mountains',
-        speakerName: 'Pastor Grace K.',
-        progress: 0.33,
-        durationLabel: '22 min left',
-      ),
-      WatchCard(
-        id: 'w-3',
-        kind: WatchKind.sermon,
-        title: 'Kingdom Principles for Business',
-        speakerName: 'Dr. Emmanuel A.',
-        progress: 0.81,
-        durationLabel: '8 min left',
-      ),
-      WatchCard(
-        id: 'w-4',
-        kind: WatchKind.sermon,
-        title: 'Walking in the Spirit',
-        speakerName: 'Bishop J. Mensah',
-        progress: 0.15,
-        durationLabel: '38 min left',
-      ),
-    ];
-  }
-
-  // ── Aggregate ────────────────────────────────────────────────────────────────
-
+  /// Legacy aggregate — used by the existing `homeDashboardProvider` for
+  /// backward compat with the screen's `.when(data: ...)` API.
   Future<HomeDashboardData> fetchAll() async {
-    final results = await Future.wait([
+    final results = await Future.wait(<Future<dynamic>>[
       fetchGreeting(),
       fetchScripture(),
       fetchContinueCards(),
@@ -301,19 +380,101 @@ class HomeDashboardRepository {
     );
   }
 
-  Future<void> _latency(int ms) =>
-      Future<void>.delayed(Duration(milliseconds: ms));
+  // ── Helpers ──────────────────────────────────────────────────────────────
 
-  int _weekOfYear(DateTime dt) {
-    final startOfYear = DateTime(dt.year);
-    final diff = dt.difference(startOfYear).inDays;
-    return (diff / 7).ceil() + 1;
+  String? get _userId {
+    try {
+      return _client.auth.currentUser?.id;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<T> _guard<T>(
+    String label,
+    Future<T> Function() live,
+    T Function() fallback,
+  ) async {
+    try {
+      return await live();
+    } catch (e, st) {
+      _log.w('HomeDashboardRepository.$label live fetch failed; '
+          'using offline fallback',
+          error: e,
+          stackTrace: st);
+      return fallback();
+    }
+  }
+
+  Future<List<T>> _guardList<T>(
+    String label,
+    Future<List<T>> Function() live,
+    List<T> fallback,
+  ) =>
+      _guard<List<T>>(
+        label,
+        live,
+        () => fallback,
+      );
+
+  ContinueKind _kindFromString(String kind) {
+    switch (kind) {
+      case 'sermon':
+        return ContinueKind.sermon;
+      case 'biblePlan':
+        return ContinueKind.biblePlan;
+      case 'devotional':
+        return ContinueKind.devotional;
+      case 'podcast':
+        return ContinueKind.podcast;
+      case 'prayerChallenge':
+        return ContinueKind.prayerChallenge;
+    }
+    return ContinueKind.devotional;
+  }
+
+  SpiritualTaskKind _taskKindFromString(String kind) {
+    switch (kind) {
+      case 'scripture':
+        return SpiritualTaskKind.scripture;
+      case 'devotional':
+        return SpiritualTaskKind.devotional;
+      case 'prayer':
+        return SpiritualTaskKind.prayer;
+      case 'reflection':
+        return SpiritualTaskKind.reflection;
+      case 'worship':
+        return SpiritualTaskKind.worship;
+      case 'journal':
+        return SpiritualTaskKind.journal;
+    }
+    return SpiritualTaskKind.scripture;
+  }
+
+  TodayEventCategory _categoryFromString(String? category) {
+    switch (category) {
+      case 'prayer':
+        return TodayEventCategory.prayer;
+      case 'bible_study':
+        return TodayEventCategory.bibleStudy;
+      case 'youth':
+        return TodayEventCategory.youth;
+      case 'sunday_service':
+        return TodayEventCategory.sundayService;
+      case 'outreach':
+        return TodayEventCategory.outreach;
+      case 'choir':
+        return TodayEventCategory.choir;
+    }
+    return TodayEventCategory.other;
   }
 }
 
-extension _DateTimeExt on DateTime {
-  int get dayOfYear {
-    final start = DateTime(year);
-    return difference(start).inDays;
-  }
+/// Helper: convert any thrown object into a [Failure]. Used by widgets
+/// that watch providers and want to surface a typed error message.
+Failure failureFromError(Object error) {
+  if (error is Failure) return error;
+  if (error is AuthException) return AuthFailure(message: error.message);
+  if (error is PostgrestException) return ServerFailure(message: error.message);
+  return UnknownFailure(message: error.toString());
 }

@@ -9,7 +9,6 @@
 // tab).
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -17,7 +16,6 @@ import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/router/route_names.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
-import 'package:kingdom_heir/core/theme/motion.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/core/widgets/responsive_section_header.dart';
 import 'package:kingdom_heir/features/more/domain/more_models.dart';
@@ -122,10 +120,7 @@ class _SearchSurface extends StatelessWidget {
             ),
           ),
         ),
-      )
-          .animate()
-          .fadeIn(duration: AppMotion.standard)
-          .slideY(begin: 0.04, end: 0),
+      ),
     );
   }
 

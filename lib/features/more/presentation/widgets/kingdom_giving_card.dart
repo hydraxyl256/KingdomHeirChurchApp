@@ -12,13 +12,14 @@
 //   • Sparkline drawn with a `CustomPainter` — no extra dependency
 //
 // Animation:
-//   • Card fades in, then both progress bars animate via
-//     `TweenAnimationBuilder` (1.2s ease-out)
+//   • Card fades in via a self-contained `TweenAnimationBuilder` (no
+//     `flutter_animate` chain — its internal Builder crashed
+//     inside SliverToBoxAdapter).
+//   • Both progress bars animate via `TweenAnimationBuilder` (1.2s ease-out).
 
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
@@ -26,7 +27,6 @@ import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/router/route_names.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
-import 'package:kingdom_heir/core/theme/motion.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/core/widgets/app_button.dart';
 import 'package:kingdom_heir/features/more/domain/more_models.dart';
@@ -42,27 +42,31 @@ class KingdomGivingCard extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.fromLTRB(insets.lg, insets.md, insets.lg, insets.lg),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [AppColors.navy, AppColors.navyMid, AppColors.navyAccent],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(AppRadius.xxl),
-          border: Border.all(color: AppColors.gold.withValues(alpha: 0.35)),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.navy.withValues(alpha: 0.18),
-              blurRadius: 18,
-              offset: const Offset(0, 8),
+      // Wrap the card in a self-contained fade-in to avoid the
+      // flutter_animate internal Builder that crashed RenderBox.size
+      // inside SliverToBoxAdapter.
+      child: _KingdomCardFadeIn(
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [AppColors.navy, AppColors.navyMid, AppColors.navyAccent],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-          ],
-        ),
-        padding: EdgeInsets.all(insets.lg),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
+            borderRadius: BorderRadius.circular(AppRadius.xxl),
+            border: Border.all(color: AppColors.gold.withValues(alpha: 0.35)),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.navy.withValues(alpha: 0.18),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          padding: EdgeInsets.all(insets.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
           children: [
             // ── Header ────────────────────────────────────────────────────
             Row(
@@ -242,6 +246,13 @@ class KingdomGivingCard extends StatelessWidget {
             SizedBox(height: insets.md),
 
             // ── CTAs ─────────────────────────────────────────────────────
+            // Two CTAs share the row equally via `Expanded` so each
+            // gets half the available width. The secondary button
+            // intentionally drops its icon — at 1080×2400 logical
+            // pixels the row is only ~150 px per button, so an icon +
+            // label "History" overflows the inner Row in `AppButton`
+            // (icon + spacing + label ≈ 104 px > 104 px content
+            // area). "History" is unambiguous without an icon.
             Row(
               children: [
                 Expanded(
@@ -253,21 +264,20 @@ class KingdomGivingCard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: insets.sm),
-                AppButton(
-                  label: 'History',
-                  variant: AppButtonVariant.outlined,
-                  icon: Icons.history_rounded,
-                  onPressed: () =>
-                      GoRouter.of(context).push(RouteNames.givingHistory),
+                Expanded(
+                  child: AppButton(
+                    label: 'History',
+                    variant: AppButtonVariant.outlined,
+                    onPressed: () =>
+                        GoRouter.of(context).push(RouteNames.givingHistory),
+                  ),
                 ),
               ],
             ),
           ],
         ),
-      )
-          .animate()
-          .fadeIn(duration: AppMotion.emphasized, curve: AppMotion.decelerate)
-          .slideY(begin: 0.05, end: 0, duration: AppMotion.emphasized),
+        ),
+      ),
     );
   }
 
@@ -278,6 +288,34 @@ class KingdomGivingCard extends StatelessWidget {
       decimalDigits: 0,
     );
     return formatter.format(amount);
+  }
+}
+
+/// Self-contained opacity + Y-translate fade-in used for the Kingdom
+/// Giving card. Replaces `flutter_animate`'s chain so SliverToBoxAdapter
+/// measurement never sees an internal Builder.
+class _KingdomCardFadeIn extends StatelessWidget {
+  const _KingdomCardFadeIn({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.decelerate,
+      builder: (context, value, animatedChild) {
+        return Opacity(
+          opacity: value.clamp(0.0, 1.0),
+          child: Transform.translate(
+            offset: Offset(0, (1 - value) * 12),
+            child: animatedChild,
+          ),
+        );
+      },
+      child: child,
+    );
   }
 }
 

@@ -31,8 +31,10 @@ class PrayerFeedNotifier extends AsyncNotifier<List<PrayerRequest>> {
         results[0] as fpdart.Either<String, List<PrayerRequestModel>>;
     final intercededIds = results[1] as List<String>;
 
+    // Surface the repository's failure message verbatim rather than wrapping
+    // it in `Exception(err)` (which becomes "Exception: ..." noise in the UI).
     final initialList = requestsResult.fold(
-      (err) => throw Exception(err),
+      (err) => throw _PrayerLoadFailure(err),
       (models) => models
           .map((m) => m.toEntity(hasPrayed: intercededIds.contains(m.id)))
           .toList(),
@@ -148,4 +150,13 @@ class SubmitPrayerNotifier extends StateNotifier<AsyncValue<void>> {
       (_) => state = const AsyncData(null),
     );
   }
+}
+
+/// Thrown when the repository returns a Left for `getPrayerRequests`.
+/// `toString()` returns just the underlying message (no "Exception: " prefix).
+class _PrayerLoadFailure implements Exception {
+  _PrayerLoadFailure(this.message);
+  final String message;
+  @override
+  String toString() => message;
 }

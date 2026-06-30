@@ -71,5 +71,89 @@
   "scriptureToday": "TODAY'S VERSE",
   "@scriptureToday": {
     "description": "Label for today's verse header"
+  },
+  "reminderSet": {
+    "value": "We will remind you 30 minutes before service.",
+    "description": "Snackbar when reminder is set"
+  },
+  "directionsOpen": {
+    "value": "Opening directions…",
+    "description": "Snackbar when opening maps"
+  },
+  "liveNow": {
+    "value": "LIVE NOW",
+    "description": "Live service badge"
+  },
+  "upcoming": {
+    "value": "Upcoming",
+    "description": "Upcoming events label"
+  },
+  "today": {
+    "value": "Today",
+    "description": "Today label"
+  },
+  "tomorrow": {
+    "value": "Tomorrow",
+    "description": "Tomorrow label"
+  },
+  "prayedFor": {
+    "value": "prayed for",
+    "description": "Past tense label"
+  },
+  "joinOnline": {
+    "value": "Join Online",
+    "description": "Join online CTA"
+  },
+  "joinInPerson": {
+    "value": "Join In Person",
+    "description": "Join in person CTA"
+  },
+  "comingSoon": {
+    "value": "Coming soon",
+    "description": "Coming soon label"
+  },
+  "addToCalendar": {
+    "value": "Add to Calendar",
+    "description": "Add to calendar CTA"
+  },
+  "noEventsToday": {
+    "value": "No events today",
+    "description": "Empty state title"
+  },
+  "noPrayerRequests": {
+    "value": "No prayer requests yet. Be the first to share.",
+    "description": "Empty state"
+  },
+  "submitPrayerRequest": {
+    "value": "Submit Prayer Request",
+    "description": "Submit CTA"
+  },
+  "browseEvents": {
+    "value": "Browse Events",
+    "description": "Browse events CTA"
+  },
+  "watchLatestSermon": {
+    "value": "Watch Latest Sermon",
+    "description": "Watch CTA"
+  },
+  "noSermonsWatched": {
+    "value": "No sermons watched yet",
+    "description": "Empty state"
+  },
+  "scheduleTBD": {
+    "value": "Schedule coming soon",
+    "description": "Empty state for service schedule"
+  },
+  "partlyCloudy": {
+    "value": "Partly Cloudy",
+    "description": "Weather badge text"
+  },
+  "dayStreak": {
+    "value": "{count, plural, one{{count} day streak} other{{count} day streak}}",
+    "description": "Streak pill text"
+  },
+  "noSermonsWatchedDescription": {
+    "value": "Tap “See all” to browse the latest sermons.",
+    "description": "Empty state body"
   }
 }

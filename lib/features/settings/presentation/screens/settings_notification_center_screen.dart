@@ -296,8 +296,15 @@ class SettingsNotificationCenterScreen extends ConsumerWidget {
                   style: TextStyle(color: AppColors.error),
                 ),
                 onTap: () async {
+                  // Capture navigator/messenger BEFORE any awaits so
+                  // they remain valid even if the widget tree rebuilds
+                  // while the dialog is open.
+                  final outerContext = context;
+                  final messenger = ScaffoldMessenger.of(outerContext);
+                  final router = GoRouter.of(outerContext);
+
                   final confirmed = await showDialog<bool>(
-                    context: context,
+                    context: outerContext,
                     builder: (_) => AlertDialog(
                       title: const Text('Sign Out'),
                       content: const Text('Are you sure you want to sign out?'),
@@ -316,8 +323,36 @@ class SettingsNotificationCenterScreen extends ConsumerWidget {
                       ],
                     ),
                   );
-                  if (confirmed ?? false) {
+
+                  if (confirmed != true) return;
+
+                  // Disable further interaction with this settings page
+                  // while we tear down — `signOut` will pop us back to
+                  // the Start Here screen via the auth-state listener
+                  // in the router, but only after we've invalidated
+                  // providers + signed out of Supabase + removed the
+                  // FCM token.
+                  try {
                     await ref.read(authNotifierProvider.notifier).signOut();
+
+                    // Force navigation to Start Here and replace the
+                    // entire stack so the user cannot tap back into
+                    // authenticated screens (Dashboard, Profile, etc).
+                    router.go(RouteNames.startHere);
+
+                    messenger.showSnackBar(
+                      const SnackBar(
+                        content: Text('You have been signed out.'),
+                        duration: Duration(seconds: 3),
+                      ),
+                    );
+                  } catch (_) {
+                    // Even on a hard failure the auth state stream
+                    // should fire null after Supabase is told to
+                    // sign out — navigate regardless so the user is
+                    // never stranded on a settings screen they can't
+                    // exit.
+                    router.go(RouteNames.startHere);
                   }
                 },
               ),

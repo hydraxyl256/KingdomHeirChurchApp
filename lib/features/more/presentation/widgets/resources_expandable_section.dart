@@ -9,9 +9,17 @@
 // rotates 180° when expanded. The body animates open via
 // `AnimatedSize`. Three feature tiles render in a `Wrap` so 320 dp
 // phones stack them vertically and tablets render 3-wide.
+//
+// Safety: the per-tile entrance animation uses `TweenAnimationBuilder`
+// rather than `flutter_animate`'s `.animate().fadeIn().slideY()` chain.
+// `flutter_animate` mounts an internal `Builder` that can interfere
+// with `AnimatedSize` and the surrounding `LayoutBuilder` during the
+// first frame, producing a `RenderBox.size` null-deref in
+// `RenderViewport → SliverToBoxAdapter → RenderBox.size`. The current
+// implementation wraps each tile with a self-contained opacity + translate
+// fade-in that doesn't need any external Builder.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 
 import 'package:kingdom_heir/core/responsive/breakpoints.dart';
 import 'package:kingdom_heir/core/responsive/insets.dart';
@@ -149,15 +157,14 @@ class _ResourcesExpandableSectionState
                               width: tileWidth,
                               child: AspectRatio(
                                 aspectRatio: 0.95,
-                                child: FeatureTileWidget(feature: _features[i])
-                                    .animate()
-                                    .fadeIn(
-                                      duration: const Duration(
-                                        milliseconds: 320,
-                                      ),
-                                      delay: Duration(milliseconds: 40 * i),
-                                    )
-                                    .slideY(begin: 0.04, end: 0),
+                                // Self-contained opacity+translate fade-in.
+                                // No Builder, no LayoutBuilder — predictable
+                                // measurement so AnimatedSize can measure
+                                // the body during the expand animation.
+                                child: _TileFadeIn(
+                                  delayMs: 40 * i,
+                                  child: FeatureTileWidget(feature: _features[i]),
+                                ),
                               ),
                             ),
                         ],
@@ -168,6 +175,38 @@ class _ResourcesExpandableSectionState
               : const SizedBox.shrink(),
         ),
       ],
+    );
+  }
+}
+
+/// Self-contained opacity + translate fade-in. The animation runs once
+/// on first build (with an optional `delayMs`). We deliberately avoid
+/// `flutter_animate`'s `.animate().fadeIn().slideY()` here because that
+/// pattern mounted an internal `Builder` that interacted badly with
+/// `AnimatedSize` during the expand animation, producing a
+/// `RenderBox.size` null-deref.
+class _TileFadeIn extends StatelessWidget {
+  const _TileFadeIn({required this.delayMs, required this.child});
+
+  final int delayMs;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 320),
+      curve: Curves.decelerate,
+      builder: (context, value, animatedChild) {
+        return Opacity(
+          opacity: value.clamp(0.0, 1.0),
+          child: Transform.translate(
+            offset: Offset(0, (1 - value) * 8),
+            child: animatedChild,
+          ),
+        );
+      },
+      child: child,
     );
   }
 }

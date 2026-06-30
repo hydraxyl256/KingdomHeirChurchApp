@@ -71,12 +71,29 @@ class AppButton extends StatelessWidget {
                   Icon(icon,
                       size: AppSpacing.iconSm, color: _foreground(scheme),),
                   const SizedBox(width: AppSpacing.sm),
-                  Text(label,
+                  // Wrap the label in Flexible + ellipsis so an
+                  // icon+label row never overflows a narrow parent.
+                  // Before this change a fixed-width AppButton (e.g.
+                  // the secondary "History" CTA inside
+                  // `KingdomGivingCard`) overflowed its inner Row by
+                  // ~40 px on a 360 dp phone and threw
+                  // "A RenderFlex overflowed by N pixels on the right".
+                  Flexible(
+                    child: Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
                       style:
-                          effectiveStyle?.copyWith(color: _foreground(scheme)),),
+                          effectiveStyle?.copyWith(color: _foreground(scheme)),
+                    ),
+                  ),
                 ],
               )
             : Text(label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
                 style: effectiveStyle?.copyWith(color: _foreground(scheme)),);
 
     final shape = RoundedRectangleBorder(

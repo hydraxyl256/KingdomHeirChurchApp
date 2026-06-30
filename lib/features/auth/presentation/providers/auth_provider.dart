@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kingdom_heir/core/analytics/analytics_service.dart';
 import 'package:kingdom_heir/core/di/providers.dart';
 import 'package:kingdom_heir/core/notifications/push_notification_service.dart';
+import 'package:kingdom_heir/core/storage/local_storage_service.dart';
 import 'package:kingdom_heir/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:kingdom_heir/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:kingdom_heir/features/auth/domain/entities/app_user.dart';
@@ -106,13 +107,50 @@ class AuthNotifier extends AsyncNotifier<void> {
 
   Future<void> signOut() async {
     state = const AsyncLoading();
-    // Remove FCM token before signing out so it can authenticate to delete it
-    await ref.read(pushNotificationServiceProvider).removeToken();
-    final result = await ref.read(signOutUseCaseProvider).call();
-    state = result.fold(
-      (failure) => AsyncError(failure, StackTrace.current),
-      (_) => const AsyncData(null),
-    );
+    try {
+      // 1. Remove FCM token from Supabase + the local device BEFORE
+      //    signing out — once we're signed out we lose the auth
+      //    context that lets the user_devices row be deleted.
+      await ref.read(pushNotificationServiceProvider).removeToken();
+
+      // 2. Sign out of Supabase. Wrapped in try so a network failure
+      //    doesn't strand the user — we still want to wipe local
+      //    state below.
+      try {
+        await ref.read(signOutUseCaseProvider).call();
+      } catch (_) {
+        // Ignore — local cleanup is still required.
+      }
+
+      // 3. Wipe non-essential local preferences. Keep keys that the
+      //    auth/redirect flow needs to make a sensible decision
+      //    (onboarding-complete, user-role) so the user lands in the
+      //    correct post-logout state instead of being forced back
+      //    through onboarding.
+      final storage = ref.read(localStorageServiceProvider);
+      await storage.remove(LocalStorageKeys.selectedTheme);
+      await storage.remove(LocalStorageKeys.selectedLocale);
+      await storage.remove(LocalStorageKeys.selectedCurrency);
+      await storage.remove(LocalStorageKeys.lastSeenNotification);
+      await storage.remove('more_favorites_v1');
+
+      // 4. Invalidate all auth-dependent providers so every Consumer
+      //    rebuilds in the signed-out state. The auth stream will
+      //    also fire with null shortly, but invalidating here lets us
+      //    reset the UI synchronously rather than waiting on the
+      //    Supabase auth event.
+      ref
+        ..invalidate(authStateProvider)
+        ..invalidate(currentUserProvider);
+
+      // 5. Reset analytics identity.
+      unawaited(ref.read(analyticsServiceProvider).setUserId(null));
+
+
+      state = const AsyncData(null);
+    } catch (e, st) {
+      state = AsyncError(e, st);
+    }
   }
 
   Future<void> resetPassword(String email) async {
