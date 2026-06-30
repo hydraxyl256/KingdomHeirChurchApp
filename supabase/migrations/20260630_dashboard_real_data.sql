@@ -16,15 +16,22 @@
 -- ════════════════════════════════════════════════════════════════════════════
 -- 0. Required extensions
 -- ════════════════════════════════════════════════════════════════════════════
-
-create extension if not exists "uuid-ossp";
+--
+-- We rely on `gen_random_uuid()` (provided by pgcrypto, pre-installed on
+-- Supabase via the `extensions` schema which is in `extra_search_path`).
+-- We deliberately do NOT enable `uuid-ossp` — its `uuid_generate_v4()`
+-- function lives in a non-search-path schema and triggers
+-- `function … does not exist (SQLSTATE 42883)` on Supabase, which is
+-- the regression this migration's first version hit. All other
+-- migrations in this repo (`core_schema`, `sermons_streaming`, etc.)
+-- already follow this pattern.
 
 -- ════════════════════════════════════════════════════════════════════════════
 -- 1. Daily verses (scripture of the day)
 -- ════════════════════════════════════════════════════════════════════════════
 
 create table if not exists public.daily_verses (
-  id          uuid primary key default uuid_generate_v4(),
+  id          uuid primary key default gen_random_uuid(),
   day_date    date unique not null,
   verse_text  text not null,
   reference   text not null,
@@ -86,7 +93,7 @@ create policy "journey_tasks_self_write"
 -- ════════════════════════════════════════════════════════════════════════════
 
 create table if not exists public.service_schedules (
-  id             uuid primary key default uuid_generate_v4(),
+  id             uuid primary key default gen_random_uuid(),
   title          text not null,
   host_label     text,
   starts_at      timestamptz not null,
@@ -125,7 +132,7 @@ create policy "service_schedules_admin_write"
 -- ════════════════════════════════════════════════════════════════════════════
 
 create table if not exists public.prayer_requests (
-  id           uuid primary key default uuid_generate_v4(),
+  id           uuid primary key default gen_random_uuid(),
   author_id    uuid references auth.users(id) on delete set null,
   author_name  text not null,
   preview      text not null,
