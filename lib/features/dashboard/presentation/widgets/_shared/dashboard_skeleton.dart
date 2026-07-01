@@ -20,7 +20,7 @@ class DashboardSkeleton extends StatelessWidget {
         horizontal: AppSpacing.lg,
         vertical: AppSpacing.lg,
       ),
-      children: [
+      children: const [
         // Header
         Row(
           children: [

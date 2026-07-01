@@ -40,9 +40,15 @@ class SupabasePrayerRepository implements PrayerRepository {
     int limit = 50,
   }) async {
     try {
+      // Explicit relationship hint `profiles!author_id(...)` tells PostgREST
+      // exactly which foreign key to use for the embedded join. Without the
+      // hint, PostgREST can return "Could not find a relationship between
+      // 'prayer_requests' and 'profiles' in the schema cache" if there are
+      // any ambiguities (e.g. multiple FKs in the schema or the second
+      // dashboard-only prayer_requests table shadowing the relationship).
       final response = await _client
           .from('prayer_requests')
-          .select('*, profiles(full_name, avatar_url)')
+          .select('*, profiles!author_id(full_name, avatar_url)')
           .order('created_at', ascending: false)
           .limit(limit);
 

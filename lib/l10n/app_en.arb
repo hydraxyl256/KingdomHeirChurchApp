@@ -72,88 +72,94 @@
   "@scriptureToday": {
     "description": "Label for today's verse header"
   },
-  "reminderSet": {
-    "value": "We will remind you 30 minutes before service.",
+  "reminderSet": "We will remind you 30 minutes before service.",
+  "@reminderSet": {
     "description": "Snackbar when reminder is set"
   },
-  "directionsOpen": {
-    "value": "Opening directions…",
+  "directionsOpen": "Opening directions…",
+  "@directionsOpen": {
     "description": "Snackbar when opening maps"
   },
-  "liveNow": {
-    "value": "LIVE NOW",
+  "liveNow": "LIVE NOW",
+  "@liveNow": {
     "description": "Live service badge"
   },
-  "upcoming": {
-    "value": "Upcoming",
+  "upcoming": "Upcoming",
+  "@upcoming": {
     "description": "Upcoming events label"
   },
-  "today": {
-    "value": "Today",
+  "today": "Today",
+  "@today": {
     "description": "Today label"
   },
-  "tomorrow": {
-    "value": "Tomorrow",
+  "tomorrow": "Tomorrow",
+  "@tomorrow": {
     "description": "Tomorrow label"
   },
-  "prayedFor": {
-    "value": "prayed for",
+  "prayedFor": "prayed for",
+  "@prayedFor": {
     "description": "Past tense label"
   },
-  "joinOnline": {
-    "value": "Join Online",
+  "joinOnline": "Join Online",
+  "@joinOnline": {
     "description": "Join online CTA"
   },
-  "joinInPerson": {
-    "value": "Join In Person",
+  "joinInPerson": "Join In Person",
+  "@joinInPerson": {
     "description": "Join in person CTA"
   },
-  "comingSoon": {
-    "value": "Coming soon",
+  "comingSoon": "Coming soon",
+  "@comingSoon": {
     "description": "Coming soon label"
   },
-  "addToCalendar": {
-    "value": "Add to Calendar",
+  "addToCalendar": "Add to Calendar",
+  "@addToCalendar": {
     "description": "Add to calendar CTA"
   },
-  "noEventsToday": {
-    "value": "No events today",
+  "noEventsToday": "No events today",
+  "@noEventsToday": {
     "description": "Empty state title"
   },
-  "noPrayerRequests": {
-    "value": "No prayer requests yet. Be the first to share.",
+  "noPrayerRequests": "No prayer requests yet. Be the first to share.",
+  "@noPrayerRequests": {
     "description": "Empty state"
   },
-  "submitPrayerRequest": {
-    "value": "Submit Prayer Request",
+  "submitPrayerRequest": "Submit Prayer Request",
+  "@submitPrayerRequest": {
     "description": "Submit CTA"
   },
-  "browseEvents": {
-    "value": "Browse Events",
+  "browseEvents": "Browse Events",
+  "@browseEvents": {
     "description": "Browse events CTA"
   },
-  "watchLatestSermon": {
-    "value": "Watch Latest Sermon",
+  "watchLatestSermon": "Watch Latest Sermon",
+  "@watchLatestSermon": {
     "description": "Watch CTA"
   },
-  "noSermonsWatched": {
-    "value": "No sermons watched yet",
+  "noSermonsWatched": "No sermons watched yet",
+  "@noSermonsWatched": {
     "description": "Empty state"
   },
-  "scheduleTBD": {
-    "value": "Schedule coming soon",
+  "scheduleTBD": "Schedule coming soon",
+  "@scheduleTBD": {
     "description": "Empty state for service schedule"
   },
-  "partlyCloudy": {
-    "value": "Partly Cloudy",
+  "partlyCloudy": "Partly Cloudy",
+  "@partlyCloudy": {
     "description": "Weather badge text"
   },
-  "dayStreak": {
-    "value": "{count, plural, one{{count} day streak} other{{count} day streak}}",
-    "description": "Streak pill text"
+  "dayStreak": "{count, plural, one{{count} day streak} other{{count} day streak}}",
+  "@dayStreak": {
+    "description": "Streak pill text",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
   },
-  "noSermonsWatchedDescription": {
-    "value": "Tap “See all” to browse the latest sermons.",
+  "noSermonsWatchedDescription": "Tap “See all” to browse the latest sermons.",
+  "@noSermonsWatchedDescription": {
     "description": "Empty state body"
   }
 }

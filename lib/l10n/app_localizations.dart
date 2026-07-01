@@ -233,6 +233,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'TODAY\'S VERSE'**
   String get scriptureToday;
+
+  /// Snackbar when reminder is set
+  ///
+  /// In en, this message translates to:
+  /// **'We will remind you 30 minutes before service.'**
+  String get reminderSet;
+
+  /// Snackbar when opening maps
+  ///
+  /// In en, this message translates to:
+  /// **'Opening directions…'**
+  String get directionsOpen;
+
+  /// Live service badge
+  ///
+  /// In en, this message translates to:
+  /// **'LIVE NOW'**
+  String get liveNow;
+
+  /// Upcoming events label
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get upcoming;
+
+  /// Today label
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// Tomorrow label
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow'**
+  String get tomorrow;
+
+  /// Past tense label
+  ///
+  /// In en, this message translates to:
+  /// **'prayed for'**
+  String get prayedFor;
+
+  /// Join online CTA
+  ///
+  /// In en, this message translates to:
+  /// **'Join Online'**
+  String get joinOnline;
+
+  /// Join in person CTA
+  ///
+  /// In en, this message translates to:
+  /// **'Join In Person'**
+  String get joinInPerson;
+
+  /// Coming soon label
+  ///
+  /// In en, this message translates to:
+  /// **'Coming soon'**
+  String get comingSoon;
+
+  /// Add to calendar CTA
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Calendar'**
+  String get addToCalendar;
+
+  /// Empty state title
+  ///
+  /// In en, this message translates to:
+  /// **'No events today'**
+  String get noEventsToday;
+
+  /// Empty state
+  ///
+  /// In en, this message translates to:
+  /// **'No prayer requests yet. Be the first to share.'**
+  String get noPrayerRequests;
+
+  /// Submit CTA
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Prayer Request'**
+  String get submitPrayerRequest;
+
+  /// Browse events CTA
+  ///
+  /// In en, this message translates to:
+  /// **'Browse Events'**
+  String get browseEvents;
+
+  /// Watch CTA
+  ///
+  /// In en, this message translates to:
+  /// **'Watch Latest Sermon'**
+  String get watchLatestSermon;
+
+  /// Empty state
+  ///
+  /// In en, this message translates to:
+  /// **'No sermons watched yet'**
+  String get noSermonsWatched;
+
+  /// Empty state for service schedule
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule coming soon'**
+  String get scheduleTBD;
+
+  /// Weather badge text
+  ///
+  /// In en, this message translates to:
+  /// **'Partly Cloudy'**
+  String get partlyCloudy;
+
+  /// Streak pill text
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} day streak} other{{count} day streak}}'**
+  String dayStreak(int count);
+
+  /// Empty state body
+  ///
+  /// In en, this message translates to:
+  /// **'Tap “See all” to browse the latest sermons.'**
+  String get noSermonsWatchedDescription;
 }
 
 class _AppLocalizationsDelegate

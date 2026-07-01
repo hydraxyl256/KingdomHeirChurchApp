@@ -10,6 +10,13 @@
 // Save-back methods (toggleJourneyTask, incrementPrayerCount,
 // updateWatchProgress) are fire-and-forget — callers update the UI
 // optimistically and `ref.invalidate(...)` refreshes from the server.
+//
+// All `row['x']` index access in this file is on a Supabase PostgREST
+// row (which is a Map). We suppress `avoid_dynamic_calls` because
+// adding an explicit Map<String, dynamic> cast at every site would
+// be 50+ lines of noise for zero runtime safety gain (Supabase's
+// generated types are erased at runtime).
+// ignore_for_file: avoid_dynamic_calls, inference_failure_on_function_invocation
 
 import 'dart:async';
 import 'dart:math' as math;
@@ -47,10 +54,10 @@ class HomeDashboardRepository {
         () async {
           final uid = _userId;
           if (uid == null) return HomeDashboardMock.greeting(_rng);
-          final data = await _client
-              .rpc('get_dashboard_greeting', params: <String, dynamic>{
+          final dynamic data = await _client
+              .rpc<dynamic>('get_dashboard_greeting', params: <String, dynamic>{
                 'p_user_id': uid,
-              })
+              },)
               .single();
           return DashboardGreeting(
             firstName: (data['first_name'] as String?) ?? 'Friend',
@@ -68,7 +75,7 @@ class HomeDashboardRepository {
   Future<List<ScriptureCard>> fetchScriptureRoster() => _guardList(
         'fetchScriptureRoster',
         () async {
-          final rows = await _client.rpc('get_dashboard_scripture');
+          final dynamic rows = await _client.rpc<dynamic>('get_dashboard_scripture');
           final list = rows as List<dynamic>;
           if (list.isEmpty) return HomeDashboardMock.scriptureRoster;
           return list
@@ -77,7 +84,7 @@ class HomeDashboardRepository {
                     reference: row['reference'] as String,
                     translation: row['translation'] as String,
                     isBookmarked: row['is_bookmarked'] as bool? ?? false,
-                  ))
+                  ),)
               .toList(growable: false);
         },
         HomeDashboardMock.scriptureRoster,
@@ -97,7 +104,7 @@ class HomeDashboardRepository {
         () async {
           final uid = _userId;
           if (uid == null) return HomeDashboardMock.continueCards;
-          final rows = await _client.rpc(
+          final dynamic rows = await _client.rpc<dynamic>(
             'get_dashboard_continue',
             params: <String, dynamic>{'p_user_id': uid, 'p_limit': 8},
           );
@@ -113,7 +120,7 @@ class HomeDashboardRepository {
                         (row['progress'] as num?)?.toDouble() ?? 0,
                     thumbnailUrl: row['thumbnail_url'] as String?,
                     durationLabel: row['duration_label'] as String?,
-                  ))
+                  ),)
               .toList(growable: false);
         },
         HomeDashboardMock.continueCards,
@@ -124,8 +131,8 @@ class HomeDashboardRepository {
   Future<ServiceStatus> fetchServiceStatus() => _guard(
         'fetchServiceStatus',
         () async {
-          final data = await _client
-              .rpc('get_dashboard_service')
+          final dynamic data = await _client
+              .rpc<dynamic>('get_dashboard_service')
               .maybeSingle();
           if (data == null) return HomeDashboardMock.serviceStatus(_rng);
           return ServiceStatus(
@@ -150,13 +157,13 @@ class HomeDashboardRepository {
         () async {
           final uid = _userId;
           if (uid == null) return HomeDashboardMock.dailyJourney;
-          final rows = await _client.rpc(
+          final dynamic rows = await _client.rpc<dynamic>(
             'get_dashboard_journey',
             params: <String, dynamic>{'p_user_id': uid},
           );
           final completed = <SpiritualTaskKind>{
             for (final dynamic row in rows as List<dynamic>)
-              if ((row['is_completed'] as bool? ?? false))
+              if (row['is_completed'] as bool? ?? false)
                 _taskKindFromString(row['kind'] as String),
           };
           return DailyJourney(
@@ -166,7 +173,7 @@ class HomeDashboardRepository {
                       kind: task.kind,
                       isCompleted: completed.contains(task.kind),
                       label: task.label,
-                    ))
+                    ),)
                 .toList(growable: false),
           );
         },
@@ -176,15 +183,15 @@ class HomeDashboardRepository {
   /// Toggle a journey task. Optimistic — the caller should
   /// `ref.invalidate(journeyProvider)` immediately. We don't await this.
   Future<DashboardWriteResult> toggleJourneyTask(
-    SpiritualTaskKind kind,
-    bool isCompleted,
-  ) async {
+    SpiritualTaskKind kind, {
+    required bool isCompleted,
+  }) async {
     final uid = _userId;
     if (uid == null) {
       return const DashboardWriteResult(success: false);
     }
     try {
-      await _client.rpc(
+      await _client.rpc<dynamic>(
         'toggle_journey_task',
         params: <String, dynamic>{
           'p_user_id': uid,
@@ -204,7 +211,7 @@ class HomeDashboardRepository {
   Future<List<TodayEvent>> fetchTodayEvents() => _guardList(
         'fetchTodayEvents',
         () async {
-          final rows = await _client.rpc('get_dashboard_events');
+          final dynamic rows = await _client.rpc<dynamic>('get_dashboard_events');
           final list = rows as List<dynamic>;
           if (list.isEmpty) return HomeDashboardMock.todayEvents();
           return list
@@ -219,7 +226,7 @@ class HomeDashboardRepository {
                     category: _categoryFromString(
                       row['category'] as String?,
                     ),
-                  ))
+                  ),)
               .toList(growable: false);
         },
         HomeDashboardMock.todayEvents(),
@@ -230,7 +237,7 @@ class HomeDashboardRepository {
   Future<PrayerCorner> fetchPrayerCorner() => _guard(
         'fetchPrayerCorner',
         () async {
-          final rows = await _client.rpc(
+          final dynamic rows = await _client.rpc<dynamic>(
             'get_dashboard_prayer',
             params: <String, dynamic>{'p_limit': 4},
           );
@@ -248,7 +255,7 @@ class HomeDashboardRepository {
                           preview: row['preview'] as String,
                           avatarUrl: row['avatar_url'] as String?,
                           prayerCount: row['prayer_count'] as int? ?? 0,
-                        ))
+                        ),)
                     .toList(growable: false),
           );
         },
@@ -259,7 +266,7 @@ class HomeDashboardRepository {
   /// (or null if Supabase is unreachable).
   Future<int?> incrementPrayerCount(String prayerId) async {
     try {
-      final result = await _client.rpc(
+      final dynamic result = await _client.rpc<dynamic>(
         'increment_prayer_count',
         params: <String, dynamic>{'p_prayer_id': prayerId},
       );
@@ -277,10 +284,10 @@ class HomeDashboardRepository {
         () async {
           final uid = _userId;
           if (uid == null) return HomeDashboardMock.communityHighlight;
-          final data = await _client
-              .rpc('get_dashboard_community', params: <String, dynamic>{
+          final dynamic data = await _client
+              .rpc<dynamic>('get_dashboard_community', params: <String, dynamic>{
                 'p_user_id': uid,
-              })
+              },)
               .maybeSingle();
           if (data == null) return HomeDashboardMock.communityHighlight;
           return CommunityHighlight(
@@ -300,7 +307,7 @@ class HomeDashboardRepository {
         () async {
           final uid = _userId;
           if (uid == null) return HomeDashboardMock.watchCards;
-          final rows = await _client.rpc(
+          final dynamic rows = await _client.rpc<dynamic>(
             'get_dashboard_watch',
             params: <String, dynamic>{'p_user_id': uid, 'p_limit': 6},
           );
@@ -318,7 +325,7 @@ class HomeDashboardRepository {
                     thumbnailUrl: row['thumbnail_url'] as String?,
                     durationLabel: row['duration_label'] as String?,
                     isDownloaded: row['is_downloaded'] as bool? ?? false,
-                  ))
+                  ),)
               .toList(growable: false);
         },
         HomeDashboardMock.watchCards,
@@ -334,7 +341,7 @@ class HomeDashboardRepository {
     final uid = _userId;
     if (uid == null) return const DashboardWriteResult(success: false);
     try {
-      await _client.rpc(
+      await _client.rpc<dynamic>(
         'update_watch_progress',
         params: <String, dynamic>{
           'p_user_id': uid,
@@ -401,7 +408,7 @@ class HomeDashboardRepository {
       _log.w('HomeDashboardRepository.$label live fetch failed; '
           'using offline fallback',
           error: e,
-          stackTrace: st);
+          stackTrace: st,);
       return fallback();
     }
   }

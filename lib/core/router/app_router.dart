@@ -79,6 +79,7 @@ import 'package:kingdom_heir/features/settings/presentation/screens/settings_not
 import 'package:kingdom_heir/features/shell/app_shell.dart';
 import 'package:kingdom_heir/features/start_here/presentation/screens/founder_letter_screen.dart';
 import 'package:kingdom_heir/features/start_here/presentation/screens/kingdom_heirs_story_screen.dart';
+import 'package:kingdom_heir/features/start_here/presentation/screens/plan_your_visit_screen.dart';
 import 'package:kingdom_heir/features/start_here/presentation/screens/start_here_hub_screen.dart';
 import 'package:kingdom_heir/features/start_here/presentation/screens/statement_of_faith_screen.dart';
 import 'package:kingdom_heir/features/start_here/presentation/screens/vision_mission_detail_screen.dart';
@@ -169,6 +170,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RouteNames.startHereStory,
         builder: (_, __) => const KingdomHeirsStoryScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.startHerePlanVisit,
+        builder: (_, __) => const PlanYourVisitScreen(),
       ),
 
       // ── Onboarding ──────────────────────────────────────────────────

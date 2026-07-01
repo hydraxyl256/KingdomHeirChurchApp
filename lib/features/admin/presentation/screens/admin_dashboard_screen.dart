@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kingdom_heir/core/di/providers.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
+import 'package:kingdom_heir/core/theme/iconography.dart';
 
 final analyticsDashboardProvider =
     FutureProvider.autoDispose<Map<String, dynamic>>((ref) async {
@@ -54,7 +55,7 @@ class AdminAnalyticsDashboardScreen extends ConsumerWidget {
         title: const Text('Analytics & Intelligence'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.download),
+            icon: const Icon(Iconography.adminDownload),
             tooltip: 'Export Financial Data (CSV)',
             onPressed: () {
               final data = asyncData.valueOrNull;
@@ -68,7 +69,7 @@ class AdminAnalyticsDashboardScreen extends ConsumerWidget {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Iconography.adminRefresh),
             onPressed: () => ref.refresh(analyticsDashboardProvider),
           ),
         ],
@@ -88,35 +89,35 @@ class AdminAnalyticsDashboardScreen extends ConsumerWidget {
                 const SizedBox(height: 16),
                 _buildKpiGrid(context, [
                   _Kpi('Online Now', data['online'].toString(),
-                      Icons.wifi_tethering, AppColors.success,),
+                      Iconography.adminOnline, AppColors.success,),
                   _Kpi('Daily Active (DAU)', data['dau'].toString(),
-                      Icons.today, AppColors.info,),
+                      Iconography.adminDaily, AppColors.info,),
                   _Kpi('Weekly Active (WAU)', data['wau'].toString(),
-                      Icons.calendar_view_week, AppColors.tertiary,),
+                      Iconography.adminWeekly, AppColors.tertiary,),
                   _Kpi('Monthly Active (MAU)', data['mau'].toString(),
-                      Icons.calendar_month, AppColors.navyAccent,),
+                      Iconography.adminMonthly, AppColors.navyAccent,),
                   _Kpi('Total Users', data['total_users'].toString(),
-                      Icons.people, AppColors.warning,),
+                      Iconography.adminUsers, AppColors.warning,),
                   _Kpi('Total Installs', data['total_installs'].toString(),
-                      Icons.download, AppColors.goldDark,),
+                      Iconography.adminDownload, AppColors.goldDark,),
                 ]),
                 const SizedBox(height: 32),
                 _buildSectionTitle(context, 'Financial Analytics'),
                 const SizedBox(height: 16),
                 _buildKpiGrid(context, [
                   _Kpi('Revenue Today', '\$${financial['donations_today']}',
-                      Icons.payments, AppColors.success,),
+                      Iconography.adminPayments, AppColors.success,),
                   _Kpi(
                       'Revenue (30d)',
                       '\$${financial['donations_this_month']}',
-                      Icons.account_balance,
+                      Iconography.adminBalance,
                       AppColors.info,),
                   _Kpi('Average Gift', '\$${financial['average_donation']}',
-                      Icons.show_chart, AppColors.tertiary,),
+                      Iconography.adminChart, AppColors.tertiary,),
                   _Kpi(
                       'Top Campaign',
                       (financial['top_giving_fund'] as String?) ?? 'N/A',
-                      Icons.star,
+                      Iconography.adminStar,
                       AppColors.warning,),
                 ]),
                 const SizedBox(height: 32),

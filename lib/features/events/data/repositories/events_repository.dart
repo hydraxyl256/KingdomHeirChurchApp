@@ -35,11 +35,15 @@ class SupabaseEventsRepository implements EventsRepository {
   Future<Either<String, List<Event>>> getUpcomingEvents(
       {int limit = 50,}) async {
     try {
+      // Public surface: only show events that have been published by an admin.
+      // The `events.status` column defaults to 'draft' (see core_schema.sql),
+      // so without this filter the query returns zero rows for non-admins.
       final response = await _client
           .from('events')
           .select()
+          .eq('status', 'published')
           .gte('end_at', DateTime.now().toIso8601String())
-          .order('starts_at', ascending: true)
+          .order('start_at', ascending: true)
           .limit(limit);
 
       final events = (response as List)
@@ -61,9 +65,10 @@ class SupabaseEventsRepository implements EventsRepository {
       final response = await _client
           .from('events')
           .select()
-          .gte('starts_at', start.toIso8601String())
-          .lte('starts_at', end.toIso8601String())
-          .order('starts_at', ascending: true);
+          .eq('status', 'published')
+          .gte('start_at', start.toIso8601String())
+          .lte('start_at', end.toIso8601String())
+          .order('start_at', ascending: true);
 
       final events = (response as List)
           .map((e) => EventModel.fromJson(e as Map<String, dynamic>))

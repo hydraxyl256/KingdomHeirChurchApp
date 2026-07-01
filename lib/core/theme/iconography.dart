@@ -71,4 +71,17 @@ abstract final class Iconography {
 
   // ── Fallback avatar ────────────────────────────────────────────────────
   static const IconData userAvatar = PhosphorIconsRegular.userCircle;
+
+  // ── Admin / system icons ───────────────────────────────────────────────
+  static const IconData adminDownload = PhosphorIconsRegular.downloadSimple;
+  static const IconData adminRefresh = PhosphorIconsRegular.arrowsClockwise;
+  static const IconData adminOnline = PhosphorIconsRegular.wifiHigh;
+  static const IconData adminDaily = PhosphorIconsRegular.calendar;
+  static const IconData adminWeekly = PhosphorIconsRegular.calendarDots;
+  static const IconData adminMonthly = PhosphorIconsRegular.calendarBlank;
+  static const IconData adminUsers = PhosphorIconsRegular.users;
+  static const IconData adminPayments = PhosphorIconsRegular.currencyDollar;
+  static const IconData adminBalance = PhosphorIconsRegular.bank;
+  static const IconData adminChart = PhosphorIconsRegular.trendUp;
+  static const IconData adminStar = PhosphorIconsRegular.star;
 }

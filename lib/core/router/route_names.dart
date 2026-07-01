@@ -11,6 +11,7 @@ abstract final class RouteNames {
   static const startHereFounder = '/start-here/founder';
   static const startHereStatementOfFaith = '/start-here/statement-of-faith';
   static const startHereStory = '/start-here/story';
+  static const startHerePlanVisit = '/start-here/plan-visit';
 
   // ── Auth ─────────────────────────────────────────────────────────────────
   static const login = '/auth/login';

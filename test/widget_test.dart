@@ -12,6 +12,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kingdom_heir/app.dart';
 import 'package:kingdom_heir/core/di/providers.dart';
+import 'package:kingdom_heir/core/router/app_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {

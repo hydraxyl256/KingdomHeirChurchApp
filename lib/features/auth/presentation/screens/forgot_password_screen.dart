@@ -8,6 +8,7 @@ import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/widgets/app_button.dart';
 import 'package:kingdom_heir/core/widgets/app_text_field.dart';
 import 'package:kingdom_heir/features/auth/presentation/providers/auth_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -27,6 +28,40 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   void dispose() {
     _emailController.dispose();
     super.dispose();
+  }
+
+  Future<void> _openMailApp() async {
+    // Try a couple of common mail-app entry points in order: a generic
+    // `mailto:` first (works on Android & iOS), then a Gmail web fallback.
+    // Either call is wrapped in try/catch — the spec is "Open Email App",
+    // not a strict handler, so a friendly SnackBar on failure is the right
+    // UX over silently doing nothing.
+    final mailto = Uri.parse('mailto:${_emailController.text.trim()}');
+    final webFallback = Uri.parse('https://mail.google.com/');
+
+    var opened = false;
+    try {
+      opened = await launchUrl(mailto, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      opened = false;
+    }
+    if (!opened) {
+      try {
+        opened = await launchUrl(
+          webFallback,
+          mode: LaunchMode.externalApplication,
+        );
+      } catch (_) {
+        opened = false;
+      }
+    }
+    if (!opened && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No mail app available on this device.'),
+        ),
+      );
+    }
   }
 
   Future<void> _submit() async {
@@ -67,6 +102,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               ? _SuccessView(
                   email: _emailController.text.trim(),
                   onResend: () => setState(() => _emailSent = false),
+                  onOpenMailApp: _openMailApp,
                 )
               : _FormView(
                   formKey: _formKey,
@@ -201,10 +237,15 @@ class _FormView extends StatelessWidget {
 // ─── Success View ─────────────────────────────────────────────────────────────
 
 class _SuccessView extends StatelessWidget {
-  const _SuccessView({required this.email, required this.onResend});
+  const _SuccessView({
+    required this.email,
+    required this.onResend,
+    required this.onOpenMailApp,
+  });
 
   final String email;
   final VoidCallback onResend;
+  final VoidCallback onOpenMailApp;
 
   @override
   Widget build(BuildContext context) {
@@ -262,9 +303,7 @@ class _SuccessView extends StatelessWidget {
         AppButton(
           label: 'Open Email App',
           icon: Icons.open_in_new_rounded,
-          onPressed: () {
-            // TODO(dev): use url_launcher to open mail app
-          },
+          onPressed: onOpenMailApp,
         ).animate().fadeIn(delay: 400.ms),
 
         const SizedBox(height: AppSpacing.md),

@@ -252,8 +252,6 @@ class _StreakPill extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               colors: [AppColors.goldDark, AppColors.gold],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
             ),
             borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
             boxShadow: [

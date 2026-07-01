@@ -89,13 +89,14 @@ final homeDashboardProvider = FutureProvider<HomeDashboardData>(
 /// Invalidate every per-section provider — used by the pull-to-refresh
 /// affordance.
 void invalidateDashboard(WidgetRef ref) {
-  ref.invalidate(greetingProvider);
-  ref.invalidate(scriptureProvider);
-  ref.invalidate(continueCardsProvider);
-  ref.invalidate(serviceStatusProvider);
-  ref.invalidate(journeyProvider);
-  ref.invalidate(todayEventsProvider);
-  ref.invalidate(prayerCornerProvider);
-  ref.invalidate(communityHighlightProvider);
-  ref.invalidate(watchCardsProvider);
+  ref
+    ..invalidate(greetingProvider)
+    ..invalidate(scriptureProvider)
+    ..invalidate(continueCardsProvider)
+    ..invalidate(serviceStatusProvider)
+    ..invalidate(journeyProvider)
+    ..invalidate(todayEventsProvider)
+    ..invalidate(prayerCornerProvider)
+    ..invalidate(communityHighlightProvider)
+    ..invalidate(watchCardsProvider);
 }

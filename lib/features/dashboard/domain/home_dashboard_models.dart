@@ -204,7 +204,7 @@ class TodayEvent {
   final String? leaderName;
 
   /// Premium timeline category — drives the colored dot and label badge
-  /// on the redesigned Church Today timeline. Defaults to [other] for
+  /// on the redesigned Church Today timeline. Defaults to `other` for
   /// backward compatibility with existing data sources.
   final TodayEventCategory category;
 }

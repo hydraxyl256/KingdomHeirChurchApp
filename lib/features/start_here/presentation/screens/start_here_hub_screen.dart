@@ -438,7 +438,7 @@ class _DiscoverPage extends StatelessWidget {
       color: Color(0xFFDC2626),
       title: 'Join Us This Sunday',
       description: 'Sunday Worship at 9 AM · In-person & Online. Come experience church family.',
-      route: null,
+      route: RouteNames.startHerePlanVisit,
     ),
   ];
 
@@ -1112,7 +1112,8 @@ class _BenefitChip extends StatelessWidget {
 // Shared Components
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Church logo mark (KH initials in gold serif on navy circle)
+/// Church logo mark — uses the official `assets/images/logo.jpeg` asset,
+/// with a graceful gold-gradient fallback (no letter placeholders).
 class _ChurchLogoMark extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -1127,30 +1128,38 @@ class _ChurchLogoMark extends StatelessWidget {
         ),
         color: Colors.white.withValues(alpha: 0.06),
       ),
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'KH',
-              style: AppTypography.textTheme.displaySmall?.copyWith(
-                color: AppColors.goldLight,
-                fontWeight: FontWeight.w700,
-                height: 1,
-                fontSize: 38,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              'KINGDOM HEIRS',
-              style: AppTypography.scriptureRef.copyWith(
-                color: AppColors.goldLight.withValues(alpha: 0.7),
-                fontSize: 7,
-                letterSpacing: 2,
-              ),
-            ),
-          ],
+      clipBehavior: Clip.antiAlias,
+      child: Image.asset(
+        'assets/images/logo.jpeg',
+        fit: BoxFit.contain,
+        semanticLabel: 'Kingdom Heirs',
+        errorBuilder: (_, __, ___) => const _ChurchLogoFallback(),
+      ),
+    );
+  }
+}
+
+/// Fallback for [_ChurchLogoMark] when the asset is unavailable. Renders
+/// a gold-gradient square with a subtle cross — never a letter initial.
+class _ChurchLogoFallback extends StatelessWidget {
+  const _ChurchLogoFallback();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: LinearGradient(
+          colors: [AppColors.goldDark, AppColors.gold, AppColors.goldLight],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
+      ),
+      alignment: Alignment.center,
+      child: Icon(
+        Icons.add, // cross-shaped plus; can be replaced with a custom SVG.
+        size: 48,
+        color: AppColors.navy.withValues(alpha: 0.85),
       ),
     );
   }

@@ -278,10 +278,3 @@ abstract final class HomeDashboardMock {
     return (diff / 7).ceil() + 1;
   }
 }
-
-extension _DateTimeExt on DateTime {
-  int get day {
-    final start = DateTime(year);
-    return difference(start).inDays;
-  }
-}

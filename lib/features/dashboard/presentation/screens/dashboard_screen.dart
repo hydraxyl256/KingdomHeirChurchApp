@@ -263,7 +263,7 @@ class _HomeDashboardBody extends ConsumerWidget {
     // reconcile any mismatch.
     await ref
         .read(homeDashboardRepositoryProvider)
-        .toggleJourneyTask(kind, isCompleted);
+        .toggleJourneyTask(kind, isCompleted: isCompleted);
     ref.invalidate(journeyProvider);
   }
 

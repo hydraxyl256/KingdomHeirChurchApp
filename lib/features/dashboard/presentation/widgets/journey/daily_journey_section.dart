@@ -24,6 +24,7 @@ class DailyJourneySection extends StatelessWidget {
 
   final DailyJourney journey;
   final void Function(SpiritualTask)? onTaskTap;
+  // ignore: avoid_positional_boolean_parameters
   final void Function(SpiritualTaskKind, bool)? onTaskToggle;
 
   @override
@@ -146,7 +147,7 @@ class _CompletionRing extends StatelessWidget {
           alignment: Alignment.center,
           children: [
             // Track
-            SizedBox(
+            const SizedBox(
               width: 64,
               height: 64,
               child: CircularProgressIndicator(
@@ -207,6 +208,7 @@ class _TaskTimeline extends StatelessWidget {
 
   final List<SpiritualTask> tasks;
   final void Function(SpiritualTask)? onTaskTap;
+  // ignore: avoid_positional_boolean_parameters
   final void Function(SpiritualTaskKind, bool)? onTaskToggle;
 
   @override
@@ -243,6 +245,7 @@ class _TimelineNode extends StatelessWidget {
   final bool isLast;
   final int index;
   final VoidCallback? onTap;
+  // ignore: avoid_positional_boolean_parameters
   final void Function(bool)? onToggle;
 
   @override

@@ -361,19 +361,20 @@ class _LogoFallback extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: AppColors.warmWhite,
+        gradient: const LinearGradient(
+          colors: [AppColors.goldDark, AppColors.gold, AppColors.goldLight],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         boxShadow: AppElevation.shadowFor(AppElevation.level3),
       ),
-      padding: EdgeInsets.all(size * 0.18),
-      child: FittedBox(
-        child: Text(
-          'K',
-          style: AppTypography.textTheme.displayMedium?.copyWith(
-            fontSize: size * 0.5,
-            fontWeight: FontWeight.w700,
-            color: AppColors.gold,
-          ),
-        ),
+      alignment: Alignment.center,
+      child: Icon(
+        // Cross-shaped plus; the production path is `assets/images/logo.jpeg`,
+        // so this fallback only renders if the asset is missing.
+        Icons.add,
+        size: size * 0.5,
+        color: AppColors.navy.withValues(alpha: 0.85),
       ),
     );
   }
