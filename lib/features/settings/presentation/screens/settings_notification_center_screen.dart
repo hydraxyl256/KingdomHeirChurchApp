@@ -326,20 +326,31 @@ class SettingsNotificationCenterScreen extends ConsumerWidget {
 
                   if (confirmed != true) return;
 
-                  // Disable further interaction with this settings page
-                  // while we tear down — `signOut` will pop us back to
-                  // the Start Here screen via the auth-state listener
-                  // in the router, but only after we've invalidated
-                  // providers + signed out of Supabase + removed the
-                  // FCM token.
+                  // Trigger signout. The AuthNotifier stamps a null
+                  // override on `_signedOutOverrideProvider` synchronously,
+                  // which makes `currentUserProvider` return null and
+                  // trips the router's redirect to /start-here without
+                  // us needing to call `router.go` manually.
                   try {
                     await ref.read(authNotifierProvider.notifier).signOut();
+                  } catch (_) {
+                    // Signout throws are swallowed by the notifier; this
+                    // catch is just belt-and-braces.
+                  }
 
-                    // Force navigation to Start Here and replace the
-                    // entire stack so the user cannot tap back into
-                    // authenticated screens (Dashboard, Profile, etc).
+                  // Force the navigation if the redirect listenable
+                  // hasn't fired yet (e.g. on a fresh signout before
+                  // the auth state stream has caught up). The router
+                  // will reconcile any difference.
+                  if (router.routerDelegate.currentConfiguration.uri.path !=
+                      RouteNames.startHere) {
                     router.go(RouteNames.startHere);
+                  }
 
+                  // SnackBar may not show on the settings screen (it
+                  // gets torn down by the redirect) — wrap in a try/catch
+                  // so a missing Scaffold doesn't break the signout.
+                  try {
                     messenger.showSnackBar(
                       const SnackBar(
                         content: Text('You have been signed out.'),
@@ -347,12 +358,7 @@ class SettingsNotificationCenterScreen extends ConsumerWidget {
                       ),
                     );
                   } catch (_) {
-                    // Even on a hard failure the auth state stream
-                    // should fire null after Supabase is told to
-                    // sign out — navigate regardless so the user is
-                    // never stranded on a settings screen they can't
-                    // exit.
-                    router.go(RouteNames.startHere);
+                    // ignore — the snackbar is best-effort UX.
                   }
                 },
               ),

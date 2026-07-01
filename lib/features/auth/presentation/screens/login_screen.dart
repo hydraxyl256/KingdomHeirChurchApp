@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kingdom_heir/core/router/route_names.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
@@ -366,11 +367,10 @@ class _LoginScrollable extends StatelessWidget {
               const SizedBox(height: AppSpacing.xl),
 
               // ── 4. Social login ───────────────────────────────────────
-              const _OrDivider(),
-              const SizedBox(height: AppSpacing.lg),
-              _SocialLoginRow(
-                isLoading: isLoading,
-                onGoogle: onGoogle,
+              const SizedBox(height: AppSpacing.xl),
+              _GoogleButton(
+                isLoading: isGoogleBusy,
+                onPressed: onGoogle,
               ),
               const SizedBox(height: AppSpacing.lg),
 
@@ -852,113 +852,82 @@ class _OrDivider extends StatelessWidget {
   }
 }
 
-class _SocialLoginRow extends StatelessWidget {
-  const _SocialLoginRow({
-    required this.isLoading,
-    required this.onGoogle,
-  });
-
-  final bool isLoading;
-  final VoidCallback onGoogle;
+class _GoogleLogo extends StatelessWidget {
+  const _GoogleLogo();
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _SocialButton(
-            label: 'Google',
-            iconWidget: const _GoogleIcon(),
-            onPressed: isLoading ? null : onGoogle,
-          ),
-        ),
-      ],
+    return SvgPicture.string(
+      '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>''',
+      width: 18,
+      height: 18,
     );
   }
 }
 
-class _SocialButton extends StatelessWidget {
-  const _SocialButton({
-    required this.label,
-    required this.iconWidget,
+class _GoogleButton extends StatelessWidget {
+  const _GoogleButton({
+    required this.isLoading,
     required this.onPressed,
   });
 
-  final String label;
-  final Widget iconWidget;
+  final bool isLoading;
   final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
-    final disabled = onPressed == null;
-    final borderColor =
-        AppColors.warmWhite.withValues(alpha: disabled ? 0.06 : 0.18);
-    final bg = AppColors.warmWhite.withValues(alpha: disabled ? 0.02 : 0.04);
-
-    return Semantics(
-      label: 'Continue with $label',
-      button: true,
-      enabled: !disabled,
-      child: SizedBox(
-        height: AppSpacing.buttonHeightSm + 4,
-        child: OutlinedButton(
-          onPressed: onPressed,
-          style: OutlinedButton.styleFrom(
-            backgroundColor: bg,
-            foregroundColor: AppColors.warmWhite,
-            disabledForegroundColor: AppColors.warmWhite.withValues(alpha: 0.4),
-            side: BorderSide(color: borderColor),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppRadius.full),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+    final disabled = onPressed == null || isLoading;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: disabled ? null : onPressed,
+        borderRadius: BorderRadius.circular(AppRadius.full),
+        child: Ink(
+          height: AppSpacing.buttonHeight,
+          decoration: BoxDecoration(
+            color: disabled ? Colors.white.withValues(alpha: 0.6) : Colors.white,
+            borderRadius: BorderRadius.circular(AppRadius.full),
+            boxShadow: disabled
+                ? const []
+                : [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.18),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              iconWidget,
-              const SizedBox(width: AppSpacing.sm),
-              Flexible(
-                child: Text(
-                  label,
-                  style: AppTypography.textTheme.labelMedium?.copyWith(
-                    color: AppColors.warmWhite,
-                    fontWeight: FontWeight.w700,
+          child: Center(
+            child: isLoading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.navy),
+                    ),
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const _GoogleLogo(),
+                      const SizedBox(width: AppSpacing.sm),
+                      Flexible(
+                        child: Text(
+                          'Continue with Google',
+                          style: AppTypography.textTheme.labelLarge!.copyWith(
+                            color: AppColors.navy,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.3,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ),
+                    ],
                   ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-              ),
-            ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Subtle Google "G" mark — single-color (white on dark) for the navy theme.
-class _GoogleIcon extends StatelessWidget {
-  const _GoogleIcon();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: AppSpacing.iconSm + 2,
-      height: AppSpacing.iconSm + 2,
-      alignment: Alignment.center,
-      decoration: const BoxDecoration(
-        shape: BoxShape.circle,
-        color: AppColors.warmWhite,
-      ),
-      child: Text(
-        'G',
-        style: AppTypography.textTheme.labelSmall?.copyWith(
-          color: const Color(0xFF4285F4),
-          fontWeight: FontWeight.w900,
-          height: 1,
-          fontSize: AppSpacing.sm + 1,
         ),
       ),
     );

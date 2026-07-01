@@ -22,10 +22,11 @@
 // `invalidateDashboard(ref)`, so a single gesture re-fetches the whole
 // dashboard.
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:kingdom_heir/core/router/route_names.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
@@ -34,7 +35,6 @@ import 'package:kingdom_heir/features/dashboard/domain/home_dashboard_models.dar
 import 'package:kingdom_heir/features/dashboard/presentation/providers/home_dashboard_providers.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/widgets/_shared/dashboard_skeleton.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/widgets/_shared/floating_prayer_button.dart';
-import 'package:kingdom_heir/features/dashboard/presentation/widgets/_shared/search_placeholder_sheet.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/widgets/actions/quick_actions_strip.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/widgets/community/community_highlight_section.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/widgets/continue/continue_carousel.dart';
@@ -45,6 +45,9 @@ import 'package:kingdom_heir/features/dashboard/presentation/widgets/prayer/pray
 import 'package:kingdom_heir/features/dashboard/presentation/widgets/scripture/scripture_hero_card.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/widgets/service/service_status_card.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/widgets/watching/continue_watching_carousel.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
+// search_placeholder_sheet.dart was replaced by RouteNames.globalSearch.
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Root Screen — wraps RefreshIndicator + async state
@@ -114,11 +117,9 @@ class _HomeDashboardBody extends ConsumerWidget {
                     // ── 1. Greeting ────────────────────────────────────────
                     GreetingHeader(
                       greeting: data.greeting,
-                      onNotificationTap: () => _toast(
-                        context,
-                        'Notifications coming soon',
-                      ),
-                      onSearchTap: () => _openSearchSheet(context),
+                      onNotificationTap: () =>
+                          context.push(RouteNames.notifications),
+                      onSearchTap: () => context.push(RouteNames.globalSearch),
                       onAvatarTap: () => context.push(RouteNames.myProfile),
                     ),
 
@@ -128,11 +129,26 @@ class _HomeDashboardBody extends ConsumerWidget {
                     ScriptureHeroCard(
                       scripture: data.scripture,
                       roster: roster,
-                      onBookmark: () => _toast(context, 'Saved to bookmarks'),
-                      onShare: () => _toast(context, 'Share coming soon'),
-                      onAudio: () => _toast(context, 'Audio coming soon'),
-                      onReflect: () =>
-                          _toast(context, 'Reflection journal coming soon'),
+                      onBookmark: () => _toast(
+                        context,
+                        data.scripture.isBookmarked
+                            ? 'Already saved to bookmarks'
+                            : 'Saved to bookmarks',
+                      ),
+                      onShare: () => _shareScripture(
+                        context,
+                        data.scripture.verseText,
+                        data.scripture.reference,
+                      ),
+                      onAudio: () => _listenScripture(
+                        context,
+                        data.scripture.audioUrl,
+                        data.scripture.reference,
+                      ),
+                      onReflect: () => _reflectOnScripture(
+                        context,
+                        data.scripture.reference,
+                      ),
                     ),
 
                     // ── 3. Continue Your Journey ───────────────────────────
@@ -315,10 +331,6 @@ class _HomeDashboardBody extends ConsumerWidget {
 
   // ── Helpers ──────────────────────────────────────────────────────────────
 
-  void _openSearchSheet(BuildContext context) {
-    SearchPlaceholderSheet.show(context);
-  }
-
   void _toast(BuildContext context, String msg) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
@@ -337,5 +349,66 @@ class _HomeDashboardBody extends ConsumerWidget {
           duration: const Duration(milliseconds: 1600),
         ),
       );
+  }
+
+  Future<void> _shareScripture(
+    BuildContext context,
+    String text,
+    String reference,
+  ) async {
+    // Trim quotes already in the text and wrap with attribution.
+    final clean = text.replaceAll(RegExp(r'^"|"$'), '').trim();
+    final shareText = '"$clean"\n— $reference\n\nShared from the Kingdom Heirs Church App';
+    try {
+      await Share.share(shareText, subject: reference);
+    } catch (e) {
+      if (context.mounted) {
+        _toast(context, 'Could not open share sheet');
+      }
+    }
+  }
+
+  Future<void> _listenScripture(
+    BuildContext context,
+    String? audioUrl,
+    String reference,
+  ) async {
+    if (audioUrl == null || audioUrl.isEmpty) {
+      // No audio yet — open the sermon / podcast hub so the user can
+      // listen to the wider spoken-word library.
+      if (context.mounted) {
+        _toast(context, 'Opening audio library…');
+      }
+      await context.push(RouteNames.podcasts);
+      return;
+    }
+    // Open the audio URL in the system browser / external player.
+    final uri = Uri.tryParse(audioUrl);
+    if (uri == null) {
+      if (context.mounted) {
+        _toast(context, 'Audio link unavailable');
+      }
+      return;
+    }
+    try {
+      final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!ok && context.mounted) {
+        _toast(context, 'Opening audio library…');
+        await context.push(RouteNames.podcasts);
+      }
+    } catch (_) {
+      if (context.mounted) {
+        _toast(context, 'Opening audio library…');
+        await context.push(RouteNames.podcasts);
+      }
+    }
+  }
+
+  void _reflectOnScripture(BuildContext context, String reference) {
+    // The journal screen accepts a devotionalId; pass the scripture
+    // reference as the title so the user can write a reflection on
+    // the verse they just read.
+    context.push('${RouteNames.devotionals}/scripture/reflection',
+        extra: reference,);
   }
 }

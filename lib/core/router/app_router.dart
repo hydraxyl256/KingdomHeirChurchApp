@@ -62,11 +62,13 @@ import 'package:kingdom_heir/features/more/presentation/screens/more_screen.dart
 import 'package:kingdom_heir/features/news/domain/entities/news_models.dart';
 import 'package:kingdom_heir/features/news/presentation/screens/news_announcements_screen.dart';
 import 'package:kingdom_heir/features/news/presentation/screens/news_article_details_screen.dart';
+import 'package:kingdom_heir/features/notifications/presentation/screens/notifications_screen.dart';
 import 'package:kingdom_heir/features/onboarding/presentation/screens/profile_setup_screen.dart';
 import 'package:kingdom_heir/features/podcasts/presentation/screens/podcasts_audio_hub_screen.dart';
 import 'package:kingdom_heir/features/prayer_requests/presentation/screens/prayer_feed_screen.dart';
 import 'package:kingdom_heir/features/prayer_requests/presentation/screens/submit_prayer_screen.dart';
 import 'package:kingdom_heir/features/profile/presentation/screens/my_profile_screen.dart';
+import 'package:kingdom_heir/features/search/presentation/screens/global_search_screen.dart';
 import 'package:kingdom_heir/features/sermons/presentation/screens/sermon_audio_player_screen.dart';
 import 'package:kingdom_heir/features/sermons/presentation/screens/sermon_continue_screen.dart';
 import 'package:kingdom_heir/features/sermons/presentation/screens/sermon_details_screen.dart';
@@ -234,6 +236,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: RouteNames.dashboard,
             builder: (_, __) => const DashboardScreen(),
+          ),
+
+          // Notifications Center (push from dashboard bell)
+          GoRoute(
+            path: RouteNames.notifications,
+            builder: (_, __) => const NotificationsScreen(),
+          ),
+
+          // Global Search (push from dashboard search)
+          GoRoute(
+            path: RouteNames.globalSearch,
+            builder: (_, __) => const GlobalSearchScreen(),
           ),
 
           // More Hub

@@ -33,6 +33,8 @@ abstract final class RouteNames {
 
   // ── Dashboard ────────────────────────────────────────────────────────────
   static const dashboard = '/home/dashboard';
+  static const notifications = '/home/notifications';
+  static const globalSearch = '/home/search';
 
   // ── Challenge ────────────────────────────────────────────────────────────
   static const challenge = '/home/challenge';

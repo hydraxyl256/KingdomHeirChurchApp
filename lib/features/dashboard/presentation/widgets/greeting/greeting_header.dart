@@ -33,6 +33,11 @@ class GreetingHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? AppColors.warmWhite : AppColors.navy;
+    final bodyColor = isDark
+        ? AppColors.warmWhite.withValues(alpha: 0.7)
+        : AppColors.textSecondary;
     final greetingLine = _greetingText(loc, greeting.moment);
     final tagline = _taglineText(loc, greeting.moment);
     final today = DateFormat('EEEE, MMMM d').format(DateTime.now());
@@ -57,7 +62,7 @@ class GreetingHeader extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: AppTypography.textTheme.labelMedium?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: bodyColor,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.3,
                   ),
@@ -103,7 +108,7 @@ class GreetingHeader extends StatelessWidget {
                     Text(
                       greeting.firstName,
                       style: AppTypography.textTheme.headlineSmall?.copyWith(
-                        color: AppColors.navy,
+                        color: titleColor,
                         fontWeight: FontWeight.w800,
                         height: 1.1,
                       ),
@@ -117,7 +122,7 @@ class GreetingHeader extends StatelessWidget {
                     Text(
                       tagline,
                       style: AppTypography.textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
+                        color: bodyColor,
                         height: 1.4,
                       ),
                       maxLines: 2,
@@ -366,6 +371,8 @@ class _ActionBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconColor = isDark ? AppColors.warmWhite : AppColors.navy;
     return Semantics(
       button: true,
       label: semanticLabel,
@@ -381,7 +388,7 @@ class _ActionBtn extends StatelessWidget {
             child: Icon(
               icon,
               size: AppSpacing.iconMd,
-              color: AppColors.navy,
+              color: iconColor,
             ),
           ),
         ),
@@ -397,6 +404,8 @@ class _NotificationBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconColor = isDark ? AppColors.warmWhite : AppColors.navy;
     return Semantics(
       button: true,
       label: count > 0
@@ -415,10 +424,10 @@ class _NotificationBtn extends StatelessWidget {
               alignment: Alignment.center,
               clipBehavior: Clip.none,
               children: [
-                const Icon(
+                Icon(
                   Iconography.notifications,
                   size: AppSpacing.iconMd,
-                  color: AppColors.navy,
+                  color: iconColor,
                 ),
                 if (count > 0)
                   Positioned(

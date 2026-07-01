@@ -444,8 +444,9 @@ class _DiscoverPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return ColoredBox(
-      color: AppColors.backgroundLight,
+      color: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -509,10 +510,27 @@ class _DiscoverCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    // Theme-aware surface + text colors. We previously hardcoded
+    // `Colors.white` for the card and `AppColors.navy` for the title,
+    // which made the title invisible when the card's surface resolved
+    // to the dark theme's `cardColor` (Material 3's default surface
+    // tint can also darken the card to navy in dark mode).
+    final cardColor = isDark ? AppColors.surfaceDark : AppColors.white;
+    final titleColor = isDark ? AppColors.warmWhite : AppColors.navy;
+    final bodyColor = isDark
+        ? AppColors.warmWhite.withValues(alpha: 0.7)
+        : AppColors.textSecondary;
+    final borderColor = isDark ? AppColors.dividerDark : AppColors.dividerLight;
+    final shadowColor = isDark
+        ? Colors.black.withValues(alpha: 0.35)
+        : AppColors.navy.withValues(alpha: 0.06);
+
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
       child: Material(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: AppRadius.brLg,
         child: InkWell(
           onTap: data.route != null
@@ -522,10 +540,10 @@ class _DiscoverCard extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: AppRadius.brLg,
-              border: Border.all(color: AppColors.dividerLight),
+              border: Border.all(color: borderColor),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.navy.withValues(alpha: 0.06),
+                  color: shadowColor,
                   blurRadius: 10,
                   offset: const Offset(0, 3),
                 ),
@@ -550,7 +568,7 @@ class _DiscoverCard extends StatelessWidget {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: data.color.withValues(alpha: 0.1),
+                    color: data.color.withValues(alpha: isDark ? 0.22 : 0.1),
                     borderRadius: AppRadius.brMd,
                   ),
                   child: Icon(data.icon, color: data.color, size: 22),
@@ -569,7 +587,7 @@ class _DiscoverCard extends StatelessWidget {
                         Text(
                           data.title,
                           style: AppTypography.textTheme.titleSmall?.copyWith(
-                            color: AppColors.navy,
+                            color: titleColor,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
@@ -577,7 +595,7 @@ class _DiscoverCard extends StatelessWidget {
                         Text(
                           data.description,
                           style: AppTypography.textTheme.bodySmall?.copyWith(
-                            color: AppColors.textSecondary,
+                            color: bodyColor,
                             height: 1.5,
                           ),
                           maxLines: 2,
@@ -670,8 +688,9 @@ class _ExperiencePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return ColoredBox(
-      color: AppColors.backgroundLight,
+      color: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -730,17 +749,28 @@ class _FeatureRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardColor = isDark ? AppColors.surfaceDark : AppColors.white;
+    final borderColor = isDark ? AppColors.dividerDark : AppColors.dividerLight;
+    final titleColor = isDark ? AppColors.warmWhite : AppColors.navy;
+    final bodyColor = isDark
+        ? AppColors.warmWhite.withValues(alpha: 0.7)
+        : AppColors.textSecondary;
+    final shadowColor = isDark
+        ? Colors.black.withValues(alpha: 0.35)
+        : AppColors.navy.withValues(alpha: 0.04);
+
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: cardColor,
           borderRadius: AppRadius.brLg,
-          border: Border.all(color: AppColors.dividerLight),
+          border: Border.all(color: borderColor),
           boxShadow: [
             BoxShadow(
-              color: AppColors.navy.withValues(alpha: 0.04),
+              color: shadowColor,
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -754,7 +784,7 @@ class _FeatureRow extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: data.color.withValues(alpha: 0.08),
+                color: data.color.withValues(alpha: isDark ? 0.2 : 0.08),
                 borderRadius: AppRadius.brMd,
               ),
               child: Center(
@@ -773,7 +803,7 @@ class _FeatureRow extends StatelessWidget {
                   Text(
                     data.title,
                     style: AppTypography.textTheme.titleSmall?.copyWith(
-                      color: AppColors.navy,
+                      color: titleColor,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -781,7 +811,7 @@ class _FeatureRow extends StatelessWidget {
                   Text(
                     data.benefit,
                     style: AppTypography.textTheme.bodySmall?.copyWith(
-                      color: AppColors.textSecondary,
+                      color: bodyColor,
                       height: 1.55,
                     ),
                   ),
@@ -1308,6 +1338,8 @@ class _PageTopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? AppColors.warmWhite : AppColors.navy;
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.lg,
@@ -1356,7 +1388,7 @@ class _PageTopBar extends StatelessWidget {
           Text(
             title,
             style: AppTypography.textTheme.headlineSmall?.copyWith(
-              color: AppColors.navy,
+              color: titleColor,
               fontWeight: FontWeight.w800,
               height: 1.2,
             ),
@@ -1389,6 +1421,13 @@ class _BottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
+    final borderColor = isDark ? AppColors.dividerDark : AppColors.dividerLight;
+    final signInColor = isDark
+        ? AppColors.warmWhite.withValues(alpha: 0.7)
+        : AppColors.textSecondary;
+
     final safeBottom = MediaQuery.of(context).padding.bottom;
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -1397,10 +1436,10 @@ class _BottomNav extends StatelessWidget {
         AppSpacing.lg,
         safeBottom + 56, // accounts for dot indicator
       ),
-      decoration: const BoxDecoration(
-        color: AppColors.backgroundLight,
+      decoration: BoxDecoration(
+        color: bgColor,
         border: Border(
-          top: BorderSide(color: AppColors.dividerLight, width: 0.5),
+          top: BorderSide(color: borderColor, width: 0.5),
         ),
       ),
       child: Row(
@@ -1411,7 +1450,7 @@ class _BottomNav extends StatelessWidget {
             child: Text(
               'Sign In',
               style: AppTypography.textTheme.labelMedium?.copyWith(
-                color: AppColors.textSecondary,
+                color: signInColor,
                 fontWeight: FontWeight.w600,
               ),
             ),

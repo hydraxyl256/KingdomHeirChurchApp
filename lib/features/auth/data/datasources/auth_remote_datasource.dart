@@ -1,6 +1,7 @@
 import 'package:kingdom_heir/core/auth/deep_links.dart';
 import 'package:kingdom_heir/features/auth/data/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 /// Remote data source for all Supabase auth operations.
 class AuthRemoteDataSource {
@@ -78,29 +79,47 @@ class AuthRemoteDataSource {
 
   Future<UserModel> signInWithGoogle() async {
     try {
-      // Start the sign-in process
-      await _client.auth.signInWithOAuth(
-        OAuthProvider.google,
-        // Use the universal link so we get verified App Links / Universal
-        // Links routing on both platforms.
-        redirectTo: DeepLinks.loginCallbackUrl(),
+      // The Web Client ID required for Supabase OAuth with Google Sign-In.
+      // Configure via dart-define or update this constant directly.
+      const webClientId = String.fromEnvironment(
+        'GOOGLE_WEB_CLIENT_ID',
+        defaultValue: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com',
       );
 
-      // Wait for the auth state to change to a non-null user
-      final user = await _client.auth.onAuthStateChange
-          .where((event) => event.session != null)
-          .map((event) => event.session?.user)
-          .where((user) => user != null)
-          .map((user) => user!)
-          .timeout(const Duration(seconds: 30))
-          .first;
+      final googleSignIn = GoogleSignIn(
+        serverClientId: webClientId,
+      );
 
-      // Ensure the profile exists
+      final googleUser = await googleSignIn.signIn();
+      if (googleUser == null) {
+        throw const AuthException('Google sign-in cancelled by user.');
+      }
+
+      final googleAuth = await googleUser.authentication;
+      final accessToken = googleAuth.accessToken;
+      final idToken = googleAuth.idToken;
+
+      if (idToken == null) {
+        throw const AuthException('Missing Google ID Token.');
+      }
+
+      final response = await _client.auth.signInWithIdToken(
+        provider: OAuthProvider.google,
+        idToken: idToken,
+        accessToken: accessToken,
+      );
+
+      final user = response.user;
+      if (user == null) {
+        throw const AuthException('Failed to sign in with Supabase.');
+      }
+
       await _ensureProfileForCurrentUser();
 
-      // Fetch the user again to get the updated profile (if we just created it)
       return _fetchProfile(user);
-    } on Exception catch (e) {
+    } on AuthException {
+      rethrow;
+    } catch (e) {
       throw AuthException('Google sign-in failed: $e');
     }
   }
