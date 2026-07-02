@@ -369,7 +369,7 @@ class _LoginScrollable extends StatelessWidget {
               // ── 4. Social login ───────────────────────────────────────
               const SizedBox(height: AppSpacing.xl),
               _GoogleButton(
-                isLoading: isGoogleBusy,
+                isLoading: isLoading,
                 onPressed: onGoogle,
               ),
               const SizedBox(height: AppSpacing.lg),
@@ -820,37 +820,6 @@ class _PrimarySignInButton extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Social login row
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _OrDivider extends StatelessWidget {
-  const _OrDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    final dividerColor = AppColors.warmWhite.withValues(alpha: 0.12);
-    return Row(
-      children: [
-        Expanded(
-            child: Divider(color: dividerColor, height: 1, thickness: 0.5),),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-          child: Text(
-            'OR CONTINUE WITH',
-            style: AppTypography.textTheme.labelSmall?.copyWith(
-              color: AppColors.warmWhite.withValues(alpha: 0.5),
-              letterSpacing: 1.5,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        Expanded(
-            child: Divider(color: dividerColor, height: 1, thickness: 0.5),),
-      ],
-    );
-  }
-}
 
 class _GoogleLogo extends StatelessWidget {
   const _GoogleLogo();

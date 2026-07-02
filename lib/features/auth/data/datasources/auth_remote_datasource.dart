@@ -1,7 +1,7 @@
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kingdom_heir/core/auth/deep_links.dart';
 import 'package:kingdom_heir/features/auth/data/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 /// Remote data source for all Supabase auth operations.
 class AuthRemoteDataSource {
