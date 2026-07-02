@@ -50,6 +50,9 @@ app.*.map.json
 /android/app/release
 
 # Kingdom Heir — secrets & sensitive config (NEVER commit these)
+android/key.properties
+android/keystore/*.jks
+**/*.keystore
 dart_defines/dev.json
 dart_defines/staging.json
 dart_defines/prod.json
