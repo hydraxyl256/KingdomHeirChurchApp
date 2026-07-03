@@ -60,7 +60,7 @@ class _PrayerFeedScreenState extends ConsumerState<PrayerFeedScreen> {
         loading: () => const Center(
             child: AppLoadingIndicator(label: 'Loading prayers...'),),
         error: (err, stack) => AppErrorWidget(
-          message: err.toString(),
+          message: 'We could not load prayer requests right now. Please try again.',
           onRetry: () => ref.invalidate(prayerFeedProvider),
         ),
         data: (requests) {
@@ -310,9 +310,9 @@ class _PrayerCard extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.xs),
 
-            // Body
+            // Content
             Text(
-              item.body,
+              item.content,
               style: AppTypography.textTheme.bodySmall?.copyWith(
                 height: 1.6,
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.75),
@@ -320,23 +320,6 @@ class _PrayerCard extends ConsumerWidget {
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),
-
-            if (isAnswered && item.answeredNote != null) ...[
-              const SizedBox(height: AppSpacing.md),
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.sm),
-                decoration: BoxDecoration(
-                  color: AppColors.success.withValues(alpha: 0.1),
-                  border: const Border(
-                      left: BorderSide(color: AppColors.success, width: 3),),
-                ),
-                child: Text(
-                  item.answeredNote!,
-                  style: AppTypography.textTheme.bodySmall
-                      ?.copyWith(fontStyle: FontStyle.italic),
-                ),
-              ),
-            ],
 
             const SizedBox(height: AppSpacing.md),
             const Divider(),

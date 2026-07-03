@@ -19,10 +19,11 @@ abstract final class HomeDashboardMock {
   static DashboardGreeting greeting(math.Random rng) {
     final now = DateTime.now();
     return DashboardGreeting(
-      firstName: 'Eron',
+      firstName: 'Good Steward',
       moment: resolveGreetingMoment(now),
-      streakDays: 17,
+      streakDays: 12,
       unreadNotifications: 3,
+      avatarUrl: 'assets/images/dashboard/profile.jpg',
     );
   }
 
@@ -60,6 +61,7 @@ abstract final class HomeDashboardMock {
       verseText: v.$1,
       reference: v.$2,
       translation: v.$3,
+      backgroundUrl: 'assets/images/dashboard/verse_bg.jpg',
     );
   }
 
@@ -69,62 +71,61 @@ abstract final class HomeDashboardMock {
           'I can do all things through Christ who strengthens me.',
       reference: 'Philippians 4:13',
       translation: 'NKJV',
+      backgroundUrl: 'assets/images/dashboard/verse_bg.jpg',
     ),
     ScriptureCard(
       verseText:
           'Trust in the Lord with all your heart, and do not lean on your own understanding.',
       reference: 'Proverbs 3:5',
       translation: 'ESV',
+      backgroundUrl: 'assets/images/dashboard/verse_bg.jpg',
     ),
     ScriptureCard(
       verseText:
           'For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.',
       reference: 'John 3:16',
       translation: 'NIV',
+      backgroundUrl: 'assets/images/dashboard/verse_bg.jpg',
     ),
     ScriptureCard(
       verseText: 'The Lord is my shepherd; I shall not want.',
       reference: 'Psalm 23:1',
       translation: 'KJV',
+      backgroundUrl: 'assets/images/dashboard/verse_bg.jpg',
     ),
     ScriptureCard(
       verseText:
           'Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go.',
       reference: 'Joshua 1:9',
       translation: 'NIV',
+      backgroundUrl: 'assets/images/dashboard/verse_bg.jpg',
     ),
   ];
 
   static const List<ContinueCard> continueCards = <ContinueCard>[
     ContinueCard(
-      id: 'sermon-1',
-      kind: ContinueKind.sermon,
-      title: 'Walking in the Spirit',
-      subtitle: 'Bishop J. Mensah',
-      progress: 0.46,
-      durationLabel: '28 min left',
-    ),
-    ContinueCard(
       id: 'plan-1',
       kind: ContinueKind.biblePlan,
-      title: 'Gospel of John in 21 Days',
-      subtitle: 'Day 12 of 21',
-      progress: 0.57,
+      title: 'Finding Your Purpose',
+      subtitle: 'Day 4 of 7',
+      progress: 0.65,
+      thumbnailUrl: 'assets/images/dashboard/journey_1.jpg',
+    ),
+    ContinueCard(
+      id: 'plan-2',
+      kind: ContinueKind.biblePlan,
+      title: 'Kingdom Principles',
+      subtitle: 'Day 1 of 12',
+      progress: 0.15,
+      thumbnailUrl: 'assets/images/dashboard/journey_2.jpg',
     ),
     ContinueCard(
       id: 'devotional-1',
       kind: ContinueKind.devotional,
-      title: 'Standing Firm in the Storm',
-      subtitle: 'Day 3 of 7',
-      progress: 0.42,
-    ),
-    ContinueCard(
-      id: 'podcast-1',
-      kind: ContinueKind.podcast,
-      title: 'Morning Coffee with Pastor Grace',
-      subtitle: 'Episode 14',
-      progress: 0.62,
-      durationLabel: '18 min left',
+      title: 'The Power of Community',
+      subtitle: 'Day 10 of 10',
+      progress: 0.85,
+      thumbnailUrl: 'assets/images/dashboard/journey_3.jpg',
     ),
   ];
 
@@ -240,35 +241,26 @@ abstract final class HomeDashboardMock {
     WatchCard(
       id: 'w-1',
       kind: WatchKind.sermon,
-      title: 'The Power of Resurrection',
-      speakerName: 'Bishop J. Mensah',
-      progress: 0.68,
-      durationLabel: '14 min left',
+      title: 'The Art of Stewardship',
+      speakerName: 'Series: Ancient Paths • 45m',
+      progress: 0.42,
+      thumbnailUrl: 'assets/images/dashboard/watch_1.jpg',
     ),
     WatchCard(
       id: 'w-2',
-      kind: WatchKind.podcast,
-      title: 'Faith That Moves Mountains',
-      speakerName: 'Pastor Grace K.',
-      progress: 0.33,
-      durationLabel: '22 min left',
+      kind: WatchKind.sermon,
+      title: 'Worship & The Word',
+      speakerName: 'Live Session • Oct 20',
+      progress: 0,
+      thumbnailUrl: 'assets/images/dashboard/watch_2.jpg',
     ),
     WatchCard(
       id: 'w-3',
       kind: WatchKind.sermon,
-      title: 'Kingdom Principles for Business',
-      speakerName: 'Dr. Emmanuel A.',
-      progress: 0.81,
-      durationLabel: '8 min left',
-    ),
-    WatchCard(
-      id: 'w-4',
-      kind: WatchKind.sermon,
-      title: 'Walking in the Spirit',
-      speakerName: 'Bishop J. Mensah',
-      progress: 0.15,
-      durationLabel: '38 min left',
-      isDownloaded: true,
+      title: 'Living With Purpose',
+      speakerName: 'Special Message',
+      progress: 0.1,
+      thumbnailUrl: 'assets/images/dashboard/watch_3.jpg',
     ),
   ];
 

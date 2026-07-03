@@ -34,24 +34,12 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
 
-            <!-- Custom-scheme deep link: kingdomheir://verify, kingdomheir://reset-password, kingdomheir://login-callback -->
+            <!-- Supabase Auth callback intent filter -->
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="kingdomheir"/>
-            </intent-filter>
-
-            <!-- Universal-link deep link: https://https://kingdomheirsfoundation.com/verify, /reset-password, /login-callback -->
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="https"/>
-                <data android:host="https://kingdomheirsfoundation.com"/>
-                <data android:pathPrefix="/verify"/>
-                <data android:pathPrefix="/reset-password"/>
-                <data android:pathPrefix="/login-callback"/>
+                <data android:scheme="kingdomheirs" android:host="auth" android:pathPrefix="/callback"/>
             </intent-filter>
         </activity>
 

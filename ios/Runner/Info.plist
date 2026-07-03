@@ -65,17 +65,15 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.kingdomheirsfoundation.app</string>
+			<string>com.kingdomheir.kingdom_heir</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>kingdomheir</string>
+				<string>kingdomheirs</string>
 			</array>
 		</dict>
 	</array>
 
-	<!-- Universal links: https://https://kingdomheirsfoundation.com/verify | /reset-password | /login-callback
-	     Requires matching apple-app-site-association file at
-	     https://https://kingdomheirsfoundation.com/.well-known/apple-app-site-association -->
+	<!-- App custom deep links -->
 	<key>FlutterDeepLinkingEnabled</key>
 	<true/>
 </dict>

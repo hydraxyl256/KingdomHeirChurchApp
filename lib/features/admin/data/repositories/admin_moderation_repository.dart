@@ -22,8 +22,8 @@ class AdminModerationRepository {
   Future<List<Map<String, dynamic>>> getPendingPrayers() async {
     final response = await _supabase
         .from('prayer_requests')
-        .select('*, profiles(full_name)')
-        .eq('is_approved', false)
+        .select('*, profiles!user_id(full_name)')
+        .eq('status', 'archived')
         .order('created_at', ascending: false);
     return List<Map<String, dynamic>>.from(response);
   }
@@ -45,7 +45,7 @@ class AdminModerationRepository {
   Future<void> approvePrayer(String id) async {
     await _supabase
         .from('prayer_requests')
-        .update({'is_approved': true, 'status': 'active'}).eq('id', id);
+        .update({'status': 'active'}).eq('id', id);
     await _logAction('APPROVE_PRAYER', id, {});
   }
 

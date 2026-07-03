@@ -1147,24 +1147,59 @@ class _BenefitChip extends StatelessWidget {
 class _ChurchLogoMark extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 120,
-      height: 120,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: AppColors.gold.withValues(alpha: 0.4),
-          width: 1.5,
+    final mq = MediaQuery.of(context);
+    final logoSize = (mq.size.shortestSide * 0.22).clamp(56.0, 96.0);
+
+    return Column(
+      children: [
+        Semantics(
+          label: 'Kingdom Heirs',
+          image: true,
+          child: Container(
+            width: logoSize,
+            height: logoSize,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.warmWhite,
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.gold.withValues(alpha: 0.35),
+                  blurRadius: 24,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            padding: EdgeInsets.all(logoSize * 0.16),
+            child: ClipOval(
+              child: Image.asset(
+                'assets/images/logo.jpeg',
+                fit: BoxFit.contain,
+                semanticLabel: 'Kingdom Heirs logo',
+                errorBuilder: (_, __, ___) => const _ChurchLogoFallback(),
+              ),
+            ),
+          ),
         ),
-        color: Colors.white.withValues(alpha: 0.06),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Image.asset(
-        'assets/images/logo.jpeg',
-        fit: BoxFit.contain,
-        semanticLabel: 'Kingdom Heirs',
-        errorBuilder: (_, __, ___) => const _ChurchLogoFallback(),
-      ),
+        const SizedBox(height: AppSpacing.md),
+        Text(
+          'KINGDOM HEIRS',
+          style: AppTypography.textTheme.titleMedium?.copyWith(
+            color: AppColors.gold,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 2,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          'INHERITING EXCELLENCE',
+          style: AppTypography.textTheme.labelSmall?.copyWith(
+            color: AppColors.gold.withValues(alpha: 0.7),
+            letterSpacing: 1.5,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 }

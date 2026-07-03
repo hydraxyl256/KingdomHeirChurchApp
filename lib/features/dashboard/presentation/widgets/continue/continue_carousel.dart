@@ -1,13 +1,9 @@
-// Kingdom Heir — Section 3: Continue Your Journey Carousel
-//
-// Personalized horizontal carousel of in-progress content.
-// If empty, shows a "Start Your Journey" call-to-action card.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
+import 'package:kingdom_heir/core/theme/elevation.dart';
 import 'package:kingdom_heir/features/dashboard/domain/home_dashboard_models.dart';
 
 class ContinueCarousel extends StatelessWidget {
@@ -28,7 +24,6 @@ class ContinueCarousel extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Section header
         Padding(
           padding: const EdgeInsets.fromLTRB(
             AppSpacing.lg,
@@ -39,7 +34,7 @@ class ContinueCarousel extends StatelessWidget {
           child: Text(
             'Continue Your Journey',
             style: AppTypography.textTheme.titleMedium?.copyWith(
-              color: AppColors.navy,
+              color: AppColors.textPrimary,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -48,7 +43,7 @@ class ContinueCarousel extends StatelessWidget {
           _StartJourneyCard(onTap: onStartJourney)
         else
           SizedBox(
-            height: 168,
+            height: 320,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(
@@ -84,120 +79,113 @@ class _ContinueCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (color, icon) = _kindStyle(card.kind);
-
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 156,
+        width: 256,
         margin: const EdgeInsets.only(right: AppSpacing.md),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.navy.withValues(alpha: 0.07),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-          border: Border.all(
-            color: AppColors.dividerLight,
-            width: 0.5,
-          ),
+          color: AppColors.surfaceVariantLight,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: AppElevation.shadowFor(AppElevation.level1),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Icon badge
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-                ),
-                child: Icon(icon, color: color, size: 18),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            if (card.thumbnailUrl != null)
+              Image.asset(
+                card.thumbnailUrl!,
+                fit: BoxFit.cover,
               ),
-              const SizedBox(height: AppSpacing.sm),
-              // Kind label
-              Text(
-                card.kindLabel.toUpperCase(),
-                style: AppTypography.scriptureRef.copyWith(
-                  color: color,
-                  fontSize: 9,
-                  letterSpacing: 1.2,
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                  colors: [
+                    AppColors.surfaceLight.withValues(alpha: 0.9),
+                    AppColors.surfaceLight.withValues(alpha: 0.2),
+                    Colors.transparent,
+                  ],
+                  stops: const [0.0, 0.4, 1.0],
                 ),
               ),
-              const SizedBox(height: 3),
-              // Title
-              Text(
-                card.title,
-                style: AppTypography.textTheme.labelLarge?.copyWith(
-                  color: AppColors.navy,
-                  fontWeight: FontWeight.w700,
-                  height: 1.3,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const Spacer(),
-              // Progress bar
-              Column(
+            ),
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  if (card.durationLabel != null)
-                    Text(
-                      card.durationLabel!,
-                      style: AppTypography.textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
-                        fontSize: 10,
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.gold.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: AppColors.gold.withValues(alpha: 0.3),
                       ),
                     ),
-                  const SizedBox(height: 4),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(2),
-                    child: LinearProgressIndicator(
-                      value: card.progress,
-                      backgroundColor: AppColors.dividerLight,
-                      valueColor: AlwaysStoppedAnimation<Color>(color),
-                      minHeight: 3,
+                    child: Text(
+                      card.kindLabel.toUpperCase(),
+                      style: AppTypography.textTheme.labelSmall?.copyWith(
+                        color: AppColors.goldDark,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.2,
+                      ),
                     ),
                   ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    card.title,
+                    style: AppTypography.textTheme.titleMedium?.copyWith(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (card.subtitle.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      card.subtitle,
+                      style: AppTypography.textTheme.bodySmall?.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: AppSpacing.md),
                 ],
               ),
-            ],
-          ),
+            ),
+            // Bottom Progress Bar
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: 4,
+              child: Container(
+                color: AppColors.surfaceVariantLight,
+                alignment: Alignment.centerLeft,
+                child: FractionallySizedBox(
+                  widthFactor: card.progress.clamp(0.0, 1.0),
+                  child: Container(color: AppColors.goldDark),
+                ),
+              ),
+            ),
+          ],
         ),
-      )
-          .animate()
-          .fadeIn(
+      ).animate().fadeIn(
             delay: Duration(milliseconds: 220 + index * 60),
             duration: 350.ms,
             curve: Curves.easeOut,
-          )
-          .slideX(
-            begin: 0.1,
-            end: 0,
-            delay: Duration(milliseconds: 220 + index * 60),
-            duration: 350.ms,
           ),
     );
   }
-
-  (Color, IconData) _kindStyle(ContinueKind kind) => switch (kind) {
-        ContinueKind.sermon => (AppColors.navyAccent, Icons.play_circle_rounded),
-        ContinueKind.biblePlan => (AppColors.goldDark, Icons.menu_book_rounded),
-        ContinueKind.devotional =>
-          (AppColors.success, Icons.volunteer_activism_rounded),
-        ContinueKind.podcast => (AppColors.tertiary, Icons.podcasts_rounded),
-        ContinueKind.prayerChallenge =>
-          (const Color(0xFF7C3AED), Icons.self_improvement_rounded),
-      };
 }
 
 class _StartJourneyCard extends StatelessWidget {

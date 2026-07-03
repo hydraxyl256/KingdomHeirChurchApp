@@ -42,10 +42,6 @@ class _CheckYourEmailScreenState extends ConsumerState<CheckYourEmailScreen> {
   /// Anti-spam cooldown. Disabled until [_cooldownSeconds] reaches zero.
   int _cooldownSeconds = 60;
 
-  /// Periodic timer that auto-checks the verification status so the user
-  /// doesn't have to tap "I've Verified My Email" by hand.
-  Timer? _pollTimer;
-
   /// Set while a resend request is in flight to disable the button.
   bool _isResending = false;
 
@@ -53,20 +49,17 @@ class _CheckYourEmailScreenState extends ConsumerState<CheckYourEmailScreen> {
   /// success / error feedback so the user is never left guessing.
   String? _resendFeedback;
 
-  /// Set true when the polling loop detects verification, so we can
-  /// suppress further polls and play the success animation.
+  /// Set true when manual check detects verification, so we can play the success animation.
   bool _verified = false;
 
   @override
   void initState() {
     super.initState();
     _startCooldown();
-    _startAutoPoll();
   }
 
   @override
   void dispose() {
-    _pollTimer?.cancel();
     super.dispose();
   }
 
@@ -86,15 +79,9 @@ class _CheckYourEmailScreenState extends ConsumerState<CheckYourEmailScreen> {
     });
   }
 
-  void _startAutoPoll() {
-    _pollTimer?.cancel();
-    _pollTimer = Timer.periodic(const Duration(seconds: 5), (_) async {
-      if (!mounted || _verified) return;
-      await _checkVerification(silent: true);
-    });
-  }
 
-  Future<void> _checkVerification({bool silent = false}) async {
+
+  Future<void> _checkVerification() async {
     try {
       // Refresh the session — this pulls the latest email_confirmed_at
       // from Supabase. If the user has tapped the link in another
@@ -105,7 +92,6 @@ class _CheckYourEmailScreenState extends ConsumerState<CheckYourEmailScreen> {
       if (user != null && user.emailConfirmedAt != null) {
         if (!mounted) return;
         setState(() => _verified = true);
-        _pollTimer?.cancel();
         // Drive the auth state through Riverpod so the router redirects
         // us to the dashboard via its refreshListenable.
         ref
@@ -116,20 +102,19 @@ class _CheckYourEmailScreenState extends ConsumerState<CheckYourEmailScreen> {
         await Future<void>.delayed(const Duration(milliseconds: 900));
         if (!mounted) return;
         context.go(RouteNames.dashboard);
-      } else if (!silent && mounted) {
+      } else if (mounted) {
         setState(
           () => _resendFeedback =
               "We haven't detected verification yet. Please tap the link in your email.",
         );
       }
     } on supabase.AuthException catch (e) {
-      if (!silent && mounted) {
+      if (mounted) {
         setState(() => _resendFeedback = e.message);
       }
     } catch (_) {
-      // Network failures during silent polling are expected (offline mode)
-      // and are intentionally swallowed so we keep trying.
-      if (!silent && mounted) {
+      // Network failures during manual polling
+      if (mounted) {
         setState(
           () => _resendFeedback =
               'Could not reach the server. Check your connection and try again.',

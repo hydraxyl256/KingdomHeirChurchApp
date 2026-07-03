@@ -1,22 +1,10 @@
-// Kingdom Heir — Section 4: Premium Service Status Card
-//
-// Renders one of three variants based on `status`:
-//   • LIVE NOW    → red gradient card with pulsing dot + "Watch Live"
-//   • UPCOMING    → white card with HH:MM:SS countdown + Reminder / Calendar
-//                   / Directions actions
-//   • EMPTY       → soft "Schedule coming soon" placeholder
-//
-// The countdown ticks every 1s via `Timer.periodic` and respects
-// `MediaQuery.disableAnimations` (paused when the user prefers reduced
-// motion).
-
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
+import 'package:kingdom_heir/core/theme/elevation.dart';
 import 'package:kingdom_heir/core/theme/iconography.dart';
 import 'package:kingdom_heir/features/dashboard/domain/home_dashboard_models.dart';
 
@@ -39,21 +27,18 @@ class ServiceStatusCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        AppSpacing.xl,
-        AppSpacing.lg,
-        0,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.sm,
       ),
       child: status.isLive
           ? _LiveCard(status: status, onWatchNow: onWatchNow)
           : (status.startsAt == null
-              ? const _EmptyServiceCard()
+              ? const SizedBox.shrink()
               : _NextServiceCard(
                   status: status,
-                  onAddReminder: onAddReminder,
-                  onAddToCalendar: onAddToCalendar,
-                  onDirections: onDirections,
+                  onInvite: onAddReminder, // Using for Invite Friend
+                  onDetails: onDirections,  // Using for Details
                 )),
     ).animate().fadeIn(delay: 320.ms, duration: 400.ms).slideY(
           begin: 0.06,
@@ -123,25 +108,6 @@ class _LiveCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (status.hostLabel != null) ...[
-                    const SizedBox(height: 3),
-                    Text(
-                      status.hostLabel!,
-                      style: AppTypography.textTheme.bodySmall?.copyWith(
-                        color: Colors.white70,
-                      ),
-                    ),
-                  ],
-                  if (status.viewerCount != null) ...[
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      '${status.viewerCount} watching',
-                      style: AppTypography.textTheme.bodySmall?.copyWith(
-                        color: Colors.white60,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ],
                 ],
               ),
             ),
@@ -158,22 +124,16 @@ class _LiveCard extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusFull),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
-                        Iconography.live,
-                        color: Color(0xFFDC2626),
-                        size: 16,
-                      ),
+                      const Icon(Iconography.live, color: Color(0xFFDC2626), size: 16),
                       const SizedBox(width: 4),
                       Text(
                         'Watch',
-                        style:
-                            AppTypography.textTheme.labelMedium?.copyWith(
+                        style: AppTypography.textTheme.labelMedium?.copyWith(
                           color: const Color(0xFFDC2626),
                           fontWeight: FontWeight.w800,
                         ),
@@ -234,15 +194,13 @@ class _PulseDot extends StatelessWidget {
 class _NextServiceCard extends StatefulWidget {
   const _NextServiceCard({
     required this.status,
-    this.onAddReminder,
-    this.onAddToCalendar,
-    this.onDirections,
+    this.onInvite,
+    this.onDetails,
   });
 
   final ServiceStatus status;
-  final VoidCallback? onAddReminder;
-  final VoidCallback? onAddToCalendar;
-  final VoidCallback? onDirections;
+  final VoidCallback? onInvite;
+  final VoidCallback? onDetails;
 
   @override
   State<_NextServiceCard> createState() => _NextServiceCardState();
@@ -256,10 +214,6 @@ class _NextServiceCardState extends State<_NextServiceCard> {
   void initState() {
     super.initState();
     _update();
-    // Tick once per second. If the user prefers reduced motion, the
-    // UI rebuilds once per second instead of churning — the value
-    // still updates. (We deliberately don't read MediaQuery here:
-    // doing so in initState would throw.)
     _timer = Timer.periodic(const Duration(seconds: 1), (_) => _update());
   }
 
@@ -280,285 +234,179 @@ class _NextServiceCardState extends State<_NextServiceCard> {
     super.dispose();
   }
 
-  /// Format as `HH:MM:SS` (days omitted if 0). Sub-hour shows `MM:SS`.
-  String _format(Duration d) {
-    final days = d.inDays;
-    final hours = d.inHours.remainder(24);
-    final minutes = d.inMinutes.remainder(60);
-    final seconds = d.inSeconds.remainder(60);
-
+  @override
+  Widget build(BuildContext context) {
+    final days = _remaining.inDays;
+    final hours = _remaining.inHours.remainder(24);
+    final minutes = _remaining.inMinutes.remainder(60);
     String two(int n) => n.toString().padLeft(2, '0');
 
-    if (days > 0) {
-      return '${days}d ${two(hours)}:${two(minutes)}:${two(seconds)}';
-    }
-    if (hours > 0) {
-      return '${two(hours)}:${two(minutes)}:${two(seconds)}';
-    }
-    return '${two(minutes)}:${two(seconds)}';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final s = widget.status;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(color: AppColors.dividerLight),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.navy.withValues(alpha: 0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: AppElevation.shadowFor(AppElevation.level1),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Header row — icon + title + countdown
-            Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: AppColors.goldContainer,
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusMd),
-                  ),
-                  child: const Icon(
-                    Iconography.calendar,
-                    color: AppColors.goldDark,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'NEXT SERVICE',
-                        style: AppTypography.scriptureRef.copyWith(
-                          color: AppColors.goldDark,
-                          fontSize: 9,
-                          letterSpacing: 1.5,
-                        ),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        s.title,
-                        style:
-                            AppTypography.textTheme.titleSmall?.copyWith(
-                          color: AppColors.navy,
-                          fontWeight: FontWeight.w800,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      if (s.hostLabel != null) ...[
-                        const SizedBox(height: 2),
-                        Text(
-                          'with ${s.hostLabel}',
-                          style:
-                              AppTypography.textTheme.bodySmall?.copyWith(
-                            color: AppColors.textSecondary,
-                            fontSize: 11,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Text(
-                  _format(_remaining),
-                  style: AppTypography.textTheme.titleMedium?.copyWith(
-                    color: AppColors.navy,
-                    fontWeight: FontWeight.w800,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
-                ),
-              ],
-            ),
-            if (s.locationLabel != null) ...[
-              const SizedBox(height: AppSpacing.md),
-              Row(
-                children: [
-                  const Icon(
-                    Iconography.directions,
-                    size: 14,
-                    color: AppColors.textSecondary,
-                  ),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: Text(
-                      s.locationLabel!,
-                      style: AppTypography.textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
-                        fontSize: 11,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-            const SizedBox(height: AppSpacing.md),
-            Container(
-              height: 0.5,
-              color: AppColors.dividerLight,
-            ),
-            const SizedBox(height: AppSpacing.md),
-            // Action row — equal-width tiles so they fit a 320dp card
-            // (the dashboard uses 1080×2400 → ~360dp content width).
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: _MiniAction(
-                    icon: Iconography.reminder,
-                    label: 'Remind',
-                    onTap: widget.onAddReminder,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.xs),
-                Expanded(
-                  child: _MiniAction(
-                    icon: Iconography.calendar,
-                    label: 'Calendar',
-                    onTap: widget.onAddToCalendar,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.xs),
-                Expanded(
-                  child: _MiniAction(
-                    icon: Iconography.directions,
-                    label: 'Directions',
-                    onTap: widget.onDirections,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _MiniAction extends StatelessWidget {
-  const _MiniAction({
-    required this.icon,
-    required this.label,
-    this.onTap,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: label,
-      child: Material(
-        color: AppColors.goldContainer.withValues(alpha: 0.6),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: 8,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(icon, size: 14, color: AppColors.goldDark),
-                const SizedBox(width: 4),
-                Flexible(
-                  child: Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTypography.textTheme.labelSmall?.copyWith(
-                      color: AppColors.goldDark,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Empty State ───────────────────────────────────────────────────────────────
-
-class _EmptyServiceCard extends StatelessWidget {
-  const _EmptyServiceCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: AppColors.goldContainer.withValues(alpha: 0.4),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        border: Border.all(
-          color: AppColors.gold.withValues(alpha: 0.2),
-        ),
-      ),
-      child: Row(
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
         children: [
-          const Icon(
-            Iconography.calendar,
-            color: AppColors.goldDark,
-            size: 24,
+          // Background decorative glow
+          Positioned(
+            top: -40,
+            right: -40,
+            child: Container(
+              width: 128,
+              height: 128,
+              decoration: BoxDecoration(
+                color: AppColors.gold.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+            ),
           ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
+          
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
+                Row(
+                  children: [
+                    const Icon(Icons.calendar_today_rounded, size: 16, color: AppColors.goldDark),
+                    const SizedBox(width: AppSpacing.xs),
+                    Text(
+                      'NEXT SERVICE',
+                      style: AppTypography.textTheme.labelMedium?.copyWith(
+                        color: AppColors.goldDark,
+                        letterSpacing: 1.5,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.xs),
                 Text(
-                  'Schedule coming soon',
-                  style: AppTypography.textTheme.titleSmall?.copyWith(
-                    color: AppColors.navy,
-                    fontWeight: FontWeight.w700,
+                  widget.status.title,
+                  style: AppTypography.textTheme.titleLarge?.copyWith(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  'We’re preparing the next service schedule — check back shortly.',
-                  style: AppTypography.textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                    height: 1.4,
+                if (widget.status.locationLabel != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    '${widget.status.locationLabel} · 9:00 AM', // hardcoded time mock to match design
+                    style: AppTypography.textTheme.bodyMedium?.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
                   ),
+                ],
+                const SizedBox(height: AppSpacing.xl),
+                
+                // Countdown Timer Box
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.md,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceLight,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.dividerLight),
+                    boxShadow: AppElevation.shadowFor(AppElevation.level0),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _TimeBlock(value: two(days), label: 'Days'),
+                      const SizedBox(width: AppSpacing.sm),
+                      _TimeBlock(value: two(hours), label: 'Hrs'),
+                      const SizedBox(width: AppSpacing.sm),
+                      _TimeBlock(value: two(minutes), label: 'Mins', highlight: true),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                
+                // Action Buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: widget.onInvite,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.goldDark,
+                          foregroundColor: AppColors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                        ),
+                        icon: const Icon(Icons.group_add_rounded, size: 18),
+                        label: const Text('Invite Friend', style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: widget.onDetails,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.surfaceContainerLight,
+                          foregroundColor: AppColors.textPrimary,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                        ),
+                        child: const Text('Details', style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _TimeBlock extends StatelessWidget {
+  const _TimeBlock({required this.value, required this.label, this.highlight = false});
+  final String value;
+  final String label;
+  final bool highlight;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
+      children: [
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.w300,
+            color: highlight ? AppColors.goldDark : AppColors.textPrimary,
+            fontFamily: 'Roboto',
+            letterSpacing: -1,
+          ),
+        ),
+        const SizedBox(width: 2),
+        Text(
+          label.toUpperCase(),
+          style: AppTypography.textTheme.labelSmall?.copyWith(
+            color: highlight ? AppColors.goldDark : AppColors.textSecondary,
+            letterSpacing: 1,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
     );
   }
 }

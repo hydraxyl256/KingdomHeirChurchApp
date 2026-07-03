@@ -160,15 +160,12 @@ enabled = true
 # Production redirect target — see lib/core/auth/deep_links.dart for the
 # client-side mirror. Localhost references were removed so that locally-
 # issued Supabase emails also hand off cleanly to the production app.
-site_url = "https://https://kingdomheirsfoundation.com"
+site_url = "kingdomheirs://auth/callback"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
 # The custom-scheme form is listed as a fallback when App Links / Universal
 # Links verification is not yet active on the device.
 additional_redirect_urls = [
-  "https://https://kingdomheirsfoundation.com",
-  "https://https://kingdomheirsfoundation.com/verify",
-  "https://https://kingdomheirsfoundation.com/reset-password",
-  "https://https://kingdomheirsfoundation.com/login-callback",
+  "kingdomheirs://auth/callback",
   "kingdomheir://verify",
   "kingdomheir://reset-password",
   "kingdomheir://login-callback",

@@ -50,7 +50,7 @@ class AuthRemoteDataSource {
       // Info.plist, then routed into the app via [DeepLinkHandler]. We
       // intentionally use the universal link (not the custom scheme) so
       // the App Links / Universal Links verification flows apply.
-      emailRedirectTo: DeepLinks.verifyEmailUrl(),
+      emailRedirectTo: DeepLinks.authCallbackUrl,
     );
     final user = response.user;
     if (user == null) throw const AuthException('Sign up failed.');
@@ -79,28 +79,28 @@ class AuthRemoteDataSource {
 
   Future<UserModel> signInWithGoogle() async {
     try {
-      // The Web Client ID required for Supabase OAuth with Google Sign-In.
-      // Configure via dart-define or update this constant directly.
-      const webClientId = String.fromEnvironment(
-        'GOOGLE_WEB_CLIENT_ID',
-        defaultValue: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com',
-      );
+      const webClientId = String.fromEnvironment('GOOGLE_WEB_CLIENT_ID');
+      
+      if (webClientId.isEmpty || !webClientId.endsWith('.apps.googleusercontent.com')) {
+        throw const AuthException('Google sign-in is temporarily unavailable. Please use email and password.');
+      }
 
       final googleSignIn = GoogleSignIn(
         serverClientId: webClientId,
+        scopes: const ['email', 'profile'],
       );
 
       final googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
-        throw const AuthException('Google sign-in cancelled by user.');
+        throw GoogleAuthCancelledException();
       }
 
       final googleAuth = await googleUser.authentication;
       final accessToken = googleAuth.accessToken;
       final idToken = googleAuth.idToken;
 
-      if (idToken == null) {
-        throw const AuthException('Missing Google ID Token.');
+      if (idToken == null || idToken.isEmpty) {
+        throw const AuthException('Google sign-in could not be completed. Please try again.');
       }
 
       final response = await _client.auth.signInWithIdToken(
@@ -111,16 +111,24 @@ class AuthRemoteDataSource {
 
       final user = response.user;
       if (user == null) {
-        throw const AuthException('Failed to sign in with Supabase.');
+        throw const AuthException('We could not sign you in with Google. Please try again or use email sign-in.');
       }
 
       await _ensureProfileForCurrentUser();
 
       return _fetchProfile(user);
+    } on GoogleAuthCancelledException {
+      rethrow;
     } on AuthException {
       rethrow;
     } catch (e) {
-      throw AuthException('Google sign-in failed: $e');
+      final errorStr = e.toString();
+      if (errorStr.contains('Sign_in_failed') || errorStr.contains('DEVELOPER_ERROR') || errorStr.contains('10:')) {
+        throw const AuthException('Google sign-in needs an app configuration update. Please try again later.');
+      } else if (errorStr.toLowerCase().contains('network') || errorStr.toLowerCase().contains('socket') || errorStr.toLowerCase().contains('connection')) {
+        throw const AuthException('Check your internet connection and try again.');
+      }
+      throw const AuthException('We could not sign you in with Google. Please try again or use email sign-in.');
     }
   }
 
@@ -130,7 +138,7 @@ class AuthRemoteDataSource {
   Future<void> resetPassword(String email) =>
       _client.auth.resetPasswordForEmail(
         email,
-        redirectTo: DeepLinks.resetPasswordUrl(),
+        redirectTo: DeepLinks.authCallbackUrl,
       );
 
   /// Resends the email-verification message. Returns silently on success
@@ -141,7 +149,7 @@ class AuthRemoteDataSource {
       await _client.auth.resend(
         type: OtpType.email,
         email: email,
-        emailRedirectTo: DeepLinks.verifyEmailUrl(),
+        emailRedirectTo: DeepLinks.authCallbackUrl,
       );
     } on AuthException {
       rethrow;
@@ -193,20 +201,36 @@ class AuthRemoteDataSource {
   Future<void> _ensureProfileForCurrentUser() async {
     final user = _client.auth.currentUser;
     if (user == null) return;
+    
     final existing = await _client
         .from('profiles')
         .select('id')
         .eq('id', user.id)
         .maybeSingle();
+        
     if (existing == null) {
       final meta = user.userMetadata ?? {};
-      await _client.from('profiles').upsert({
+      final emailName = user.email?.split('@').first;
+      
+      final fullName = meta['full_name'] as String? ?? 
+                       meta['name'] as String? ?? 
+                       emailName ?? 
+                       'Kingdom Heirs Member';
+                       
+      final avatarUrl = meta['avatar_url'] as String? ?? 
+                        meta['picture'] as String?;
+
+      await _client.from('profiles').insert({
         'id': user.id,
         'email': user.email ?? '',
-        'full_name': meta['full_name'] ?? meta['name'] ?? 'Member',
-        'avatar_url': meta['avatar_url'] ?? meta['picture'],
+        'full_name': fullName,
+        'avatar_url': avatarUrl,
         'role': 'member',
+        'created_at': DateTime.now().toIso8601String(),
       });
     }
   }
 }
+
+/// Thrown when the user cancels the Google Sign-In native picker.
+class GoogleAuthCancelledException implements Exception {}

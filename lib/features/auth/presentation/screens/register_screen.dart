@@ -41,6 +41,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
+  final _nameController = TextEditingController();
 
   // Toggles
   bool _obscurePassword = true;
@@ -51,6 +52,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   bool _emailTouched = false;
   bool _passwordTouched = false;
   bool _confirmTouched = false;
+  bool _nameTouched = false;
 
   @override
   void initState() {
@@ -58,6 +60,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     _emailController.addListener(() => _onChanged('email'));
     _passwordController.addListener(() => _onChanged('password'));
     _confirmController.addListener(() => _onChanged('confirm'));
+    _nameController.addListener(() => _onChanged('name'));
   }
 
   @override
@@ -65,6 +68,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmController.dispose();
+    _nameController.dispose();
     super.dispose();
   }
 
@@ -80,6 +84,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           _passwordTouched = true;
         case 'confirm':
           _confirmTouched = true;
+        case 'name':
+          _nameTouched = true;
       }
     });
   }
@@ -97,6 +103,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   static final RegExp _digitRegex = RegExp('[0-9]');
   static final RegExp _specialRegex =
       RegExp(r'[!@#$&*~%^()_\-+=\[\]{};:.,?<>/|\\]');
+
+  String? _validateName(String? raw) {
+    final value = raw?.trim() ?? '';
+    if (value.isEmpty) return 'Full name is required';
+    if (value.length < 2) return 'Enter your full name';
+    return null;
+  }
 
   String? _validateEmail(String? raw) {
     final value = raw?.trim() ?? '';
@@ -138,9 +151,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) {
-      // Force re-validate so all 3 fields show errors even if user
+      // Force re-validate so all fields show errors even if user
       // hit Enter without touching them.
       setState(() {
+        _nameTouched = true;
         _emailTouched = true;
         _passwordTouched = true;
         _confirmTouched = true;
@@ -149,13 +163,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
 
     final email = _emailController.text.trim();
+    final fullName = _nameController.text.trim();
 
     await ref.read(authNotifierProvider.notifier).signUp(
           email: email,
           password: _passwordController.text,
-          fullName: '', // No name field — Supabase profile populated
-          //                    via OAuth metadata or by the user in
-          //                    their profile screen.
+          fullName: fullName,
         );
 
     if (!mounted) return;
@@ -200,7 +213,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     // registration — even if Supabase happens to confirm the email
     // synchronously, the screen handles that and forwards to the
     // dashboard.
-    context.go('${RouteNames.verifyEmail}?email=${Uri.encodeComponent(email)}');
+    context.go('${RouteNames.checkYourEmail}?email=${Uri.encodeComponent(email)}');
   }
 
   // ── Submit — Google OAuth ────────────────────────────────────────────────
@@ -316,6 +329,32 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 _TitleBlock(reduceMotion: reduceMotion),
 
                                 const SizedBox(height: AppSpacing.xl),
+
+                                // ── Full Name ─────────────────────────
+                                _AuthLabel(
+                                  text: 'Full Name',
+                                  reduceMotion: reduceMotion,
+                                ),
+                                const SizedBox(height: AppSpacing.xs),
+                                TextFormField(
+                                  controller: _nameController,
+                                  keyboardType: TextInputType.name,
+                                  textInputAction: TextInputAction.next,
+                                  textCapitalization: TextCapitalization.words,
+                                  autofillHints: const [AutofillHints.name],
+                                  style: _fieldTextStyle(),
+                                  decoration: _fieldDecoration(
+                                    hint: 'Enter your full name',
+                                    icon: Icons.person_outline_rounded,
+                                  ),
+                                  validator: (v) =>
+                                      _nameTouched ? _validateName(v) : null,
+                                  onChanged: (_) => _nameTouched = true,
+                                  onFieldSubmitted: (_) =>
+                                      FocusScope.of(context).nextFocus(),
+                                ),
+
+                                const SizedBox(height: AppSpacing.lg),
 
                                 // ── Email ─────────────────────────
                                 _AuthLabel(
@@ -585,36 +624,50 @@ class _BrandHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
-          width: logoSize,
-          height: logoSize,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: RadialGradient(
-              colors: [
-                AppColors.gold.withValues(alpha: 0.35),
-                AppColors.gold.withValues(alpha: 0),
+        Semantics(
+          label: 'Kingdom Heirs',
+          image: true,
+          child: Container(
+            width: logoSize,
+            height: logoSize,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.warmWhite,
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.gold.withValues(alpha: 0.35),
+                  blurRadius: 24,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 8),
+                ),
               ],
             ),
-          ),
-          child: Center(
+            padding: EdgeInsets.all(logoSize * 0.16),
             child: ClipOval(
               child: Image.asset(
                 'assets/images/logo.jpeg',
-                width: logoSize - 8,
-                height: logoSize - 8,
-                fit: BoxFit.cover,
+                fit: BoxFit.contain,
+                semanticLabel: 'Kingdom Heirs logo',
               ),
             ),
           ),
         ),
         const SizedBox(height: AppSpacing.md),
         Text(
-          'Kingdom Heirs',
-          style: AppTypography.textTheme.titleLarge!.copyWith(
+          'KINGDOM HEIRS',
+          style: AppTypography.textTheme.titleMedium?.copyWith(
             color: AppColors.gold,
             fontWeight: FontWeight.w800,
-            letterSpacing: 1.6,
+            letterSpacing: 2,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          'INHERITING EXCELLENCE',
+          style: AppTypography.textTheme.labelSmall?.copyWith(
+            color: AppColors.gold.withValues(alpha: 0.7),
+            letterSpacing: 1.5,
+            fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: AppSpacing.xxs),

@@ -1,8 +1,5 @@
 import 'package:equatable/equatable.dart';
 
-/// Visibility of a prayer request.
-enum PrayerVisibility { public, leadersOnly, private }
-
 /// Status lifecycle of a prayer request.
 enum PrayerStatus { active, answered, archived }
 
@@ -10,11 +7,11 @@ enum PrayerStatus { active, answered, archived }
 class PrayerRequest extends Equatable {
   const PrayerRequest({
     required this.id,
-    required this.authorId,
+    required this.userId,
     required this.title,
-    required this.body,
+    required this.content,
     required this.category,
-    required this.visibility,
+    required this.isPublic,
     required this.isAnonymous,
     required this.status,
     required this.prayerCount,
@@ -23,16 +20,14 @@ class PrayerRequest extends Equatable {
     required this.updatedAt,
     this.authorName,
     this.authorAvatarUrl,
-    this.answeredNote,
-    this.answeredAt,
   });
 
   final String id;
-  final String authorId;
+  final String userId;
   final String title;
-  final String body;
+  final String content;
   final String category;
-  final PrayerVisibility visibility;
+  final bool isPublic;
   final bool isAnonymous;
   final PrayerStatus status;
   final int prayerCount;
@@ -41,16 +36,14 @@ class PrayerRequest extends Equatable {
   final DateTime updatedAt;
   final String? authorName;
   final String? authorAvatarUrl;
-  final String? answeredNote;
-  final DateTime? answeredAt;
 
   PrayerRequest copyWith({
     String? id,
-    String? authorId,
+    String? userId,
     String? title,
-    String? body,
+    String? content,
     String? category,
-    PrayerVisibility? visibility,
+    bool? isPublic,
     bool? isAnonymous,
     PrayerStatus? status,
     int? prayerCount,
@@ -59,16 +52,14 @@ class PrayerRequest extends Equatable {
     DateTime? updatedAt,
     String? authorName,
     String? authorAvatarUrl,
-    String? answeredNote,
-    DateTime? answeredAt,
   }) =>
       PrayerRequest(
         id: id ?? this.id,
-        authorId: authorId ?? this.authorId,
+        userId: userId ?? this.userId,
         title: title ?? this.title,
-        body: body ?? this.body,
+        content: content ?? this.content,
         category: category ?? this.category,
-        visibility: visibility ?? this.visibility,
+        isPublic: isPublic ?? this.isPublic,
         isAnonymous: isAnonymous ?? this.isAnonymous,
         status: status ?? this.status,
         prayerCount: prayerCount ?? this.prayerCount,
@@ -77,18 +68,16 @@ class PrayerRequest extends Equatable {
         updatedAt: updatedAt ?? this.updatedAt,
         authorName: authorName ?? this.authorName,
         authorAvatarUrl: authorAvatarUrl ?? this.authorAvatarUrl,
-        answeredNote: answeredNote ?? this.answeredNote,
-        answeredAt: answeredAt ?? this.answeredAt,
       );
 
   @override
   List<Object?> get props => [
         id,
-        authorId,
+        userId,
         title,
-        body,
+        content,
         category,
-        visibility,
+        isPublic,
         isAnonymous,
         status,
         prayerCount,
@@ -97,8 +86,6 @@ class PrayerRequest extends Equatable {
         updatedAt,
         authorName,
         authorAvatarUrl,
-        answeredNote,
-        answeredAt,
       ];
 }
 

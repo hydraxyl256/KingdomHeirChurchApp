@@ -254,7 +254,7 @@ class HomeDashboardRepository {
                           authorName: row['author_name'] as String,
                           preview: row['preview'] as String,
                           avatarUrl: row['avatar_url'] as String?,
-                          prayerCount: row['prayer_count'] as int? ?? 0,
+                          prayerCount: row['pray_count'] as int? ?? 0,
                         ),)
                     .toList(growable: false),
           );

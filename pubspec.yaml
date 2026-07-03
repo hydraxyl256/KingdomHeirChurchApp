@@ -115,6 +115,7 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/images/dashboard/
     - assets/icons/
     - assets/lottie/
 

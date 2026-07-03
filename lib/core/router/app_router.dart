@@ -15,6 +15,7 @@ import 'package:kingdom_heir/features/admin/presentation/screens/admin_moderatio
 import 'package:kingdom_heir/features/admin/presentation/screens/admin_sermons_screen.dart';
 import 'package:kingdom_heir/features/admin/presentation/screens/admin_shell.dart';
 import 'package:kingdom_heir/features/auth/presentation/providers/auth_provider.dart';
+import 'package:kingdom_heir/features/auth/presentation/screens/auth_callback_screen.dart';
 import 'package:kingdom_heir/features/auth/presentation/screens/check_your_email_screen.dart';
 import 'package:kingdom_heir/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:kingdom_heir/features/auth/presentation/screens/login_screen.dart';
@@ -92,15 +93,13 @@ import 'package:kingdom_heir/features/volunteers/presentation/screens/volunteer_
 
 /// Global GoRouter provider — no code generation required.
 final appRouterProvider = Provider<GoRouter>((ref) {
-  // Listen to auth state changes so the router rebuilds on sign in/out
-  final authState = ref.watch(authStateProvider);
-
   return GoRouter(
     navigatorKey: NotificationRouter.navigatorKey,
     initialLocation: RouteNames.dashboard,
     debugLogDiagnostics: true,
     refreshListenable: _AuthStateListenable(ref),
     redirect: (context, state) {
+      final authState = ref.read(authStateProvider);
       final isLoggedIn = authState.valueOrNull != null;
       final localStorage = ref.read(localStorageServiceProvider);
       final onboardingDone =
@@ -127,7 +126,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         return RouteNames.roleSelection;
       }
 
-      if (isLoggedIn && onboardingDone && roleSelected && isAtAuth) {
+      if (isLoggedIn && onboardingDone && roleSelected && (isAtAuth || isAtStartHere)) {
         return RouteNames.dashboard;
       }
 
@@ -206,14 +205,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (_, __) => const ResetPasswordScreen(),
       ),
 
-      // ── Email Verification Deep-Link Landing ──────────────────────────
-      // Reached when the user taps the verification link in their email.
-      // The custom-scheme form (kingdomheir://verify) is mapped to this
-      // path by GoRouter's path matcher — the universal-link form
-      // (https://https://kingdomheirsfoundation.com/verify) is delivered to the
-      // app by Android's App Links / iOS Universal Links.
+      // ── Email Verification Landing ──────────────────────────────────────────
+      // Reached when the user registers. Instructs them to check their email.
       GoRoute(
-        path: RouteNames.verifyEmail,
+        path: RouteNames.checkYourEmail,
         builder: (context, state) {
           final storage = ref.read(localStorageServiceProvider);
           final pending = storage.getString(
@@ -224,6 +219,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             email: (fromQuery != null && fromQuery.isNotEmpty)
                 ? fromQuery
                 : (pending ?? ''),
+          );
+        },
+      ),
+
+      // ── Deep-Link Auth Callback ──────────────────────────────────────────
+      // Reached when the user taps the verification link in their email but Supabase 
+      // returns an error (e.g. link expired, invalid).
+      GoRoute(
+        path: RouteNames.authCallback,
+        builder: (context, state) {
+          return AuthCallbackScreen(
+            errorDescription: state.uri.queryParameters['error_description'],
+            errorCode: state.uri.queryParameters['error_code'],
           );
         },
       ),

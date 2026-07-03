@@ -48,7 +48,7 @@ class SupabasePrayerRepository implements PrayerRepository {
       // dashboard-only prayer_requests table shadowing the relationship).
       final response = await _client
           .from('prayer_requests')
-          .select('*, profiles!author_id(full_name, avatar_url)')
+          .select('*, profiles!user_id(full_name, avatar_url)')
           .order('created_at', ascending: false)
           .limit(limit);
 
@@ -72,7 +72,7 @@ class SupabasePrayerRepository implements PrayerRepository {
         return left('You must be logged in to submit a prayer request.');
       }
 
-      insertData['author_id'] = user.id;
+      insertData['user_id'] = user.id;
 
       await _client.from('prayer_requests').insert(insertData);
 

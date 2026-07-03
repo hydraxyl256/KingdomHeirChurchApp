@@ -134,8 +134,8 @@ class SupabaseGlobalSearchRepository {
     try {
       final response = await _client
           .from('prayer_requests')
-          .select('id, title, body, profiles!author_id(full_name)')
-          .or('title.ilike.$pattern,body.ilike.$pattern')
+          .select('id, title, content, profiles!user_id(full_name)')
+          .or('title.ilike.$pattern,content.ilike.$pattern')
           .order('created_at', ascending: false)
           .limit(5);
       for (final row in response as List) {
@@ -151,7 +151,7 @@ class SupabaseGlobalSearchRepository {
           subtitle: author == null || author.isEmpty
               ? 'Community prayer'
               : 'Prayed for by $author',
-          description: (map['body'] as String?) ?? '',
+          description: (map['content'] as String?) ?? '',
         ),);
       }
     } catch (_) {/* skip */}

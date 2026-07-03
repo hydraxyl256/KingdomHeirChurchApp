@@ -17,7 +17,7 @@ abstract interface class PrayerRequestRepository {
     required String title,
     required String body,
     required String category,
-    required PrayerVisibility visibility,
+    required bool isPublic,
     required bool isAnonymous,
   });
 

@@ -49,6 +49,7 @@ class ScriptureCard {
     required this.translation,
     this.isBookmarked = false,
     this.audioUrl,
+    this.backgroundUrl,
   });
 
   final String verseText;
@@ -56,6 +57,7 @@ class ScriptureCard {
   final String translation;
   final bool isBookmarked;
   final String? audioUrl;
+  final String? backgroundUrl;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -303,16 +305,27 @@ class WatchCard {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Quick Actions
-// ─────────────────────────────────────────────────────────────────────────────
-
-enum QuickActionItem { bible, prayer, sermons, give }
+enum QuickActionItem {
+  bible,
+  prayer,
+  live,
+  study,
+  groups,
+  giving,
+  events,
+  journal,
+}
 
 extension QuickActionItemX on QuickActionItem {
   String get label => switch (this) {
         QuickActionItem.bible => 'Bible',
         QuickActionItem.prayer => 'Prayer',
-        QuickActionItem.sermons => 'Sermons',
-        QuickActionItem.give => 'Give',
+        QuickActionItem.live => 'Live',
+        QuickActionItem.study => 'Study',
+        QuickActionItem.groups => 'Groups',
+        QuickActionItem.giving => 'Giving',
+        QuickActionItem.events => 'Events',
+        QuickActionItem.journal => 'Journal',
       };
 }
 

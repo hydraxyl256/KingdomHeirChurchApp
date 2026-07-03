@@ -36,12 +36,9 @@ import 'package:kingdom_heir/features/dashboard/presentation/providers/home_dash
 import 'package:kingdom_heir/features/dashboard/presentation/widgets/_shared/dashboard_skeleton.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/widgets/_shared/floating_prayer_button.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/widgets/actions/quick_actions_strip.dart';
-import 'package:kingdom_heir/features/dashboard/presentation/widgets/community/community_highlight_section.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/widgets/continue/continue_carousel.dart';
-import 'package:kingdom_heir/features/dashboard/presentation/widgets/events/church_today_section.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/widgets/greeting/greeting_header.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/widgets/journey/daily_journey_section.dart';
-import 'package:kingdom_heir/features/dashboard/presentation/widgets/prayer/prayer_corner_section.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/widgets/scripture/scripture_hero_card.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/widgets/service/service_status_card.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/widgets/watching/continue_watching_carousel.dart';
@@ -107,20 +104,22 @@ class _HomeDashboardBody extends ConsumerWidget {
             parent: BouncingScrollPhysics(),
           ),
           slivers: [
+            DashboardTopBar(
+              greeting: data.greeting,
+              onNotificationTap: () => context.push(RouteNames.notifications),
+              onAvatarTap: () => context.push(RouteNames.myProfile),
+            ),
             SliverToBoxAdapter(
               child: SafeArea(
+                top: false, // AppBar handles top safe area
                 bottom: false,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // ── 1. Greeting ────────────────────────────────────────
-                    GreetingHeader(
+                    // ── 1. Hero ────────────────────────────────────────────
+                    HeroHeader(
                       greeting: data.greeting,
-                      onNotificationTap: () =>
-                          context.push(RouteNames.notifications),
-                      onSearchTap: () => context.push(RouteNames.globalSearch),
-                      onAvatarTap: () => context.push(RouteNames.myProfile),
                     ),
 
                     const SizedBox(height: AppSpacing.lg),
@@ -151,14 +150,19 @@ class _HomeDashboardBody extends ConsumerWidget {
                       ),
                     ),
 
-                    // ── 3. Continue Your Journey ───────────────────────────
+                    // ── 3. Quick Actions ───────────────────────────────────
+                    QuickActionsStrip(
+                      onActionTap: (action) => _onQuickAction(context, action),
+                    ),
+
+                    // ── 4. Continue Your Journey ───────────────────────────
                     ContinueCarousel(
                       cards: data.continueCards,
                       onCardTap: (card) => _onContinueCardTap(context, card),
                       onStartJourney: () => context.push(RouteNames.biblePlans),
                     ),
 
-                    // ── 4. Live / Next Service ─────────────────────────────
+                    // ── 5. Live / Next Service ─────────────────────────────
                     ServiceStatusCard(
                       status: data.serviceStatus,
                       onWatchNow: () => context.push(RouteNames.live),
@@ -176,7 +180,7 @@ class _HomeDashboardBody extends ConsumerWidget {
                       ),
                     ),
 
-                    // ── 5. Daily Spiritual Journey ─────────────────────────
+                    // ── 6. Daily Spiritual Journey ─────────────────────────
                     DailyJourneySection(
                       journey: data.dailyJourney,
                       onTaskTap: (task) =>
@@ -185,50 +189,12 @@ class _HomeDashboardBody extends ConsumerWidget {
                           _onJourneyTaskToggle(ref, kind, isCompleted),
                     ),
 
-                    // ── 6. Church Today ────────────────────────────────────
-                    ChurchTodaySection(
-                      events: data.todayEvents,
-                      onJoin: (e) => _toast(
-                        context,
-                        e.isOnline
-                            ? 'Joining ${e.title}…'
-                            : 'Opening directions to ${e.title}…',
-                      ),
-                      onReminder: (e) => _toast(
-                        context,
-                        'Reminder set for ${e.title}',
-                      ),
-                      onSeeAll: () => context.push(RouteNames.events),
-                    ),
-
-                    // ── 7. Prayer Corner ───────────────────────────────────
-                    PrayerCornerSection(
-                      corner: data.prayerCorner,
-                      onPray: (req) =>
-                          _onPrayerRequest(context, ref, req),
-                      onSubmit: () => context.push(RouteNames.submitPrayer),
-                      onSeeAll: () => context.push(RouteNames.prayerFeed),
-                    ),
-
-                    // ── 8. Community ───────────────────────────────────────
-                    CommunityHighlightSection(
-                      highlight: data.communityHighlight,
-                      onGroupsTap: () => context.push(RouteNames.groups),
-                      onMembersTap: () => context.push(RouteNames.members),
-                      onNewsTap: () => context.push(RouteNames.news),
-                    ),
-
-                    // ── 9. Continue Watching ───────────────────────────────
+                    // ── 7. Continue Watching ───────────────────────────────
                     ContinueWatchingCarousel(
                       cards: data.watchCards,
                       onCardTap: (card) =>
                           context.push(RouteNames.sermonDetails),
                       onSeeAll: () => context.push(RouteNames.sermons),
-                    ),
-
-                    // ── 10. Quick Actions ──────────────────────────────────
-                    QuickActionsStrip(
-                      onActionTap: (action) => _onQuickAction(context, action),
                     ),
 
                     // Bottom breathing room for nav bar + FAB clearance
@@ -299,22 +265,7 @@ class _HomeDashboardBody extends ConsumerWidget {
     }
   }
 
-  Future<void> _onPrayerRequest(
-    BuildContext context,
-    WidgetRef ref,
-    PrayerRequest req,
-  ) async {
-    // Optimistic UI update via invalidation is the simplest path here —
-    // the repository handles offline fallback, and the existing card
-    // surface already reflects the latest count on next render.
-    await ref
-        .read(homeDashboardRepositoryProvider)
-        .incrementPrayerCount(req.id);
-    ref.invalidate(prayerCornerProvider);
-    if (context.mounted) {
-      _toast(context, 'Praying for ${req.authorName}');
-    }
-  }
+
 
   void _onQuickAction(BuildContext context, QuickActionItem action) {
     switch (action) {
@@ -322,10 +273,19 @@ class _HomeDashboardBody extends ConsumerWidget {
         context.push(RouteNames.bible);
       case QuickActionItem.prayer:
         context.push(RouteNames.prayerFeed);
-      case QuickActionItem.sermons:
-        context.push(RouteNames.sermons);
-      case QuickActionItem.give:
+      case QuickActionItem.live:
+        context.push(RouteNames.live);
+      case QuickActionItem.study:
+        context.push(RouteNames.biblePlans);
+      case QuickActionItem.groups:
+        context.push(RouteNames.groups);
+      case QuickActionItem.giving:
         context.push(RouteNames.giving);
+      case QuickActionItem.events:
+        context.push(RouteNames.events);
+      case QuickActionItem.journal:
+        // context.push(RouteNames.journal); // if it exists
+        _toast(context, 'Opening Journal...');
     }
   }
 

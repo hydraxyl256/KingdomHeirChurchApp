@@ -68,14 +68,12 @@ class PrayerFeedNotifier extends AsyncNotifier<List<PrayerRequest>> {
           final parsed = PrayerRequestModel.fromJson(raw);
           updatedList[index] = current.copyWith(
             title: parsed.title,
-            body: parsed.body,
+            content: parsed.content,
             status: parsed.toEntity().status,
             prayerCount: parsed.prayerCount,
             category: parsed.category,
-            visibility: parsed.toEntity().visibility,
+            isPublic: parsed.isPublic,
             isAnonymous: parsed.isAnonymous,
-            answeredNote: parsed.answeredNote,
-            answeredAt: parsed.answeredAt,
           );
         } else {
           // New request arrived. In a real app, you might want to fetch the profile manually here

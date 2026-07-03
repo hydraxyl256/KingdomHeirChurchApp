@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
-import 'package:kingdom_heir/core/theme/elevation.dart';
 import 'package:kingdom_heir/core/theme/motion.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/core/theme/spacing.dart';
@@ -117,16 +116,14 @@ class _SplashBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     return const DecoratedBox(
       decoration: BoxDecoration(
-        // Layered radial gradients give the screen a soft cinematic depth
-        // without resorting to a per-frame animation.
         gradient: RadialGradient(
-          radius: 1.2,
+          center: Alignment(0, -0.8), // Top center lighting
+          radius: 1.5,
           colors: [
-            Color(0xFF162033), // softer centre
-            Color(0xFF0F172A), // mid navy
-            Color(0xFF0B1120), // deepest edge
+            Color(0xFF141B2D), // Subtle top lighting
+            Color(0xFF0E1323), // Deep background
           ],
-          stops: [0.0, 0.55, 1.0],
+          stops: [0.0, 1.0],
         ),
       ),
     );
@@ -243,73 +240,78 @@ class _SplashHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Match the native splash screen dimensions exactly.
-    const logoSize = 200.0;
-
-    // Reserve vertical room above the bottom progress so nothing overlaps.
+    final mq = MediaQuery.of(context);
+    final logoSize = (mq.size.shortestSide * 0.42).clamp(160.0, 240.0);
     const reservedBottom = AppSpacing.huge + AppSpacing.xxxl;
 
-    final logo = Semantics(
-      label: 'Kingdom Heirs logo',
+    final logoContainer = Semantics(
+      label: 'Kingdom Heirs',
       image: true,
-      child: const SizedBox(
+      child: Container(
         width: logoSize,
         height: logoSize,
-        child: _LogoMark(size: logoSize),
-      ),
-    );
-
-    final tagline = Semantics(
-      label: 'Inheriting Excellence',
-      child: Text(
-        'Inheriting Excellence',
-        style: AppTypography.textTheme.titleMedium?.copyWith(
-          fontStyle: FontStyle.italic,
-          fontWeight: FontWeight.w500,
-          color: AppColors.goldLight,
-          letterSpacing: 2,
-          shadows: [
-            Shadow(
-              color: AppColors.gold.withValues(alpha: 0.45),
-              blurRadius: 16,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: AppColors.warmWhite,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.gold.withValues(alpha: 0.35),
+              blurRadius: 40,
+              spreadRadius: 4,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
-        textAlign: TextAlign.center,
-      ),
-    );
-
-    final divider = Semantics(
-      excludeSemantics: true,
-      child: Container(
-        width: AppSpacing.huge,
-        height: 1,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              AppColors.gold.withValues(alpha: 0),
-              AppColors.gold.withValues(alpha: 0.6),
-              AppColors.gold.withValues(alpha: 0),
-            ],
+        padding: EdgeInsets.all(logoSize * 0.16),
+        child: ClipOval(
+          child: Image.asset(
+            'assets/images/logo.jpeg',
+            fit: BoxFit.contain,
+            semanticLabel: 'Kingdom Heirs logo',
+            errorBuilder: (_, __, ___) => _LogoFallback(size: logoSize),
           ),
-          borderRadius: AppRadius.brFull,
         ),
       ),
     );
 
-    final children = <Widget>[
-      logo,
-      const SizedBox(height: AppSpacing.xl),
-      divider,
-      const SizedBox(height: AppSpacing.md),
-      tagline,
-    ];
+    final title = Text(
+      'KINGDOM HEIRS',
+      style: AppTypography.textTheme.headlineSmall?.copyWith(
+        color: AppColors.gold,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 4,
+      ),
+    );
 
-    // Apply entrance animations (or skip them under reduce-motion).
-    final Widget content = Column(
+    final subtitle = Text(
+      'INHERITING EXCELLENCE',
+      style: AppTypography.textTheme.labelMedium?.copyWith(
+        color: AppColors.goldLight.withValues(alpha: 0.8),
+        letterSpacing: 3,
+        fontWeight: FontWeight.w600,
+      ),
+    );
+
+    final content = Column(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
-      children: children,
+      children: [
+        if (reduceMotion)
+          logoContainer
+        else
+          logoContainer
+              .animate(onPlay: (c) => c.repeat(reverse: true))
+              .scale(
+                begin: const Offset(1, 1),
+                end: const Offset(1.04, 1.04),
+                duration: 2500.ms,
+                curve: Curves.easeInOutSine,
+              ),
+        const SizedBox(height: AppSpacing.xxxl),
+        title,
+        const SizedBox(height: AppSpacing.sm),
+        subtitle,
+      ],
     );
 
     if (reduceMotion) {
@@ -322,29 +324,9 @@ class _SplashHero extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: reservedBottom),
       child: content.animate().fadeIn(
-            duration: const Duration(milliseconds: 1200),
+            duration: const Duration(milliseconds: 1500),
             curve: AppMotion.decelerate,
           ),
-    );
-  }
-}
-
-/// Logo mark — uses the brand asset when present, with an elegant vector
-/// fallback (gold serif "K" in a gold ring) so the splash is never broken.
-class _LogoMark extends StatelessWidget {
-  const _LogoMark({required this.size});
-
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return Image.asset(
-      'assets/images/logo.jpeg',
-      width: size,
-      height: size,
-      fit: BoxFit.contain,
-      semanticLabel: 'Kingdom Heirs',
-      errorBuilder: (_, __, ___) => _LogoFallback(size: size),
     );
   }
 }
@@ -359,22 +341,13 @@ class _LogoFallback extends StatelessWidget {
     return Container(
       width: size,
       height: size,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         shape: BoxShape.circle,
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           colors: [AppColors.goldDark, AppColors.gold, AppColors.goldLight],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        boxShadow: AppElevation.shadowFor(AppElevation.level3),
-      ),
-      alignment: Alignment.center,
-      child: Icon(
-        // Cross-shaped plus; the production path is `assets/images/logo.jpeg`,
-        // so this fallback only renders if the asset is missing.
-        Icons.add,
-        size: size * 0.5,
-        color: AppColors.navy.withValues(alpha: 0.85),
       ),
     );
   }
@@ -393,9 +366,8 @@ class _SplashProgress extends StatelessWidget {
     final reduceMotion = mq.disableAnimations;
     final screenWidth = mq.size.width;
 
-    // Bar width is responsive — clamped between 200 and 320 logical pixels
-    // for a tasteful, narrow progress strip (not a full-width loader).
-    final barWidth = (screenWidth * 0.55).clamp(200.0, 320.0);
+    // Bar width is responsive — clamped between 150 and 240 logical pixels.
+    final barWidth = (screenWidth * 0.4).clamp(150.0, 240.0);
 
     return Semantics(
       label: 'Loading the Kingdom Heirs app',
@@ -409,7 +381,7 @@ class _SplashProgress extends StatelessWidget {
               borderRadius: AppRadius.brFull,
               child: LinearProgressIndicator(
                 value: reduceMotion ? 1 : null,
-                minHeight: 2,
+                minHeight: 2.5,
                 backgroundColor: AppColors.gold.withValues(alpha: 0.15),
                 valueColor: const AlwaysStoppedAnimation<Color>(
                   AppColors.gold,
@@ -419,21 +391,6 @@ class _SplashProgress extends StatelessWidget {
           )
               .animate()
               .fadeIn(delay: AppMotion.standard, duration: AppMotion.standard),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            'PREPARING KINGDOM ASSETS',
-            style: AppTypography.textTheme.labelSmall?.copyWith(
-              color: AppColors.warmWhite.withValues(alpha: 0.55),
-              letterSpacing: 3,
-              fontWeight: FontWeight.w500,
-            ),
-            textAlign: TextAlign.center,
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-          ).animate().fadeIn(
-                delay: const Duration(milliseconds: 400),
-                duration: AppMotion.standard,
-              ),
         ],
       ),
     );

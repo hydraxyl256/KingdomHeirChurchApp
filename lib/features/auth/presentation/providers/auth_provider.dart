@@ -56,27 +56,10 @@ final authStateProvider = StreamProvider<AppUser?>((ref) {
   return ref.watch(authRepositoryProvider).watchAuthState();
 });
 
-/// Manual override that the signout flow sets to null to immediately
-/// trip the redirect logic, even before the Supabase auth-state stream
-/// catches up.
-///
-/// Read order:
-///   1. If [_signedOutOverrideProvider] is set, use that (signout is in progress
-///      or has just completed).
-///   2. Otherwise, fall through to the live [authStateProvider] stream.
+/// Streams the current [AppUser?]. null = signed out.
 final currentUserProvider = Provider<AppUser?>((ref) {
-  // The override wins while it is non-null. We re-read on every
-  // dependency change so a signout flips the user to null synchronously
-  // even if the Supabase stream is mid-emission.
-  final override = ref.watch(_signedOutOverrideProvider);
-  if (override != null) return override;
   return ref.watch(authStateProvider).valueOrNull;
 });
-
-/// State controller that the signout flow sets to `null` to immediately
-/// trip the redirect logic, even before the Supabase auth-state stream
-/// catches up.
-final _signedOutOverrideProvider = StateProvider<AppUser?>((ref) => null);
 
 // ─────────────────────────────────────────────
 // Auth Notifier (Sign In / Up / Out actions)
@@ -94,9 +77,7 @@ class AuthNotifier extends AsyncNotifier<void> {
     state = result.fold(
       (failure) => AsyncError(failure, StackTrace.current),
       (user) {
-        // Clear any leftover signed-out override from a previous
-        // session so the live auth stream takes over again.
-        ref.read(_signedOutOverrideProvider.notifier).state = null;
+
         unawaited(ref.read(analyticsServiceProvider).setUserId(user.id));
         unawaited(ref.read(analyticsServiceProvider).logLogin(method: 'email'));
         unawaited(ref.read(pushNotificationServiceProvider).syncToken());
@@ -117,9 +98,7 @@ class AuthNotifier extends AsyncNotifier<void> {
     state = result.fold(
       (failure) => AsyncError(failure, StackTrace.current),
       (user) {
-        // Clear any leftover signed-out override from a previous
-        // session so the live auth stream takes over again.
-        ref.read(_signedOutOverrideProvider.notifier).state = null;
+
         unawaited(ref.read(analyticsServiceProvider).setUserId(user.id));
         unawaited(ref.read(analyticsServiceProvider).logRegistration(method: 'email'));
         unawaited(ref.read(pushNotificationServiceProvider).syncToken());
@@ -131,46 +110,36 @@ class AuthNotifier extends AsyncNotifier<void> {
   Future<void> signOut() async {
     state = const AsyncLoading();
     try {
-      // 1. Stamp `null` synchronously so the router's redirect logic
-      //    fires the moment the user confirms signout. We don't wait
-      //    for the Supabase auth-state stream to propagate — that
-      //    can take a tick, and the user must not be left on the
-      //    authenticated settings page for a single frame longer
-      //    than necessary.
-      ref.read(_signedOutOverrideProvider.notifier).state = null;
+      // 1. Remove FCM token from Supabase + the local device.
+      // If offline or failed, we continue signing out anyway.
+      try {
+        await ref.read(pushNotificationServiceProvider).removeToken();
+      } catch (_) {
+        // Ignore failure
+      }
 
-      // 2. Remove FCM token from Supabase + the local device BEFORE
-      //    signing out — once we're signed out we lose the auth
-      //    context that lets the user_devices row be deleted.
-      await ref.read(pushNotificationServiceProvider).removeToken();
-
-      // 3. Sign out of Supabase. Wrapped in try so a network failure
-      //    doesn't strand the user — we still want to wipe local
-      //    state below.
+      // 2. Sign out of Supabase.
       try {
         await ref.read(signOutUseCaseProvider).call();
       } catch (_) {
-        // Ignore — local cleanup is still required.
+        // Ignore failure
       }
 
-      // 4. Wipe non-essential local preferences. Keep keys that the
-      //    auth/redirect flow needs to make a sensible decision
-      //    (onboarding-complete, user-role) so the user lands in the
-      //    correct post-logout state instead of being forced back
-      //    through onboarding.
+      // 3. Wipe user-scoped local preferences aggressively.
       final storage = ref.read(localStorageServiceProvider);
-      await storage.remove(LocalStorageKeys.selectedTheme);
-      await storage.remove(LocalStorageKeys.selectedLocale);
-      await storage.remove(LocalStorageKeys.selectedCurrency);
+      await storage.remove(LocalStorageKeys.userRole);
+      await storage.remove(LocalStorageKeys.pendingVerificationEmail);
       await storage.remove(LocalStorageKeys.lastSeenNotification);
       await storage.remove('more_favorites_v1');
 
-      // 5. Invalidate the upstream auth state provider so the next
-      //    time the user signs in, a fresh stream is set up.
+      // 4. Invalidate upstream providers that cache user state.
       ref.invalidate(authStateProvider);
 
-      // 6. Reset analytics identity.
+      // 5. Reset analytics identity.
       unawaited(ref.read(analyticsServiceProvider).setUserId(null));
+
+      // 6. Force state to null so any listeners complete the logout.
+      state = const AsyncData(null);
 
       state = const AsyncData(null);
     } catch (e, st) {
@@ -204,14 +173,15 @@ class AuthNotifier extends AsyncNotifier<void> {
     state = const AsyncLoading();
     try {
       await ref.read(authRemoteDataSourceProvider).signInWithGoogle();
-      // Clear the signed-out override so the live auth stream wins.
-      ref.read(_signedOutOverrideProvider.notifier).state = null;
+
       final user = ref.read(currentUserProvider);
       if (user != null) {
         unawaited(ref.read(analyticsServiceProvider).setUserId(user.id));
         unawaited(ref.read(analyticsServiceProvider).logLogin(method: 'google'));
         unawaited(ref.read(pushNotificationServiceProvider).syncToken());
       }
+      state = const AsyncData(null);
+    } on GoogleAuthCancelledException {
       state = const AsyncData(null);
     } catch (e, st) {
       state = AsyncError(e, st);
