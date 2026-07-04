@@ -2,4 +2,5 @@
 <resources>
     <!-- Kingdom Heirs brand dark navy — matches Flutter splash background -->
     <color name="splashBackground">#0F172A</color>
+	<color name="ic_launcher_background">#160B2D</color>
 </resources>
