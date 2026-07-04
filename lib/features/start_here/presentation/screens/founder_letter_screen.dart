@@ -9,46 +9,47 @@ class FounderLetterScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final contentAsync = ref.watch(startHereContentProvider('founder_letter'));
     return Scaffold(
       appBar: AppBar(
         title: const Text('A Letter from our Founder'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.primary,
+        foregroundColor: isDark ? AppColors.warmWhite : Colors.white,
       ),
       body: contentAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(child: Text('Error: $err')),
+        error: (err, _) => Center(child: Text('Error: $err', style: TextStyle(color: isDark ? AppColors.warmWhite : AppColors.textPrimary))),
         data: (content) {
           return ListView(
             padding: const EdgeInsets.all(AppSpacing.xl),
             children: [
-              const Text(
+              Text(
                 'Welcome to Kingdom Heirs Foundation',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w900,
-                  color: AppColors.primaryDark,
+                  color: isDark ? AppColors.warmWhite : AppColors.primaryDark,
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
               Text(
                 content.body,
-                style: const TextStyle(
-                    fontSize: 16, height: 1.6, color: AppColors.textPrimary,),
+                style: TextStyle(
+                    fontSize: 16, height: 1.6, color: isDark ? AppColors.warmWhite.withValues(alpha: 0.85) : AppColors.textPrimary,),
               ),
               const SizedBox(height: AppSpacing.xl),
-              const Text(
+              Text(
                 'Rev. James Maddalone',
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     fontStyle: FontStyle.italic,
-                    color: AppColors.primary,),
+                    color: isDark ? AppColors.gold : AppColors.primary,),
               ),
-              const Text(
+              Text(
                 'Founder, Kingdom Heirs Foundation',
-                style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+                style: TextStyle(fontSize: 14, color: isDark ? AppColors.warmWhite.withValues(alpha: 0.6) : AppColors.textSecondary),
               ),
               const SizedBox(height: AppSpacing.xxxl),
             ],

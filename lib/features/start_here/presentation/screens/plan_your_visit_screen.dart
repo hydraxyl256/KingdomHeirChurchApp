@@ -122,7 +122,7 @@ class PlanYourVisitScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -221,6 +221,7 @@ class _TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.lg,
@@ -237,7 +238,7 @@ class _TopBar extends StatelessWidget {
               'Plan Your Visit',
               style: AppTypography.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppColors.navy,
+                color: isDark ? AppColors.warmWhite : AppColors.navy,
               ),
             ),
           ),
@@ -384,13 +385,14 @@ class _ServiceTimeRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       children: [
         Container(
           width: 56,
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
           decoration: BoxDecoration(
-            color: AppColors.goldContainer,
+            color: isDark ? AppColors.surfaceDark : AppColors.goldContainer,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           ),
           child: Column(
@@ -398,7 +400,7 @@ class _ServiceTimeRow extends StatelessWidget {
               Text(
                 time.day.substring(0, 3).toUpperCase(),
                 style: AppTypography.textTheme.labelSmall?.copyWith(
-                  color: AppColors.goldDark,
+                  color: isDark ? AppColors.gold : AppColors.goldDark,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.8,
                 ),
@@ -407,7 +409,7 @@ class _ServiceTimeRow extends StatelessWidget {
               Text(
                 time.time,
                 style: AppTypography.textTheme.labelSmall?.copyWith(
-                  color: AppColors.navy,
+                  color: isDark ? AppColors.warmWhite : AppColors.navy,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -423,7 +425,7 @@ class _ServiceTimeRow extends StatelessWidget {
               Text(
                 time.label,
                 style: AppTypography.textTheme.titleSmall?.copyWith(
-                  color: AppColors.navy,
+                  color: isDark ? AppColors.warmWhite : AppColors.navy,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -431,7 +433,7 @@ class _ServiceTimeRow extends StatelessWidget {
               Text(
                 time.note,
                 style: AppTypography.textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: isDark ? AppColors.warmWhite.withValues(alpha: 0.7) : AppColors.textSecondary,
                 ),
               ),
             ],
@@ -459,6 +461,7 @@ class _AddressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return AppCard(
       padding: const EdgeInsets.all(AppSpacing.lg),
       borderRadius: AppSpacing.radiusXl,
@@ -473,7 +476,7 @@ class _AddressCard extends StatelessWidget {
           Text(
             line1,
             style: AppTypography.textTheme.titleSmall?.copyWith(
-              color: AppColors.navy,
+              color: isDark ? AppColors.warmWhite : AppColors.navy,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -481,7 +484,7 @@ class _AddressCard extends StatelessWidget {
           Text(
             line2,
             style: AppTypography.textTheme.bodyMedium?.copyWith(
-              color: AppColors.textSecondary,
+              color: isDark ? AppColors.warmWhite.withValues(alpha: 0.7) : AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
@@ -511,6 +514,7 @@ class _LiveStreamCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return AppCard(
       padding: const EdgeInsets.all(AppSpacing.lg),
       borderRadius: AppSpacing.radiusXl,
@@ -542,7 +546,7 @@ class _LiveStreamCard extends StatelessWidget {
                 Text(
                   'Worship with us online',
                   style: AppTypography.textTheme.titleSmall?.copyWith(
-                    color: AppColors.navy,
+                    color: isDark ? AppColors.warmWhite : AppColors.navy,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -550,7 +554,7 @@ class _LiveStreamCard extends StatelessWidget {
                 Text(
                   'Stream our services live on YouTube.',
                   style: AppTypography.textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: isDark ? AppColors.warmWhite.withValues(alpha: 0.7) : AppColors.textSecondary,
                   ),
                 ),
               ],
@@ -656,6 +660,7 @@ class _ContactRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return InkWell(
       borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
       onTap: onTap,
@@ -663,7 +668,7 @@ class _ContactRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
         child: Row(
           children: [
-            Icon(icon, size: AppSpacing.iconMd, color: AppColors.goldDark),
+            Icon(icon, size: AppSpacing.iconMd, color: isDark ? AppColors.gold : AppColors.goldDark),
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
@@ -673,14 +678,14 @@ class _ContactRow extends StatelessWidget {
                   Text(
                     label,
                     style: AppTypography.textTheme.labelSmall?.copyWith(
-                      color: AppColors.textSecondary,
+                      color: isDark ? AppColors.warmWhite.withValues(alpha: 0.7) : AppColors.textSecondary,
                       letterSpacing: 0.6,
                     ),
                   ),
                   Text(
                     value,
                     style: AppTypography.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.navy,
+                      color: isDark ? AppColors.warmWhite : AppColors.navy,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -775,21 +780,22 @@ class _BackToDiscoverButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton(
         onPressed: onTap,
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.navy,
-          side: const BorderSide(color: AppColors.dividerLight),
+          foregroundColor: isDark ? AppColors.warmWhite : AppColors.navy,
+          side: BorderSide(color: isDark ? AppColors.dividerDark : AppColors.dividerLight),
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
           ),
         ),
-        child: const Text(
+        child: Text(
           'Back to Discover',
-          style: TextStyle(fontWeight: FontWeight.w600),
+          style: TextStyle(fontWeight: FontWeight.w600, color: isDark ? AppColors.warmWhite : AppColors.navy),
         ),
       ),
     );
@@ -808,14 +814,15 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       children: [
-        Icon(icon, size: AppSpacing.iconSm, color: AppColors.goldDark),
+        Icon(icon, size: AppSpacing.iconSm, color: isDark ? AppColors.gold : AppColors.goldDark),
         const SizedBox(width: AppSpacing.sm),
         Text(
           title,
           style: AppTypography.textTheme.titleMedium?.copyWith(
-            color: AppColors.navy,
+            color: isDark ? AppColors.warmWhite : AppColors.navy,
             fontWeight: FontWeight.w700,
             letterSpacing: 0.2,
           ),

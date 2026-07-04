@@ -241,7 +241,7 @@ class _SplashHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context);
-    final logoSize = (mq.size.shortestSide * 0.42).clamp(160.0, 240.0);
+    final logoSize = (mq.size.shortestSide * 0.30).clamp(120.0, 160.0);
     const reservedBottom = AppSpacing.huge + AppSpacing.xxxl;
 
     final logoContainer = Semantics(

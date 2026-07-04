@@ -13,11 +13,12 @@ class StatementOfFaithScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final contentAsync =
         ref.watch(startHereContentProvider('statement_of_faith'));
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Statement of Faith'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.primary,
+        foregroundColor: isDark ? AppColors.warmWhite : Colors.white,
       ),
       body: contentAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -27,22 +28,22 @@ class StatementOfFaithScreen extends ConsumerWidget {
           return ListView(
             padding: const EdgeInsets.all(AppSpacing.xl),
             children: [
-              const Text(
+              Text(
                 'The Kingdom Heirs Foundation',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primaryDark,
+                  color: isDark ? AppColors.warmWhite : AppColors.primaryDark,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.sm),
-              const Text(
+              Text(
                 'Statement of Faith',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.secondaryDark,
+                  color: isDark ? AppColors.gold : AppColors.secondaryDark,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -54,8 +55,8 @@ class StatementOfFaithScreen extends ConsumerWidget {
                   padding: const EdgeInsets.only(bottom: AppSpacing.md),
                   child: Text(
                     '• $text',
-                    style: const TextStyle(
-                        fontSize: 16, height: 1.5, color: Colors.black87,),
+                    style: TextStyle(
+                        fontSize: 16, height: 1.5, color: isDark ? AppColors.warmWhite.withValues(alpha: 0.85) : Colors.black87,),
                   ),
                 );
               }),
@@ -67,11 +68,14 @@ class StatementOfFaithScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSection({
+  Widget _buildSection(
+    BuildContext context, {
     required String title,
     required String content,
     required String references,
   }) {
+    // Only used locally if called, providing theme context here just in case.
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.xl),
       child: Column(
@@ -79,20 +83,20 @@ class StatementOfFaithScreen extends ConsumerWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: AppColors.primary,
+              color: isDark ? AppColors.gold : AppColors.primary,
               letterSpacing: 1.1,
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
             content,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               height: 1.6,
-              color: AppColors.textPrimary,
+              color: isDark ? AppColors.warmWhite.withValues(alpha: 0.85) : AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: AppSpacing.xs),

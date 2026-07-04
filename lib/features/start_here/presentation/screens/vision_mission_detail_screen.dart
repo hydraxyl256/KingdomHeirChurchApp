@@ -45,7 +45,7 @@ class VisionMissionDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -167,7 +167,9 @@ class _TopBar extends StatelessWidget {
                 Text(
                   'Who we are.',
                   style: AppTypography.textTheme.titleLarge?.copyWith(
-                    color: AppColors.navy,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? AppColors.warmWhite
+                        : AppColors.navy,
                     fontWeight: FontWeight.w700,
                     height: 1.1,
                   ),
@@ -198,7 +200,13 @@ class _CircleIconButton extends StatelessWidget {
         child: SizedBox(
           width: AppSpacing.minTouchTarget,
           height: AppSpacing.minTouchTarget,
-          child: Icon(icon, size: 18, color: AppColors.navy),
+          child: Icon(
+            icon,
+            size: 18,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppColors.warmWhite
+                : AppColors.navy,
+          ),
         ),
       ),
     );
@@ -278,6 +286,8 @@ class _PremiumCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     final gradient = accent == _CardAccent.gold
         ? const LinearGradient(
             colors: [AppColors.goldDark, AppColors.gold, AppColors.goldLight],
@@ -291,16 +301,21 @@ class _PremiumCard extends StatelessWidget {
           );
     final onSurfaceColor =
         accent == _CardAccent.gold ? AppColors.navy : AppColors.warmWhite;
-    final bodyColor = accent == _CardAccent.gold
-        ? AppColors.navy.withValues(alpha: 0.78)
-        : AppColors.warmWhite.withValues(alpha: 0.85);
+
+    // Fix body color to contrast with the actual card surface, not the accent banner.
+    // In dark mode, card surface is dark (AppColors.surfaceDark), so body text must be light.
+    // In light mode, card surface is light (AppColors.surface), so body text must be dark.
+    final bodyColor = isDark
+        ? AppColors.warmWhite.withValues(alpha: 0.85)
+        : AppColors.navy.withValues(alpha: 0.78);
+
     final eyebrowColor = accent == _CardAccent.gold
         ? AppColors.goldDark
         : AppColors.goldLight;
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: isDark ? AppColors.surfaceDark : AppColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
         boxShadow: const [
           BoxShadow(

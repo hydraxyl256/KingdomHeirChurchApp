@@ -304,10 +304,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                         // ── Brand block ───────────────────────────────
                         const KingdomHeirsBrandHeader(
-                          sizeFactor: 0.13,
-                          minSize: 44,
-                          maxSize: 64,
-                        ).animate(target: reduceMotion ? 1 : 0).fadeIn(
+                          minSize: 72,
+                          maxSize: 100,
+                        ).animate(target: reduceMotion ? 0 : 1).fadeIn(
                               duration: AppMotion.standard,
                               delay: const Duration(milliseconds: 80),
                             ),
