@@ -29,6 +29,11 @@ abstract class PrayerRepository {
 
   /// Fetches the IDs of requests the current user has prayed for.
   Future<List<String>> getIntercededPrayerIds();
+
+  /// Fetches all prayer requests submitted by the current user (public + private).
+  Future<Either<String, List<PrayerRequestModel>>> getMyPrayerRequests({
+    int limit = 30,
+  });
 }
 
 class SupabasePrayerRepository implements PrayerRepository {
@@ -40,15 +45,12 @@ class SupabasePrayerRepository implements PrayerRepository {
     int limit = 50,
   }) async {
     try {
-      // Explicit relationship hint `profiles!author_id(...)` tells PostgREST
-      // exactly which foreign key to use for the embedded join. Without the
-      // hint, PostgREST can return "Could not find a relationship between
-      // 'prayer_requests' and 'profiles' in the schema cache" if there are
-      // any ambiguities (e.g. multiple FKs in the schema or the second
-      // dashboard-only prayer_requests table shadowing the relationship).
       final response = await _client
           .from('prayer_requests')
           .select('*, profiles!user_id(full_name, avatar_url)')
+          // Public wall: only show publicly visible, active requests
+          .eq('is_public', true)
+          .neq('status', 'archived')
           .order('created_at', ascending: false)
           .limit(limit);
 
@@ -117,9 +119,13 @@ class SupabasePrayerRepository implements PrayerRepository {
 
   @override
   Stream<List<Map<String, dynamic>>> streamPrayerRequests() {
+    // Only stream publicly visible, non-archived requests.
+    // Private requests are excluded — the submitter sees them only
+    // in their own history (fetched separately).
     return _client
         .from('prayer_requests')
         .stream(primaryKey: ['id'])
+        .eq('is_public', true)
         .order('created_at')
         .limit(50);
   }
@@ -142,6 +148,32 @@ class SupabasePrayerRepository implements PrayerRepository {
           .toList();
     } catch (e) {
       return [];
+    }
+  }
+
+  @override
+  Future<Either<String, List<PrayerRequestModel>>> getMyPrayerRequests({
+    int limit = 30,
+  }) async {
+    try {
+      final user = _client.auth.currentUser;
+      if (user == null) return left('Not authenticated.');
+
+      final response = await _client
+          .from('prayer_requests')
+          .select()
+          // Only the current user's own requests — all visibility levels
+          .eq('user_id', user.id)
+          .order('created_at')
+          .limit(limit);
+
+      final requests = (response as List)
+          .map((e) => PrayerRequestModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+
+      return right(requests);
+    } catch (e) {
+      return left('Failed to load your prayer history: $e');
     }
   }
 }

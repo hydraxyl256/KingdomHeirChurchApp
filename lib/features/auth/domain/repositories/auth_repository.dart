@@ -34,4 +34,16 @@ abstract class AuthRepository {
 
   /// Update the user's profile in the database.
   Future<Either<Failure, AppUser>> updateProfile(AppUser user);
+
+  /// Re-authenticate then change password.
+  /// [currentPassword] is verified first; then [newPassword] is applied.
+  Future<Either<Failure, Unit>> changePassword({
+    required String email,
+    required String currentPassword,
+    required String newPassword,
+  });
+
+  /// Returns the Supabase auth provider for the current user
+  /// (e.g. 'google', 'email').  Used to detect OAuth-only accounts.
+  String get currentAuthProvider;
 }

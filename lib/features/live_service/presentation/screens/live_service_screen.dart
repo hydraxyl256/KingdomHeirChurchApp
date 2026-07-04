@@ -77,7 +77,7 @@ class _LiveServiceScreenState extends ConsumerState<LiveServiceScreen>
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
-        backgroundColor: AppColors.backgroundLight,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         // No standard AppBar — hero replaces it
         extendBodyBehindAppBar: true,
         body: Stack(
@@ -221,11 +221,12 @@ class _ChatSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.backgroundLight,
+      decoration: BoxDecoration(
+        color: cs.surface,
         border: Border(
-          top: BorderSide(color: AppColors.dividerLight, width: 0.5),
+          top: BorderSide(color: cs.outlineVariant, width: 0.5),
         ),
       ),
       child: Column(
@@ -242,13 +243,13 @@ class _ChatSection extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.chat_rounded,
-                      size: 15, color: AppColors.navy,),
+                  Icon(Icons.chat_rounded,
+                      size: 15, color: cs.primary,),
                   const SizedBox(width: 6),
                   Text(
                     'Live Chat',
                     style: AppTypography.textTheme.labelMedium?.copyWith(
-                      color: AppColors.navy,
+                      color: cs.onSurface,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -256,8 +257,8 @@ class _ChatSection extends StatelessWidget {
                   AnimatedRotation(
                     turns: expanded ? 0.5 : 0,
                     duration: const Duration(milliseconds: 250),
-                    child: const Icon(Icons.keyboard_arrow_down_rounded,
-                        color: AppColors.textSecondary, size: 20,),
+                    child: Icon(Icons.keyboard_arrow_down_rounded,
+                        color: cs.onSurfaceVariant, size: 20,),
                   ),
                 ],
               ),

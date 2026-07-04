@@ -10,7 +10,7 @@
         android:height="160dp"
         android:gravity="center">
         <bitmap
-            android:gravity="fill"
+            android:gravity="center"
             android:src="@drawable/logo" />
     </item>
 </layer-list>

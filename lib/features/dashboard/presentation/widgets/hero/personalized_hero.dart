@@ -167,6 +167,7 @@ class _WideTopRow extends StatelessWidget {
         _AvatarWithBell(
           sizing: sizing,
           avatarUrl: data.avatarUrl,
+          firstName: data.firstName,
           onNotificationsTap: onNotificationsTap,
         ),
       ],
@@ -194,6 +195,7 @@ class _NarrowTopRow extends StatelessWidget {
         _AvatarWithBell(
           sizing: sizing,
           avatarUrl: data.avatarUrl,
+          firstName: data.firstName,
           onNotificationsTap: onNotificationsTap,
         ),
       ],
@@ -205,11 +207,13 @@ class _AvatarWithBell extends StatelessWidget {
   const _AvatarWithBell({
     required this.sizing,
     this.avatarUrl,
+    this.firstName,
     this.onNotificationsTap,
   });
 
   final Sizing sizing;
   final String? avatarUrl;
+  final String? firstName;
   final VoidCallback? onNotificationsTap;
 
   @override
@@ -264,9 +268,17 @@ class _AvatarWithBell extends StatelessWidget {
                 ? Image.network(
                     avatarUrl!,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => const _Initial('K'),
+                    errorBuilder: (_, __, ___) => _Initial(
+                      (firstName?.isNotEmpty ?? false)
+                          ? firstName![0].toUpperCase()
+                          : 'K',
+                    ),
                   )
-                : const _Initial('K'),
+                : _Initial(
+                    (firstName?.isNotEmpty ?? false)
+                        ? firstName![0].toUpperCase()
+                        : 'K',
+                  ),
           ),
         ),
       ],

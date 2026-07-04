@@ -39,7 +39,7 @@ class ContinueWatchingCarousel extends StatelessWidget {
               Text(
                 'Continue Watching',
                 style: AppTypography.textTheme.titleMedium?.copyWith(
-                  color: AppColors.textPrimary,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontWeight: FontWeight.w800,
                 ),
               ),
@@ -60,28 +60,33 @@ class ContinueWatchingCarousel extends StatelessWidget {
         if (cards.isEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-            child: Container(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceLight,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                border: Border.all(color: AppColors.dividerLight),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Iconography.sermon, color: AppColors.goldDark),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: Text(
-                      'No sermons watched yet — tap “See all” to browse.',
-                      style: AppTypography.textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
-                        height: 1.4,
-                      ),
-                    ),
+            child: Builder(
+              builder: (context) {
+                final cs = Theme.of(context).colorScheme;
+                return Container(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  decoration: BoxDecoration(
+                    color: cs.surface,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                    border: Border.all(color: cs.outlineVariant),
                   ),
-                ],
-              ),
+                  child: Row(
+                    children: [
+                      const Icon(Iconography.sermon, color: AppColors.goldDark),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Text(
+                          'No sermons watched yet — tap "See all" to browse.',
+                          style: AppTypography.textTheme.bodySmall?.copyWith(
+                            color: cs.onSurfaceVariant,
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           )
         else
@@ -122,6 +127,8 @@ class _WatchCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Semantics(
       button: true,
       label: '${card.title}, Resume',
@@ -132,7 +139,8 @@ class _WatchCard extends StatelessWidget {
           margin: const EdgeInsets.only(right: AppSpacing.md),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24),
-            color: AppColors.surfaceVariantLight,
+            // Adaptive card base
+            color: cs.surfaceContainerHigh,
             boxShadow: AppElevation.shadowFor(AppElevation.level1),
           ),
           clipBehavior: Clip.antiAlias,
@@ -145,22 +153,22 @@ class _WatchCard extends StatelessWidget {
                   card.thumbnailUrl!,
                   fit: BoxFit.cover,
                 ),
-              // Gradient Overlay
+              // Adaptive gradient overlay
               Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
                     colors: [
-                      AppColors.surfaceLight.withValues(alpha: 0.9),
-                      AppColors.surfaceLight.withValues(alpha: 0.4),
+                      cs.surface.withValues(alpha: 0.92),
+                      cs.surface.withValues(alpha: 0.45),
                       Colors.transparent,
                     ],
                     stops: const [0.0, 0.6, 1.0],
                   ),
                 ),
               ),
-              
+
               // Content overlay
               Padding(
                 padding: const EdgeInsets.all(AppSpacing.md),
@@ -201,12 +209,13 @@ class _WatchCard extends StatelessWidget {
                                   vertical: 4,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.surfaceLight.withValues(alpha: 0.5),
+                                  // Adaptive glass chip
+                                  color: cs.surface.withValues(alpha: 0.55),
                                 ),
                                 child: Text(
                                   card.durationLabel!,
                                   style: AppTypography.textTheme.labelSmall?.copyWith(
-                                    color: AppColors.textSecondary,
+                                    color: cs.onSurface,
                                   ),
                                 ),
                               ),
@@ -214,7 +223,7 @@ class _WatchCard extends StatelessWidget {
                           ),
                       ],
                     ),
-                    
+
                     // Bottom Content (Play button + Title/Subtitle)
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -242,7 +251,7 @@ class _WatchCard extends StatelessWidget {
                               Text(
                                 card.title,
                                 style: AppTypography.textTheme.titleMedium?.copyWith(
-                                  color: AppColors.textPrimary,
+                                  color: cs.onSurface,
                                   fontWeight: FontWeight.bold,
                                 ),
                                 maxLines: 2,
@@ -253,7 +262,7 @@ class _WatchCard extends StatelessWidget {
                                 Text(
                                   card.durationLabel!,
                                   style: AppTypography.textTheme.bodySmall?.copyWith(
-                                    color: AppColors.textSecondary,
+                                    color: cs.onSurfaceVariant,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -276,7 +285,8 @@ class _WatchCard extends StatelessWidget {
                   right: 0,
                   height: 4,
                   child: Container(
-                    color: AppColors.surfaceVariantLight,
+                    // Adaptive track
+                    color: cs.surfaceContainerHighest,
                     alignment: Alignment.centerLeft,
                     child: FractionallySizedBox(
                       widthFactor: card.progress.clamp(0.0, 1.0),

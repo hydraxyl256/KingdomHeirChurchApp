@@ -22,6 +22,7 @@ class DailyJourneySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.lg,
@@ -37,7 +38,7 @@ class DailyJourneySection extends StatelessWidget {
               Text(
                 'Daily Spiritual Journey',
                 style: AppTypography.textTheme.titleMedium?.copyWith(
-                  color: AppColors.textPrimary,
+                  color: cs.onSurface,
                   fontWeight: FontWeight.w800,
                 ),
               ),
@@ -63,9 +64,9 @@ class DailyJourneySection extends StatelessWidget {
           const SizedBox(height: AppSpacing.lg),
           Container(
             decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
+              color: cs.surface,
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: AppColors.dividerLight),
+              border: Border.all(color: cs.outlineVariant),
               boxShadow: AppElevation.shadowFor(AppElevation.level1),
             ),
             child: Padding(
@@ -104,16 +105,17 @@ class _TaskTimeline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Stack(
       children: [
-        // Vertical Line
+        // Vertical connector line — adaptive divider color
         Positioned(
           left: 19,
           top: 16,
           bottom: 16,
           child: Container(
             width: 2,
-            color: AppColors.dividerLight.withValues(alpha: 0.5),
+            color: cs.outlineVariant.withValues(alpha: 0.5),
           ),
         ),
         Column(
@@ -149,9 +151,10 @@ class _TimelineNode extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final style = JourneyCategory.forKind(task.kind);
     final icon = style.icon;
-    
+
     return Semantics(
       button: true,
       label: 'Task: ${task.displayLabel}. ${task.isCompleted ? "Completed" : "Not completed"}',
@@ -175,9 +178,10 @@ class _TimelineNode extends StatelessWidget {
                 height: 40,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: task.isCompleted ? AppColors.goldDark : AppColors.surfaceLight,
+                  // Completed = gold filled; uncompleted = adaptive surface
+                  color: task.isCompleted ? AppColors.goldDark : cs.surfaceContainerHigh,
                   border: Border.all(
-                    color: task.isCompleted ? AppColors.goldDark : AppColors.goldDark,
+                    color: AppColors.goldDark,
                     width: 2,
                   ),
                   boxShadow: AppElevation.shadowFor(AppElevation.level0),
@@ -199,9 +203,10 @@ class _TimelineNode extends StatelessWidget {
                   Text(
                     task.displayLabel,
                     style: AppTypography.textTheme.titleMedium?.copyWith(
+                      // Completed = muted; pending = primary adaptive
                       color: task.isCompleted
-                          ? AppColors.textSecondary
-                          : AppColors.textPrimary,
+                          ? cs.onSurfaceVariant
+                          : cs.onSurface,
                       fontWeight: FontWeight.bold,
                       decoration: task.isCompleted ? TextDecoration.lineThrough : null,
                     ),

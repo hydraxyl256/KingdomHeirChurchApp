@@ -45,7 +45,7 @@ class QuickActionsStrip extends StatelessWidget {
               Text(
                 'Quick Actions',
                 style: AppTypography.textTheme.titleMedium?.copyWith(
-                  color: AppColors.textPrimary,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontWeight: FontWeight.w800,
                 ),
               ),
@@ -91,6 +91,7 @@ class _ActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (icon, color) = _styleFor(action);
+    final cs = Theme.of(context).colorScheme;
 
     return Semantics(
       button: true,
@@ -106,9 +107,10 @@ class _ActionButton extends StatelessWidget {
               horizontal: AppSpacing.xs,
             ),
             decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
+              // Adaptive: white in light mode, navy-mid card in dark mode
+              color: cs.surface,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-              border: Border.all(color: AppColors.dividerLight),
+              border: Border.all(color: cs.outlineVariant),
               boxShadow: AppElevation.shadowFor(AppElevation.level1),
             ),
             child: Column(
@@ -126,7 +128,8 @@ class _ActionButton extends StatelessWidget {
                 Text(
                   action.label,
                   style: AppTypography.textTheme.labelSmall?.copyWith(
-                    color: AppColors.textSecondary,
+                    // Adaptive muted text
+                    color: cs.onSurfaceVariant,
                     fontWeight: FontWeight.w600,
                     fontSize: 11,
                   ),

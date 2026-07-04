@@ -78,6 +78,8 @@ import 'package:kingdom_heir/features/sermons/presentation/screens/sermon_home_s
 import 'package:kingdom_heir/features/sermons/presentation/screens/sermon_library_screen.dart';
 import 'package:kingdom_heir/features/sermons/presentation/screens/sermon_player_screen.dart';
 import 'package:kingdom_heir/features/sermons/presentation/screens/sermon_series_screen.dart';
+import 'package:kingdom_heir/features/settings/presentation/screens/about_screen.dart';
+import 'package:kingdom_heir/features/settings/presentation/screens/change_password_screen.dart';
 import 'package:kingdom_heir/features/settings/presentation/screens/settings_notification_center_screen.dart';
 import 'package:kingdom_heir/features/shell/app_shell.dart';
 import 'package:kingdom_heir/features/start_here/presentation/screens/founder_letter_screen.dart';
@@ -544,10 +546,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             ],
           ),
 
-          // Settings
+          // Settings + sub-routes
           GoRoute(
             path: RouteNames.settings,
             builder: (_, __) => const SettingsNotificationCenterScreen(),
+            routes: [
+              GoRoute(
+                path: 'change-password',
+                builder: (_, __) => const ChangePasswordScreen(),
+              ),
+              GoRoute(
+                path: 'about',
+                builder: (_, __) => const AboutScreen(),
+              ),
+            ],
           ),
 
           // Prayer Requests

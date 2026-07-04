@@ -60,10 +60,17 @@ class PrayerFeedNotifier extends AsyncNotifier<List<PrayerRequest>> {
       for (final raw in rawUpdates) {
         final id = raw['id'] as String;
         final index = updatedList.indexWhere((e) => e.id == id);
+        final isPublic = raw['is_public'] as bool? ?? true;
+        final status = raw['status'] as String? ?? 'active';
+
+        // Skip private or archived entries — public wall only
+        if (!isPublic || status == 'archived') {
+          if (index != -1) updatedList.removeAt(index);
+          continue;
+        }
 
         if (index != -1) {
-          // Update existing request (e.g. prayer_count, status)
-          // We preserve authorName/Avatar since the stream doesn't join profiles
+          // Update existing entry fields (prayer_count, status, etc.)
           final current = updatedList[index];
           final parsed = PrayerRequestModel.fromJson(raw);
           updatedList[index] = current.copyWith(
@@ -76,15 +83,41 @@ class PrayerFeedNotifier extends AsyncNotifier<List<PrayerRequest>> {
             isAnonymous: parsed.isAnonymous,
           );
         } else {
-          // New request arrived. In a real app, you might want to fetch the profile manually here
-          // or just append it as Anonymous until refresh if the stream doesn't have the profile.
-          // For now, we'll append it.
+          // New request: stream row won't have the profiles join,
+          // so build a partial entity and trigger a full refresh to
+          // backfill the author name/avatar.
           final parsed = PrayerRequestModel.fromJson(raw).toEntity();
           updatedList.insert(0, parsed);
+          // Trigger background re-fetch to get profile-joined data
+          _refetchInBackground();
         }
       }
 
       state = AsyncData(updatedList);
+    });
+  }
+
+  /// Re-fetches the full prayer list in the background to backfill
+  /// profile data for newly arrived Realtime entries.
+  void _refetchInBackground() {
+    final repo = ref.read(prayerRepositoryProvider);
+    repo.getPrayerRequests().then((result) {
+      result.fold(
+        (_) {}, // silently ignore errors — the optimistic entry remains
+        (models) {
+          state.whenData((current) {
+            final intercededIds =
+                current.where((e) => e.hasPrayed).map((e) => e.id).toSet();
+            state = AsyncData(
+              models
+                  .map((m) => m.toEntity(
+                        hasPrayed: intercededIds.contains(m.id),
+                      ),)
+                  .toList(),
+            );
+          });
+        },
+      );
     });
   }
 
@@ -158,3 +191,17 @@ class _PrayerLoadFailure implements Exception {
   @override
   String toString() => message;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// My Prayers  (current user's own history: public + private)
+// ─────────────────────────────────────────────────────────────────────────────
+
+final myPrayersProvider =
+    FutureProvider.autoDispose<List<PrayerRequest>>((ref) async {
+  final repo = ref.watch(prayerRepositoryProvider);
+  final result = await repo.getMyPrayerRequests();
+  return result.fold(
+    (err) => throw _PrayerLoadFailure(err),
+    (models) => models.map((m) => m.toEntity()).toList(),
+  );
+});

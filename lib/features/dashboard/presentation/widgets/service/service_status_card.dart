@@ -236,6 +236,7 @@ class _NextServiceCardState extends State<_NextServiceCard> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final days = _remaining.inDays;
     final hours = _remaining.inHours.remainder(24);
     final minutes = _remaining.inMinutes.remainder(60);
@@ -243,9 +244,10 @@ class _NextServiceCardState extends State<_NextServiceCard> {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        // Adaptive card surface
+        color: cs.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.dividerLight),
+        border: Border.all(color: cs.outlineVariant),
         boxShadow: AppElevation.shadowFor(AppElevation.level1),
       ),
       clipBehavior: Clip.antiAlias,
@@ -264,7 +266,7 @@ class _NextServiceCardState extends State<_NextServiceCard> {
               ),
             ),
           ),
-          
+
           Padding(
             padding: const EdgeInsets.all(AppSpacing.lg),
             child: Column(
@@ -289,21 +291,23 @@ class _NextServiceCardState extends State<_NextServiceCard> {
                 Text(
                   widget.status.title,
                   style: AppTypography.textTheme.titleLarge?.copyWith(
-                    color: AppColors.textPrimary,
+                    // Adaptive primary text
+                    color: cs.onSurface,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 if (widget.status.locationLabel != null) ...[
                   const SizedBox(height: 2),
                   Text(
-                    '${widget.status.locationLabel} · 9:00 AM', // hardcoded time mock to match design
+                    '${widget.status.locationLabel} · 9:00 AM',
                     style: AppTypography.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textSecondary,
+                      // Adaptive secondary/muted text
+                      color: cs.onSurfaceVariant,
                     ),
                   ),
                 ],
                 const SizedBox(height: AppSpacing.xl),
-                
+
                 // Countdown Timer Box
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -311,10 +315,10 @@ class _NextServiceCardState extends State<_NextServiceCard> {
                     vertical: AppSpacing.md,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceLight,
+                    // Slightly raised surface inside the card
+                    color: cs.surfaceContainerHigh,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.dividerLight),
-                    boxShadow: AppElevation.shadowFor(AppElevation.level0),
+                    border: Border.all(color: cs.outlineVariant),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -328,7 +332,7 @@ class _NextServiceCardState extends State<_NextServiceCard> {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
-                
+
                 // Action Buttons
                 Row(
                   children: [
@@ -353,8 +357,9 @@ class _NextServiceCardState extends State<_NextServiceCard> {
                       child: ElevatedButton(
                         onPressed: widget.onDetails,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.surfaceContainerLight,
-                          foregroundColor: AppColors.textPrimary,
+                          // Adaptive secondary action button
+                          backgroundColor: cs.surfaceContainerHigh,
+                          foregroundColor: cs.onSurface,
                           elevation: 0,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
@@ -383,6 +388,7 @@ class _TimeBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.baseline,
       textBaseline: TextBaseline.alphabetic,
@@ -392,7 +398,8 @@ class _TimeBlock extends StatelessWidget {
           style: TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.w300,
-            color: highlight ? AppColors.goldDark : AppColors.textPrimary,
+            // Adaptive: gold for highlighted unit, onSurface for others
+            color: highlight ? AppColors.goldDark : cs.onSurface,
             fontFamily: 'Roboto',
             letterSpacing: -1,
           ),
@@ -401,7 +408,7 @@ class _TimeBlock extends StatelessWidget {
         Text(
           label.toUpperCase(),
           style: AppTypography.textTheme.labelSmall?.copyWith(
-            color: highlight ? AppColors.goldDark : AppColors.textSecondary,
+            color: highlight ? AppColors.goldDark : cs.onSurfaceVariant,
             letterSpacing: 1,
             fontWeight: FontWeight.bold,
           ),

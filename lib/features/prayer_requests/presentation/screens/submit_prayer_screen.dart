@@ -74,13 +74,18 @@ class _SubmitPrayerScreenState extends ConsumerState<SubmitPrayerScreen> {
           SnackBar(content: Text('Error: $error')),
         );
       } else {
-        context.pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('🙏 Your prayer request has been submitted.'),
-            backgroundColor: AppColors.success,
-          ),
-        );
+        // Invalidate the prayer wall so it re-fetches and shows the new request.
+        // The Realtime stream will also push it automatically for other users.
+        ref.invalidate(prayerFeedProvider);
+        if (mounted) context.pop();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('🙏 Your prayer request has been submitted.'),
+              backgroundColor: AppColors.success,
+            ),
+          );
+        }
       }
     }
   }

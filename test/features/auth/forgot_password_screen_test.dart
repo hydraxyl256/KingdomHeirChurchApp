@@ -57,6 +57,17 @@ class _StubAuthRepository implements AuthRepository {
   @override
   Future<Either<Failure, AppUser>> updateProfile(AppUser user) async =>
       const Left(AuthFailure());
+
+  @override
+  Future<Either<Failure, Unit>> changePassword({
+    required String email,
+    required String currentPassword,
+    required String newPassword,
+  }) async =>
+      const Right(unit);
+
+  @override
+  String get currentAuthProvider => 'email';
 }
 
 void main() {

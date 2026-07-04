@@ -9,6 +9,7 @@ import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/widgets/app_avatar.dart';
 import 'package:kingdom_heir/features/auth/presentation/providers/auth_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsNotificationCenterScreen extends ConsumerStatefulWidget {
   const SettingsNotificationCenterScreen({super.key});
@@ -243,7 +244,7 @@ class _SettingsNotificationCenterScreenState
                 ),
                 title: const Text('Change Password'),
                 trailing: const Icon(Icons.chevron_right_rounded),
-                onTap: () {},
+                onTap: () => context.push(RouteNames.changePassword),
               ),
               const Divider(height: 1, indent: 56),
               ListTile(
@@ -266,7 +267,7 @@ class _SettingsNotificationCenterScreenState
                 ),
                 title: const Text('Privacy Policy'),
                 trailing: const Icon(Icons.chevron_right_rounded),
-                onTap: () {},
+                onTap: () => _launchPrivacyPolicy(context),
               ),
               const Divider(height: 1, indent: 56),
               ListTile(
@@ -275,9 +276,8 @@ class _SettingsNotificationCenterScreenState
                   const Color(0xFF10B981),
                 ),
                 title: const Text('About Kingdom Heir'),
-                subtitle: const Text('Version 1.0.0'),
                 trailing: const Icon(Icons.chevron_right_rounded),
-                onTap: () {},
+                onTap: () => context.push(RouteNames.settingsAbout),
               ),
             ],
           ).animate().fadeIn(delay: 200.ms),
@@ -319,16 +319,16 @@ class _SettingsNotificationCenterScreenState
 
                   final confirmed = await showDialog<bool>(
                     context: outerContext,
-                    builder: (_) => AlertDialog(
+                    builder: (dialogContext) => AlertDialog(
                       title: const Text('Sign Out'),
                       content: const Text('Are you sure you want to sign out?'),
                       actions: [
                         TextButton(
-                          onPressed: () => Navigator.pop(context, false),
+                          onPressed: () => Navigator.pop(dialogContext, false),
                           child: const Text('Cancel'),
                         ),
                         TextButton(
-                          onPressed: () => Navigator.pop(context, true),
+                          onPressed: () => Navigator.pop(dialogContext, true),
                           child: const Text(
                             'Sign Out',
                             style: TextStyle(color: AppColors.error),
@@ -337,6 +337,7 @@ class _SettingsNotificationCenterScreenState
                       ],
                     ),
                   );
+
 
                   if (confirmed != true) return;
 
@@ -528,7 +529,34 @@ class _SettingsNotificationCenterScreenState
       child: Icon(icon, color: color, size: 20),
     );
   }
+
+  Future<void> _launchPrivacyPolicy(BuildContext ctx) async {
+    const url =
+        'https://sites.google.com/view/kingdom-heirs-ministry/home';
+    final uri = Uri.parse(url);
+    final launched =
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!launched && ctx.mounted) {
+      ScaffoldMessenger.of(ctx).showSnackBar(
+        SnackBar(
+          content: const Text(
+            'Could not open Privacy Policy. Please try again.',
+          ),
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          action: SnackBarAction(
+            label: 'Retry',
+            textColor: Colors.white,
+            onPressed: () => _launchPrivacyPolicy(ctx),
+          ),
+        ),
+      );
+    }
+  }
 }
+
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -617,15 +645,10 @@ class _PersistentSwitchTileState extends ConsumerState<_PersistentSwitchTile> {
 
   @override
   Widget build(BuildContext context) {
-    return SwitchListTile(
-      value: _value,
-      activeThumbColor: AppColors.gold,
-      onChanged: (v) async {
-        setState(() => _value = v);
-        final storage = ref.read(localStorageServiceProvider);
-        await storage.setBool(key: widget.storageKey, value: v);
-      },
-      secondary: Container(
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+
+    return ListTile(
+      leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: widget.iconColor.withValues(alpha: 0.15),
@@ -637,13 +660,34 @@ class _PersistentSwitchTileState extends ConsumerState<_PersistentSwitchTile> {
       subtitle: Text(
         widget.subtitle,
         style: TextStyle(
-          color:
-              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55),
+          color: onSurface.withValues(alpha: 0.55),
           fontSize: 12,
         ),
       ),
+      // Use trailing Switch (not SwitchListTile) so the active-state
+      // gold color is strictly contained inside the switch widget bounds
+      // and never propagates a tinted ink splash across the entire tile.
+      trailing: Switch(
+        value: _value,
+        onChanged: (v) async {
+          setState(() => _value = v);
+          final storage = ref.read(localStorageServiceProvider);
+          await storage.setBool(key: widget.storageKey, value: v);
+        },
+        // Thumb: white when ON, muted when OFF
+        activeThumbColor: AppColors.warmWhite,
+        inactiveThumbColor: onSurface.withValues(alpha: 0.55),
+        // Track colors — gold only inside the switch, never the tile
+        activeTrackColor: AppColors.gold,
+        inactiveTrackColor: onSurface.withValues(alpha: 0.12),
+        // Remove track border in all states for a clean look
+        trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
+        // Comfortable tap target without expanding into neighbour rows
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
     );
   }
+
 }
 
 extension on String {

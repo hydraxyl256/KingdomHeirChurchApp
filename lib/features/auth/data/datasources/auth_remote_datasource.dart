@@ -133,7 +133,25 @@ class AuthRemoteDataSource {
   }
 
 
-  Future<void> signOut() => _client.auth.signOut();
+  Future<void> signOut() =>
+      // SignOutScope.global revokes the refresh token on Supabase's server so
+      // the session cannot be restored after app restart.  SignOutScope.local
+      // (the default) only clears local storage — the token remains valid
+      // server-side and supabase_flutter will re-authenticate on next launch.
+      _client.auth.signOut(scope: SignOutScope.global);
+
+  /// Re-authenticates with email + current password.
+  /// Call this before updating the password to verify the user's identity.
+  Future<void> reauthenticate({
+    required String email,
+    required String password,
+  }) async {
+    await _client.auth.signInWithPassword(email: email, password: password);
+  }
+
+  /// Returns the provider name (e.g. 'google', 'email') from app metadata.
+  String get currentAuthProvider =>
+      (_client.auth.currentUser?.appMetadata['provider'] as String?) ?? 'email';
 
   Future<void> resetPassword(String email) =>
       _client.auth.resetPasswordForEmail(

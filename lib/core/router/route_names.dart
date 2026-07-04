@@ -101,6 +101,9 @@ abstract final class RouteNames {
   static const news = '/home/news';
   static const newsDetails = '/home/news/details';
   static const settings = '/home/settings';
+  static const changePassword = '/home/settings/change-password';
+  static const settingsAbout = '/home/settings/about';
+
 
   // ── Prayer Requests ───────────────────────────────────────────────────────
   static const prayerFeed = '/home/prayer';

@@ -45,7 +45,13 @@ class _PrayerFeedScreenState extends ConsumerState<PrayerFeedScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.history_rounded),
-            onPressed: () {}, // History view
+            tooltip: 'My Prayers',
+            onPressed: () => showModalBottomSheet<void>(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (_) => const _MyPrayersSheet(),
+            ),
           ),
         ],
       ),
@@ -445,6 +451,215 @@ class _Divider extends StatelessWidget {
       width: 1,
       height: 32,
       color: Colors.white24,
+    );
+  }
+}
+
+// ─── My Prayers History Sheet ─────────────────────────────────────────────────
+
+class _MyPrayersSheet extends ConsumerWidget {
+  const _MyPrayersSheet();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final myAsync = ref.watch(myPrayersProvider);
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.75,
+      maxChildSize: 0.95,
+      minChildSize: 0.4,
+      builder: (context, scrollController) {
+        return Container(
+          decoration: BoxDecoration(
+            color: cs.surface,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(20),
+            ),
+          ),
+          child: Column(
+            children: [
+              // Handle
+              Padding(
+                padding: const EdgeInsets.only(top: 10, bottom: 4),
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: cs.outlineVariant,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              // Title
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: AppSpacing.sm,
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.self_improvement_rounded,
+                        color: AppColors.gold, size: 20,),
+                    const SizedBox(width: AppSpacing.sm),
+                    Text(
+                      'My Prayer Requests',
+                      style: AppTypography.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      icon: Icon(Icons.close, color: cs.onSurface, size: 20),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(height: 1),
+              // Content
+              Expanded(
+                child: myAsync.when(
+                  loading: () => const Center(
+                    child: CircularProgressIndicator(color: AppColors.gold),
+                  ),
+                  error: (err, _) => Center(
+                    child: Text(
+                      'Could not load your prayers.\n$err',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: cs.error),
+                    ),
+                  ),
+                  data: (requests) {
+                    if (requests.isEmpty) {
+                      return Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.inbox_outlined,
+                                size: 48, color: cs.outlineVariant,),
+                            const SizedBox(height: AppSpacing.md),
+                            Text(
+                              "You haven't submitted any prayer requests yet.",
+                              style: AppTypography.textTheme.bodyMedium
+                                  ?.copyWith(color: cs.onSurface.withValues(alpha: 0.5)),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    return ListView.separated(
+                      controller: scrollController,
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      itemCount: requests.length,
+                      separatorBuilder: (_, __) =>
+                          const SizedBox(height: AppSpacing.sm),
+                      itemBuilder: (ctx, i) {
+                        final r = requests[i];
+                        final isAnswered = r.status == PrayerStatus.answered;
+                        final isPrivate = !r.isPublic;
+                        return Card(
+                          margin: EdgeInsets.zero,
+                          child: Padding(
+                            padding: const EdgeInsets.all(AppSpacing.md),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        r.title,
+                                        style: AppTypography.textTheme
+                                            .labelMedium
+                                            ?.copyWith(
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    const SizedBox(width: AppSpacing.sm),
+                                    // Status badge
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: isAnswered
+                                            ? AppColors.successContainer
+                                            : isPrivate
+                                                ? cs.secondaryContainer
+                                                : AppColors.goldContainer,
+                                        borderRadius: BorderRadius.circular(
+                                          AppSpacing.radiusFull,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        isAnswered
+                                            ? '✅ Answered'
+                                            : isPrivate
+                                                ? '🔒 Private'
+                                                : r.category,
+                                        style: AppTypography.textTheme
+                                            .labelSmall
+                                            ?.copyWith(
+                                          color: isAnswered
+                                              ? AppColors.success
+                                              : isPrivate
+                                                  ? cs.onSecondaryContainer
+                                                  : AppColors.goldDark,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  r.content,
+                                  style: AppTypography.textTheme.bodySmall
+                                      ?.copyWith(
+                                    color: cs.onSurface.withValues(alpha: 0.65),
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  timeago.format(r.createdAt),
+                                  style: AppTypography.textTheme.labelSmall
+                                      ?.copyWith(
+                                    color: cs.onSurface.withValues(alpha: 0.4),
+                                  ),
+                                ),
+                                if (r.prayerCount > 0) ...[
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '🙏 ${r.prayerCount} praying',
+                                    style: AppTypography.textTheme.labelSmall
+                                        ?.copyWith(
+                                      color: AppColors.gold,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

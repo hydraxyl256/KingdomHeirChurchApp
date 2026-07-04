@@ -65,7 +65,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                   ),
               const SizedBox(height: 28),
               Text(
-                'Welcome, $displayName! 🎉',
+                'Welcome, $displayName!',
                 style: const TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.w800,

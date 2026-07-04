@@ -22,39 +22,45 @@ class DashboardTopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return SliverAppBar(
       pinned: true,
       elevation: 0,
       scrolledUnderElevation: 4,
-      backgroundColor: AppColors.surfaceLight.withValues(alpha: 0.85),
+      // Adaptive: light-glass on white, navy-glass on dark
+      backgroundColor: cs.surface.withValues(alpha: 0.88),
       titleSpacing: AppSpacing.md,
       title: Row(
         children: [
           GestureDetector(
             onTap: onAvatarTap,
             child: Container(
-              width: 40,
-              height: 40,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.gold, width: 2),
-                image: greeting.avatarUrl != null
-                    ? DecorationImage(
-                        image: AssetImage(greeting.avatarUrl!),
-                        fit: BoxFit.cover,
-                      )
+              ),
+              child: CircleAvatar(
+                radius: 19,
+                backgroundColor: AppColors.gold.withValues(alpha: 0.2),
+                backgroundImage: greeting.avatarUrl != null
+                    ? NetworkImage(greeting.avatarUrl!)
+                    : null,
+                onBackgroundImageError: greeting.avatarUrl != null
+                    ? (_, __) {} // silently fallback to child
+                    : null,
+                child: greeting.avatarUrl == null
+                    ? const Icon(Icons.person_rounded,
+                        color: AppColors.gold, size: 20,)
                     : null,
               ),
-              child: greeting.avatarUrl == null
-                  ? const Icon(Icons.person, color: AppColors.gold)
-                  : null,
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
           Text(
             'Royal Steward',
             style: AppTypography.textTheme.titleMedium?.copyWith(
-              fontFamily: 'Playfair Display', // or fallback to serif
+              fontFamily: 'Playfair Display',
               color: AppColors.goldDark,
               fontWeight: FontWeight.bold,
             ),
@@ -63,7 +69,8 @@ class DashboardTopBar extends StatelessWidget {
       ),
       actions: [
         IconButton(
-          icon: const Icon(Icons.notifications_none_rounded, color: AppColors.textPrimary),
+          // Use colorScheme.onSurface so it adapts to dark/light
+          icon: Icon(Icons.notifications_none_rounded, color: cs.onSurface),
           onPressed: onNotificationTap,
         ),
         const SizedBox(width: AppSpacing.sm),
@@ -87,7 +94,8 @@ class HeroHeader extends StatelessWidget {
 
     return Stack(
       children: [
-        // Simulated Shader Background (Animated Gradient)
+        // Animated gradient background (intentionally dark/navy — the hero
+        // is always rendered as a cinematic dark band regardless of theme)
         Positioned.fill(
           child: Container(
             decoration: const BoxDecoration(
@@ -116,7 +124,7 @@ class HeroHeader extends StatelessWidget {
              },
            ),
         ),
-        
+
         // Content
         Padding(
           padding: const EdgeInsets.symmetric(
@@ -136,7 +144,7 @@ class HeroHeader extends StatelessWidget {
               ).animate().fadeIn(duration: 400.ms),
               const SizedBox(height: AppSpacing.xs),
               Text(
-                'Welcome Home,\n',
+                '${greeting.greeting},',
                 style: AppTypography.textTheme.headlineMedium?.copyWith(
                   color: AppColors.white,
                   fontWeight: FontWeight.bold,
@@ -151,10 +159,20 @@ class HeroHeader extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ).animate().fadeIn(delay: 200.ms, duration: 400.ms),
-              
+
+              const SizedBox(height: AppSpacing.sm),
+
+              Text(
+                greeting.tagline,
+                style: AppTypography.textTheme.bodySmall?.copyWith(
+                  color: Colors.white54,
+                  fontStyle: FontStyle.italic,
+                ),
+              ).animate().fadeIn(delay: 280.ms, duration: 400.ms),
+
               const SizedBox(height: AppSpacing.lg),
-              
-              // Pills
+
+              // Pills — always on the dark hero, so use white/warmWhite text
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
@@ -162,13 +180,17 @@ class HeroHeader extends StatelessWidget {
                   children: [
                     _StreakPill(
                       icon: Icons.local_fire_department,
-                      label: '${greeting.streakDays} Day Prayer Streak',
+                      label: greeting.streakDays > 0
+                          ? '${greeting.streakDays}-Day Streak 🔥'
+                          : 'Start Your Streak',
                     ),
-                    const SizedBox(width: AppSpacing.sm),
-                    const _StreakPill(
-                      icon: Icons.menu_book,
-                      label: '24% Through Genesis',
-                    ),
+                    if (greeting.unreadNotifications > 0) ...[
+                      const SizedBox(width: AppSpacing.sm),
+                      _StreakPill(
+                        icon: Icons.notifications_active_rounded,
+                        label: '${greeting.unreadNotifications} New',
+                      ),
+                    ],
                   ],
                 ).animate().fadeIn(delay: 300.ms, duration: 400.ms),
               ),
@@ -188,26 +210,30 @@ class _StreakPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Pill lives inside the always-dark HeroHeader band, so keep
+    // translucent white glass styling regardless of theme.
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
         vertical: AppSpacing.sm,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        // Translucent white — readable on both navy and darker backgrounds
+        color: Colors.white.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.dividerLight),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
         boxShadow: AppElevation.shadowFor(AppElevation.level1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: AppColors.goldDark, size: 20),
+          Icon(icon, color: AppColors.gold, size: 20),
           const SizedBox(width: AppSpacing.xs),
           Text(
             label,
             style: AppTypography.textTheme.labelMedium?.copyWith(
-              color: AppColors.textPrimary,
+              // Always white/warmWhite — pill sits on the dark hero banner
+              color: AppColors.warmWhite,
               fontWeight: FontWeight.w600,
             ),
           ),

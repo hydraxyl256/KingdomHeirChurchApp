@@ -34,7 +34,7 @@ class ContinueCarousel extends StatelessWidget {
           child: Text(
             'Continue Your Journey',
             style: AppTypography.textTheme.titleMedium?.copyWith(
-              color: AppColors.textPrimary,
+              color: Theme.of(context).colorScheme.onSurface,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -79,13 +79,16 @@ class _ContinueCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 256,
         margin: const EdgeInsets.only(right: AppSpacing.md),
         decoration: BoxDecoration(
-          color: AppColors.surfaceVariantLight,
+          // Adaptive card surface
+          color: cs.surfaceContainerHigh,
           borderRadius: BorderRadius.circular(24),
           boxShadow: AppElevation.shadowFor(AppElevation.level1),
         ),
@@ -98,14 +101,16 @@ class _ContinueCard extends StatelessWidget {
                 card.thumbnailUrl!,
                 fit: BoxFit.cover,
               ),
+            // Gradient — uses adaptive surface color so it blends
+            // correctly on both white (light) and navy (dark) cards
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
                   colors: [
-                    AppColors.surfaceLight.withValues(alpha: 0.9),
-                    AppColors.surfaceLight.withValues(alpha: 0.2),
+                    cs.surface.withValues(alpha: 0.92),
+                    cs.surface.withValues(alpha: 0.25),
                     Colors.transparent,
                   ],
                   stops: const [0.0, 0.4, 1.0],
@@ -143,7 +148,7 @@ class _ContinueCard extends StatelessWidget {
                   Text(
                     card.title,
                     style: AppTypography.textTheme.titleMedium?.copyWith(
-                      color: AppColors.textPrimary,
+                      color: cs.onSurface,
                       fontWeight: FontWeight.bold,
                     ),
                     maxLines: 2,
@@ -154,7 +159,7 @@ class _ContinueCard extends StatelessWidget {
                     Text(
                       card.subtitle,
                       style: AppTypography.textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
+                        color: cs.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -169,7 +174,8 @@ class _ContinueCard extends StatelessWidget {
               right: 0,
               height: 4,
               child: Container(
-                color: AppColors.surfaceVariantLight,
+                // Adaptive progress track
+                color: cs.surfaceContainerHighest,
                 alignment: Alignment.centerLeft,
                 child: FractionallySizedBox(
                   widthFactor: card.progress.clamp(0.0, 1.0),
@@ -194,6 +200,9 @@ class _StartJourneyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final isDark = cs.brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
       child: GestureDetector(
@@ -201,11 +210,18 @@ class _StartJourneyCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.xl),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [
-                AppColors.goldContainer,
-                AppColors.warmWhite,
-              ],
+            gradient: LinearGradient(
+              colors: isDark
+                  // Dark: navy-to-midnavy gradient with subtle gold warmth
+                  ? [
+                      AppColors.navyMid,
+                      AppColors.navyLight.withValues(alpha: 0.7),
+                    ]
+                  // Light: warm gold-cream gradient
+                  : [
+                      AppColors.goldContainer,
+                      AppColors.warmWhite,
+                    ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -240,7 +256,7 @@ class _StartJourneyCard extends StatelessWidget {
                     Text(
                       'Start Your Journey',
                       style: AppTypography.textTheme.titleSmall?.copyWith(
-                        color: AppColors.navy,
+                        color: cs.onSurface,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
@@ -248,7 +264,7 @@ class _StartJourneyCard extends StatelessWidget {
                     Text(
                       'Explore Bible plans, sermons, and devotionals.',
                       style: AppTypography.textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
+                        color: cs.onSurfaceVariant,
                       ),
                     ),
                   ],

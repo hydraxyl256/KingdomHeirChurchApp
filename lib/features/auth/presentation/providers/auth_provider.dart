@@ -56,13 +56,13 @@ final authStateProvider = StreamProvider<AppUser?>((ref) {
   return ref.watch(authRepositoryProvider).watchAuthState();
 });
 
-/// Streams the current [AppUser?]. null = signed out.
+/// Convenience provider — nullable current user.
 final currentUserProvider = Provider<AppUser?>((ref) {
   return ref.watch(authStateProvider).valueOrNull;
 });
 
 // ─────────────────────────────────────────────
-// Auth Notifier (Sign In / Up / Out actions)
+// Auth Notifier (Sign In / Up / Out / Change Password)
 // ─────────────────────────────────────────────
 
 class AuthNotifier extends AsyncNotifier<void> {
@@ -77,7 +77,6 @@ class AuthNotifier extends AsyncNotifier<void> {
     state = result.fold(
       (failure) => AsyncError(failure, StackTrace.current),
       (user) {
-
         unawaited(ref.read(analyticsServiceProvider).setUserId(user.id));
         unawaited(ref.read(analyticsServiceProvider).logLogin(method: 'email'));
         unawaited(ref.read(pushNotificationServiceProvider).syncToken());
@@ -98,9 +97,10 @@ class AuthNotifier extends AsyncNotifier<void> {
     state = result.fold(
       (failure) => AsyncError(failure, StackTrace.current),
       (user) {
-
         unawaited(ref.read(analyticsServiceProvider).setUserId(user.id));
-        unawaited(ref.read(analyticsServiceProvider).logRegistration(method: 'email'));
+        unawaited(
+          ref.read(analyticsServiceProvider).logRegistration(method: 'email'),
+        );
         unawaited(ref.read(pushNotificationServiceProvider).syncToken());
         return const AsyncData(null);
       },
@@ -110,39 +110,47 @@ class AuthNotifier extends AsyncNotifier<void> {
   Future<void> signOut() async {
     state = const AsyncLoading();
     try {
-      // 1. Remove FCM token from Supabase + the local device.
-      // If offline or failed, we continue signing out anyway.
+      // 1. Remove FCM token from Supabase + the device.
+      //    Must be called BEFORE signOut — we still need an authenticated
+      //    client to reach the Supabase push_subscriptions table.
       try {
         await ref.read(pushNotificationServiceProvider).removeToken();
       } catch (_) {
-        // Ignore failure
+        // Tolerate FCM failure — the session must still be invalidated.
       }
 
-      // 2. Sign out of Supabase.
-      try {
-        await ref.read(signOutUseCaseProvider).call();
-      } catch (_) {
-        // Ignore failure
-      }
+      // 2. Invalidate the Supabase session server-side.
+      //    auth_remote_datasource.dart uses SignOutScope.global which revokes
+      //    the refresh token on Supabase's servers, preventing session
+      //    restoration after app restart.  This is the primary security action
+      //    and must NOT be swallowed.
+      await ref.read(signOutUseCaseProvider).call();
 
-      // 3. Wipe user-scoped local preferences aggressively.
+      // 3. Wipe account-scoped local preferences.
+      //    Theme and currency are NOT cleared — they are not account-specific.
       final storage = ref.read(localStorageServiceProvider);
-      await storage.remove(LocalStorageKeys.userRole);
-      await storage.remove(LocalStorageKeys.pendingVerificationEmail);
-      await storage.remove(LocalStorageKeys.lastSeenNotification);
-      await storage.remove('more_favorites_v1');
+      await Future.wait([
+        storage.remove(LocalStorageKeys.userRole),
+        storage.remove(LocalStorageKeys.pendingVerificationEmail),
+        storage.remove(LocalStorageKeys.lastSeenNotification),
+        storage.remove(LocalStorageKeys.onboardingComplete),
+        storage.remove('more_favorites_v1'),
+      ]);
 
-      // 4. Invalidate upstream providers that cache user state.
-      ref.invalidate(authStateProvider);
-
-      // 5. Reset analytics identity.
+      // 4. Reset analytics identity.
       unawaited(ref.read(analyticsServiceProvider).setUserId(null));
 
-      // 6. Force state to null so any listeners complete the logout.
-      state = const AsyncData(null);
+      // 5. Do NOT call ref.invalidate(authStateProvider).
+      //    The onAuthStateChange stream naturally emits null after the Supabase
+      //    sign-out is confirmed, which triggers GoRouter's redirect guard.
+      //    Invalidating forces the StreamProvider to re-subscribe immediately,
+      //    before Supabase confirms the logout, creating a race condition where
+      //    the old cached session value can briefly flash the authenticated UI.
 
       state = const AsyncData(null);
     } catch (e, st) {
+      // Sign-out failed — propagate so the UI can warn the user.
+      // The user remains signed in (safe-fail behaviour).
       state = AsyncError(e, st);
     }
   }
@@ -156,8 +164,8 @@ class AuthNotifier extends AsyncNotifier<void> {
     );
   }
 
-  /// Update password (used from the Reset Password screen after
-  /// clicking the deep-link from the email).
+  /// Update password (used from the Reset Password screen after the user
+  /// clicks the deep-link from the password-reset email).
   Future<void> updatePassword(String newPassword) async {
     state = const AsyncLoading();
     try {
@@ -168,7 +176,27 @@ class AuthNotifier extends AsyncNotifier<void> {
     }
   }
 
-  /// Sign in with Google OAuth (Supabase OAuth flow).
+  /// Change password — re-authenticates with [currentPassword] first so we
+  /// verify the user owns the account, then applies [newPassword].
+  /// Used by ChangePasswordScreen.
+  Future<void> changePassword({
+    required String email,
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    state = const AsyncLoading();
+    final result = await ref.read(authRepositoryProvider).changePassword(
+          email: email,
+          currentPassword: currentPassword,
+          newPassword: newPassword,
+        );
+    state = result.fold(
+      (failure) => AsyncError(failure, StackTrace.current),
+      (_) => const AsyncData(null),
+    );
+  }
+
+  /// Sign in with Google OAuth (Supabase ID-token flow).
   Future<void> signInWithGoogle() async {
     state = const AsyncLoading();
     try {
@@ -177,7 +205,9 @@ class AuthNotifier extends AsyncNotifier<void> {
       final user = ref.read(currentUserProvider);
       if (user != null) {
         unawaited(ref.read(analyticsServiceProvider).setUserId(user.id));
-        unawaited(ref.read(analyticsServiceProvider).logLogin(method: 'google'));
+        unawaited(
+          ref.read(analyticsServiceProvider).logLogin(method: 'google'),
+        );
         unawaited(ref.read(pushNotificationServiceProvider).syncToken());
       }
       state = const AsyncData(null);

@@ -59,13 +59,30 @@ class LiveServiceRepository {
         .eq('live_service_id', serviceId)
         .order('created_at')
         .limit(200)
-        .map((rows) => rows.map((row) => LiveChatMessage(
-              id: row['id'] as String,
-              userId: row['user_id'] as String,
-              displayName: 'Member', // In reality, fetch via join or handle locally
-              body: row['body'] as String,
-              sentAt: DateTime.parse(row['created_at'] as String),
-            ),).toList(),);
+        .map((rows) {
+          return rows
+              .where((row) => row['is_deleted'] != true)
+              .map(
+                (row) => LiveChatMessage(
+                  id: row['id'] as String,
+                  userId: row['user_id'] as String,
+                  displayName: row['display_name'] as String? ?? 'Member',
+                  body: row['body'] as String,
+                  sentAt: DateTime.parse(
+                    (row['sent_at'] ?? row['created_at']) as String,
+                  ),
+                  avatarUrl: row['avatar_url'] as String?,
+                  isLeader: row['is_leader'] as bool? ?? false,
+                  isModerator: row['is_moderator'] as bool? ?? false,
+                  isPinned: row['is_pinned'] as bool? ?? false,
+                  replyToId: row['reply_to_id'] as String?,
+                  replyToDisplayName: row['reply_to_display_name'] as String?,
+                  replyToBody: row['reply_to_body'] as String?,
+                  isDeleted: row['is_deleted'] as bool? ?? false,
+                ),
+              )
+              .toList();
+        });
   }
 
   Future<void> sendChatMessage(String serviceId, String body, String userId) async {

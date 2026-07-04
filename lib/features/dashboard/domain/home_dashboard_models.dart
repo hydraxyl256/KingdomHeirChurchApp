@@ -35,6 +35,19 @@ class DashboardGreeting {
   final int streakDays;
   final String? avatarUrl;
   final int unreadNotifications;
+
+  /// Time-of-day salutation: 'Good Morning', 'Good Afternoon', etc.
+  String get greeting => switch (moment) {
+        GreetingMoment.morning => 'Good Morning',
+        GreetingMoment.afternoon => 'Good Afternoon',
+        GreetingMoment.evening => 'Good Evening',
+        GreetingMoment.night => 'Resting Well',
+      };
+
+  /// Motivational sub-line beneath the name.
+  String get tagline => streakDays <= 1
+      ? 'Continue growing in Christ today.'
+      : 'You are on a $streakDays-day prayer journey. 🔥';
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

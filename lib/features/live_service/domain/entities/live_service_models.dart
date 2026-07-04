@@ -135,7 +135,7 @@ class LiveChatMessage extends Equatable {
   final bool isDeleted;
 
   Map<String, dynamic> toInsertJson(String serviceId) => {
-        'service_id': serviceId,
+        'live_service_id': serviceId,
         'user_id': userId,
         'display_name': displayName,
         'body': body,
@@ -143,6 +143,8 @@ class LiveChatMessage extends Equatable {
         'avatar_url': avatarUrl,
         'is_pinned': isPinned,
         'reply_to_id': replyToId,
+        'reply_to_display_name': replyToDisplayName,
+        'reply_to_body': replyToBody,
       };
 
   @override

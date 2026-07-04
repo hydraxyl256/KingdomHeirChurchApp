@@ -84,4 +84,23 @@ class AuthRepositoryImpl implements AuthRepository {
         final updatedModel = await _remote.updateProfile(data);
         return updatedModel.toEntity();
       });
+
+  @override
+  Future<Either<Failure, Unit>> changePassword({
+    required String email,
+    required String currentPassword,
+    required String newPassword,
+  }) =>
+      ErrorHandler.guard(() async {
+        // Step 1 — verify the current password by re-authenticating.
+        // This raises AuthException if the password is wrong.
+        await _remote.reauthenticate(email: email, password: currentPassword);
+
+        // Step 2 — update to the new password.
+        await _remote.updatePassword(newPassword);
+        return unit;
+      });
+
+  @override
+  String get currentAuthProvider => _remote.currentAuthProvider;
 }

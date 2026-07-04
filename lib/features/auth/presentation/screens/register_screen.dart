@@ -16,6 +16,7 @@ import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/motion.dart';
 import 'package:kingdom_heir/core/widgets/app_button.dart';
+import 'package:kingdom_heir/core/widgets/kingdom_heirs_logo.dart';
 import 'package:kingdom_heir/features/auth/presentation/providers/auth_provider.dart';
 
 /// Kingdom Heirs — Single-Screen Registration.
@@ -265,15 +266,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final authState = ref.watch(authNotifierProvider);
     final isLoading = authState.isLoading;
     final reduceMotion = MediaQuery.of(context).disableAnimations;
-    final mq = MediaQuery.of(context);
-
-    // Logo size is responsive (same clamp as splash + login).
-    final logoSize = (mq.size.shortestSide * 0.13).clamp(44.0, 64.0);
 
     // Disable provider rebuilds mid-submit (and keep both
     // buttons independently disabled while the other is loading).
     final isEmailBusy = isLoading;
     final isGoogleBusy = isLoading;
+
+    final mq = MediaQuery.of(context);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light.copyWith(
@@ -303,14 +302,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       children: [
                         const SizedBox(height: AppSpacing.xl),
 
-                        // ── Brand block ─────────────────────────────────
-                        _BrandHeader(
-                          logoSize: logoSize,
-                          reduceMotion: reduceMotion,
+                        // ── Brand block ───────────────────────────────
+                        const KingdomHeirsBrandHeader(
+                          sizeFactor: 0.13,
+                          minSize: 44,
+                          maxSize: 64,
                         ).animate(target: reduceMotion ? 1 : 0).fadeIn(
                               duration: AppMotion.standard,
                               delay: const Duration(milliseconds: 80),
                             ),
+
 
                         const SizedBox(height: AppSpacing.xl),
 
@@ -606,79 +607,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         color: Colors.redAccent,
         fontWeight: FontWeight.w500,
       ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Sub-widgets
-// ─────────────────────────────────────────────────────────────────────────────
-
-/// Brand block — Logo + title above the form card.
-class _BrandHeader extends StatelessWidget {
-  const _BrandHeader({required this.logoSize, required this.reduceMotion});
-  final double logoSize;
-  final bool reduceMotion;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Semantics(
-          label: 'Kingdom Heirs',
-          image: true,
-          child: Container(
-            width: logoSize,
-            height: logoSize,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.warmWhite,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.gold.withValues(alpha: 0.35),
-                  blurRadius: 24,
-                  spreadRadius: 1,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            padding: EdgeInsets.all(logoSize * 0.16),
-            child: ClipOval(
-              child: Image.asset(
-                'assets/images/logo.jpeg',
-                fit: BoxFit.contain,
-                semanticLabel: 'Kingdom Heirs logo',
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        Text(
-          'KINGDOM HEIRS',
-          style: AppTypography.textTheme.titleMedium?.copyWith(
-            color: AppColors.gold,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 2,
-          ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          'INHERITING EXCELLENCE',
-          style: AppTypography.textTheme.labelSmall?.copyWith(
-            color: AppColors.gold.withValues(alpha: 0.7),
-            letterSpacing: 1.5,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.xxs),
-        Text(
-          'Foundation',
-          style: AppTypography.textTheme.labelSmall!.copyWith(
-            color: Colors.white.withValues(alpha: 0.6),
-            letterSpacing: 3,
-          ),
-        ),
-      ],
     );
   }
 }

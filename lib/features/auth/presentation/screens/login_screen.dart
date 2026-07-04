@@ -13,6 +13,7 @@ import 'package:kingdom_heir/core/theme/elevation.dart';
 import 'package:kingdom_heir/core/theme/motion.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/core/theme/spacing.dart';
+import 'package:kingdom_heir/core/widgets/kingdom_heirs_logo.dart';
 import 'package:kingdom_heir/features/auth/presentation/providers/auth_provider.dart';
 
 /// Kingdom Heirs — Login Screen (redesigned)
@@ -271,7 +272,7 @@ class _LoginScrollable extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // ── 1. Brand header ──────────────────────────────────────
-              const _BrandHeader(),
+              const KingdomHeirsBrandHeader(),
               const SizedBox(height: AppSpacing.xxl),
 
               // ── 2. Welcome heading ───────────────────────────────────
@@ -400,102 +401,7 @@ class _LoginScrollable extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// 1. Brand header — logo + wordmark + tagline
-// ─────────────────────────────────────────────────────────────────────────────
 
-class _BrandHeader extends StatelessWidget {
-  const _BrandHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    final mq = MediaQuery.of(context);
-    final logoSize = (mq.size.shortestSide * 0.22).clamp(56.0, 96.0);
-
-    return Column(
-      children: [
-        Semantics(
-          label: 'Kingdom Heirs',
-          image: true,
-          child: Container(
-            width: logoSize,
-            height: logoSize,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.warmWhite,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.gold.withValues(alpha: 0.35),
-                  blurRadius: 24,
-                  spreadRadius: 1,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            padding: EdgeInsets.all(logoSize * 0.16),
-            child: ClipOval(
-              child: Image.asset(
-                'assets/images/logo.jpeg',
-                fit: BoxFit.contain,
-                semanticLabel: 'Kingdom Heirs logo',
-                errorBuilder: (_, __, ___) => _LogoFallback(size: logoSize),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        Text(
-          'KINGDOM HEIRS',
-          style: AppTypography.textTheme.titleMedium?.copyWith(
-            color: AppColors.gold,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 3,
-          ),
-          textAlign: TextAlign.center,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        const SizedBox(height: AppSpacing.xxs),
-        Text(
-          'INHERITING EXCELLENCE',
-          style: AppTypography.textTheme.labelSmall?.copyWith(
-            color: AppColors.warmWhite.withValues(alpha: 0.55),
-            letterSpacing: 2.5,
-            fontWeight: FontWeight.w600,
-          ),
-          textAlign: TextAlign.center,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ],
-    );
-  }
-}
-
-class _LogoFallback extends StatelessWidget {
-  const _LogoFallback({required this.size});
-
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        'KH',
-        style: AppTypography.textTheme.displayMedium?.copyWith(
-          fontSize: size * 0.4,
-          fontWeight: FontWeight.w800,
-          color: AppColors.gold,
-          letterSpacing: 1,
-        ),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 2. Welcome block — heading + sub
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _WelcomeBlock extends StatelessWidget {
   const _WelcomeBlock({required this.reduceMotion});
