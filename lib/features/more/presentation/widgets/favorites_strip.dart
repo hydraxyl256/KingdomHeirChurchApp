@@ -121,7 +121,10 @@ class _FavoritePill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spec = FeatureCatalog.of(feature);
-    final palette = AccentPalette.of(spec.accent, isDark: false);
+    final palette = AccentPalette.of(
+      spec.accent,
+      isDark: Theme.of(context).brightness == Brightness.dark,
+    );
     final insets = Insets.of(context);
 
     return Material(

@@ -34,7 +34,10 @@ class FeatureTileWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spec = FeatureCatalog.of(feature);
-    final palette = AccentPalette.of(spec.accent, isDark: false);
+    final palette = AccentPalette.of(
+      spec.accent,
+      isDark: Theme.of(context).brightness == Brightness.dark,
+    );
 
     return LayoutBuilder(
       builder: (context, constraints) {

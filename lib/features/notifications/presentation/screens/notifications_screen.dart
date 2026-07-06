@@ -23,6 +23,7 @@ import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/iconography.dart';
+import 'package:kingdom_heir/core/utils/donation_launcher.dart';
 import 'package:kingdom_heir/core/widgets/app_empty_state.dart';
 import 'package:kingdom_heir/features/notifications/domain/entities/app_notification.dart';
 import 'package:kingdom_heir/features/notifications/presentation/providers/notifications_provider.dart';
@@ -391,8 +392,11 @@ class _NotificationCard extends ConsumerWidget {
         break;
       case NotificationKind.prayer:
         context.push(RouteNames.prayerFeed);
+      case NotificationKind.prayerApproved:
+      case NotificationKind.prayerRejected:
+        context.push(RouteNames.myPrayers);
       case NotificationKind.giving:
-        context.push(RouteNames.giving);
+        openDonationPage(context);
       case NotificationKind.unknown:
         break;
     }
@@ -511,6 +515,13 @@ _KindMeta _kindMeta(NotificationKind kind) {
         Iconography.prayer,
         Color(0xFFE0F2FE),
         Color(0xFF0369A1),
+      );
+    case NotificationKind.prayerApproved:
+    case NotificationKind.prayerRejected:
+      return const _KindMeta(
+        Iconography.prayer,
+        Color(0xFFDCFCE7),
+        Color(0xFF166534),
       );
     case NotificationKind.sermon:
       return const _KindMeta(

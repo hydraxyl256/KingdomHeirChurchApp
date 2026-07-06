@@ -51,7 +51,7 @@ class FamilyEventsCard extends StatelessWidget {
           border: Border.all(color: theme.colorScheme.outlineVariant),
           boxShadow: [
             BoxShadow(
-              color: AppColors.navy.withValues(alpha: 0.06),
+              color: theme.colorScheme.shadow.withValues(alpha: 0.06),
               blurRadius: 14,
               offset: const Offset(0, 6),
             ),
@@ -69,12 +69,12 @@ class FamilyEventsCard extends StatelessWidget {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: AppColors.tertiary.withValues(alpha: 0.15),
+                    color: theme.colorScheme.tertiaryContainer,
                     borderRadius: BorderRadius.circular(AppRadius.sm),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.celebration_rounded,
-                    color: AppColors.tertiary,
+                    color: theme.colorScheme.tertiary,
                     size: 18,
                   ),
                 ),
@@ -85,7 +85,7 @@ class FamilyEventsCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: AppTypography.textTheme.labelMedium?.copyWith(
-                      color: AppColors.tertiary,
+                      color: theme.colorScheme.tertiary,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.6,
                     ),
@@ -100,11 +100,13 @@ class FamilyEventsCard extends StatelessWidget {
               width: double.infinity,
               padding: EdgeInsets.all(insets.md),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFFE0F2FE),
-                    Color(0xFFDBEAFE),
-                  ],
+                gradient: LinearGradient(
+                  colors: theme.brightness == Brightness.dark
+                      ? [AppColors.navyMid, AppColors.navyLight]
+                      : [
+                          theme.colorScheme.tertiaryContainer,
+                          theme.colorScheme.secondaryContainer,
+                        ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -116,12 +118,14 @@ class FamilyEventsCard extends StatelessWidget {
                     width: 38,
                     height: 38,
                     decoration: BoxDecoration(
-                      color: AppColors.warmWhite,
+                      color: theme.brightness == Brightness.dark
+                          ? AppColors.surfaceDark
+                          : theme.colorScheme.surface,
                       borderRadius: BorderRadius.circular(AppRadius.sm),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.event_available_rounded,
-                      color: AppColors.tertiary,
+                      color: theme.colorScheme.tertiary,
                       size: 20,
                     ),
                   ),
@@ -134,7 +138,7 @@ class FamilyEventsCard extends StatelessWidget {
                         Text(
                           'NEXT UP',
                           style: AppTypography.textTheme.labelSmall?.copyWith(
-                            color: AppColors.tertiary.withValues(alpha: 0.85),
+                            color: theme.colorScheme.tertiary,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 1.4,
                           ),
@@ -145,14 +149,14 @@ class FamilyEventsCard extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: AppTypography.textTheme.titleSmall?.copyWith(
-                            color: AppColors.navy,
+                            color: theme.colorScheme.onSurface,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
                         Text(
                           data.nextEventWhen,
                           style: AppTypography.textTheme.bodySmall?.copyWith(
-                            color: AppColors.navy.withValues(alpha: 0.65),
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
@@ -184,7 +188,7 @@ class FamilyEventsCard extends StatelessWidget {
                         icon: Icons.event_note_rounded,
                         label: 'Upcoming',
                         value: '${data.upcomingCount}',
-                        color: AppColors.tertiary,
+                        color: theme.colorScheme.tertiary,
                       ),
                     ),
                     SizedBox(
@@ -193,7 +197,7 @@ class FamilyEventsCard extends StatelessWidget {
                         icon: Icons.today_rounded,
                         label: 'This week',
                         value: '${data.thisWeekCount}',
-                        color: AppColors.goldDark,
+                        color: theme.colorScheme.primary,
                       ),
                     ),
                     SizedBox(
@@ -202,7 +206,7 @@ class FamilyEventsCard extends StatelessWidget {
                         icon: Icons.child_care_rounded,
                         label: 'Kids today',
                         value: '${data.kidsCheckedInToday}',
-                        color: const Color(0xFFB91C1C),
+                        color: theme.colorScheme.error,
                       ),
                     ),
                   ],

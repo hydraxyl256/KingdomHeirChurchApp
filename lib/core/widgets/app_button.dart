@@ -101,8 +101,8 @@ class AppButton extends StatelessWidget {
       side: variant == AppButtonVariant.outlined
           ? BorderSide(
               color: isDisabled
-                  ? AppColors.gold.withValues(alpha: 0.38)
-                  : AppColors.gold,
+                  ? scheme.primary.withValues(alpha: 0.38)
+                  : scheme.primary,
               width: 1.5,
             )
           : BorderSide.none,
@@ -123,7 +123,7 @@ class AppButton extends StatelessWidget {
                   ? AppSpacing.elevation1
                   : 0,
               shadowColor: variant == AppButtonVariant.filled
-                  ? AppColors.gold.withValues(alpha: 0.35)
+                  ? scheme.primary.withValues(alpha: 0.35)
                   : Colors.transparent,
               shape: shape,
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
@@ -134,7 +134,7 @@ class AppButton extends StatelessWidget {
         AppButtonVariant.outlined => OutlinedButton(
             onPressed: isDisabled ? null : onPressed,
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.gold,
+              foregroundColor: scheme.primary,
               side: shape.side,
               shape: shape,
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
@@ -145,7 +145,7 @@ class AppButton extends StatelessWidget {
         AppButtonVariant.text => TextButton(
             onPressed: isDisabled ? null : onPressed,
             style: TextButton.styleFrom(
-              foregroundColor: AppColors.gold,
+              foregroundColor: scheme.primary,
               shape: shape,
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
               minimumSize: Size(width ?? 0, height),
@@ -157,15 +157,15 @@ class AppButton extends StatelessWidget {
   }
 
   Color _background(ColorScheme scheme) => switch (variant) {
-        AppButtonVariant.filled => AppColors.gold,
-        AppButtonVariant.navy => AppColors.navy,
+        AppButtonVariant.filled => scheme.primary,
+        AppButtonVariant.navy => scheme.tertiary,
         _ => Colors.transparent,
       };
 
   Color _foreground(ColorScheme scheme) => switch (variant) {
-        AppButtonVariant.filled => AppColors.ink,
-        AppButtonVariant.navy => AppColors.white,
-        AppButtonVariant.outlined || AppButtonVariant.text => AppColors.gold,
+        AppButtonVariant.filled => scheme.onPrimary,
+        AppButtonVariant.navy => scheme.onTertiary,
+        AppButtonVariant.outlined || AppButtonVariant.text => scheme.primary,
       };
 }
 

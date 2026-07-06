@@ -108,6 +108,8 @@ abstract final class RouteNames {
   // ── Prayer Requests ───────────────────────────────────────────────────────
   static const prayerFeed = '/home/prayer';
   static const submitPrayer = '/home/prayer/submit';
+  static const myPrayers = '/home/prayer/my-prayers';
+  static const adminPrayerModeration = '/admin/prayer-moderation';
 
   // ── Testimonies ────────────────────────────────────────────────────────────
   static const testimonies = '/home/testimonies';

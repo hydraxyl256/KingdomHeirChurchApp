@@ -17,6 +17,7 @@ import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/iconography.dart';
+import 'package:kingdom_heir/core/utils/donation_launcher.dart';
 
 class GlobalSearchScreen extends ConsumerStatefulWidget {
   const GlobalSearchScreen({super.key});
@@ -286,7 +287,8 @@ class _IdleSearch extends StatelessWidget {
     _QuickLink(Iconography.devotional, 'Devotionals', RouteNames.devotionals),
     _QuickLink(Iconography.events, 'Events', RouteNames.events),
     _QuickLink(Iconography.prayer, 'Prayer Wall', RouteNames.prayerFeed),
-    _QuickLink(Iconography.giving, 'Giving', RouteNames.giving),
+    _QuickLink(Iconography.giving, 'Giving', RouteNames.giving,
+        opensDonationPage: true,),
   ];
 
   @override
@@ -323,7 +325,13 @@ class _IdleSearch extends StatelessWidget {
               color: Colors.transparent,
               child: InkWell(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                onTap: () => context.push(link.route),
+                onTap: () {
+                  if (link.opensDonationPage) {
+                    openDonationPage(context);
+                  } else {
+                    context.push(link.route);
+                  }
+                },
                 child: Container(
                   decoration: BoxDecoration(
                     color: cardColor,
@@ -380,10 +388,15 @@ class _IdleSearch extends StatelessWidget {
 }
 
 class _QuickLink {
-  const _QuickLink(this.icon, this.label, this.route);
+  const _QuickLink(this.icon, this.label, this.route,
+      {this.opensDonationPage = false,});
   final IconData icon;
   final String label;
   final String route;
+
+  /// When true, tapping this quick link opens the hosted donation page
+  /// in the device's external browser instead of pushing [route].
+  final bool opensDonationPage;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

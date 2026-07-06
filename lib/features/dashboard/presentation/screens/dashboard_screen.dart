@@ -30,6 +30,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kingdom_heir/core/router/route_names.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
+import 'package:kingdom_heir/core/utils/donation_launcher.dart';
 import 'package:kingdom_heir/core/widgets/app_empty_state.dart';
 import 'package:kingdom_heir/features/dashboard/domain/home_dashboard_models.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/providers/home_dashboard_providers.dart';
@@ -280,7 +281,7 @@ class _HomeDashboardBody extends ConsumerWidget {
       case QuickActionItem.groups:
         context.push(RouteNames.groups);
       case QuickActionItem.giving:
-        context.push(RouteNames.giving);
+        openDonationPage(context);
       case QuickActionItem.events:
         context.push(RouteNames.events);
       case QuickActionItem.journal:

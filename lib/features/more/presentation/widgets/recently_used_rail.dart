@@ -23,7 +23,6 @@ import 'package:intl/intl.dart';
 
 import 'package:kingdom_heir/core/responsive/breakpoints.dart';
 import 'package:kingdom_heir/core/responsive/insets.dart';
-import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/motion.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
@@ -93,8 +92,12 @@ class _RecentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spec = FeatureCatalog.of(item.feature);
-    final palette = AccentPalette.of(spec.accent, isDark: false);
+    final palette = AccentPalette.of(
+      spec.accent,
+      isDark: Theme.of(context).brightness == Brightness.dark,
+    );
     final insets = Insets.of(context);
+    final surface = Theme.of(context).colorScheme.surface;
 
     return Material(
       color: Colors.transparent,
@@ -108,7 +111,7 @@ class _RecentCard extends StatelessWidget {
               colors: [
                 palette.bg,
                 Color.alphaBlend(
-                  AppColors.warmWhite.withValues(alpha: 0.55),
+                  surface.withValues(alpha: 0.55),
                   palette.bg,
                 ),
               ],
@@ -227,6 +230,7 @@ class _ProgressBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final clamped = value.clamp(0.0, 1.0);
+    final scheme = Theme.of(context).colorScheme;
     return LayoutBuilder(
       builder: (context, constraints) {
         return Stack(
@@ -235,7 +239,7 @@ class _ProgressBar extends StatelessWidget {
               height: 4,
               width: constraints.maxWidth,
               decoration: BoxDecoration(
-                color: AppColors.gold.withValues(alpha: 0.18),
+                color: scheme.primary.withValues(alpha: 0.18),
                 borderRadius: BorderRadius.circular(AppRadius.full),
               ),
             ),
@@ -245,7 +249,7 @@ class _ProgressBar extends StatelessWidget {
               height: 4,
               width: constraints.maxWidth * clamped,
               decoration: BoxDecoration(
-                color: AppColors.goldDark,
+                color: scheme.primary,
                 borderRadius: BorderRadius.circular(AppRadius.full),
               ),
             ),
@@ -276,12 +280,12 @@ class _EmptyRecentCard extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: AppColors.gold.withValues(alpha: 0.15),
+              color: theme.colorScheme.primaryContainer,
               borderRadius: BorderRadius.circular(AppRadius.full),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.history_rounded,
-              color: AppColors.goldDark,
+              color: theme.colorScheme.primary,
               size: 18,
             ),
           ),

@@ -27,7 +27,6 @@ import 'package:kingdom_heir/core/localization/locale_provider.dart';
 import 'package:kingdom_heir/core/responsive/breakpoints.dart';
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/router/route_names.dart';
-import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/features/more/domain/more_models.dart';
@@ -136,6 +135,7 @@ class AccountSection extends ConsumerWidget {
     ];
     final notifier = ref.read(localeProvider.notifier);
     final currentCode = ref.read(localeProvider).languageCode;
+    final scheme = Theme.of(context).colorScheme;
     showDialog<void>(
       context: context,
       builder: (dialogCtx) => AlertDialog(
@@ -155,12 +155,12 @@ class AccountSection extends ConsumerWidget {
                 final isSelected = lang.code == currentCode;
                 return RadioListTile<String>(
                   value: lang.code,
-                  activeColor: AppColors.gold,
+                  activeColor: scheme.primary,
                   title: Text(lang.label),
                   secondary: isSelected
-                      ? const Icon(
+                      ? Icon(
                           Icons.check_circle_rounded,
-                          color: AppColors.gold,
+                          color: scheme.primary,
                         )
                       : null,
                 );
@@ -191,7 +191,10 @@ class _AccountTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spec = FeatureCatalog.of(feature);
-    final palette = AccentPalette.of(spec.accent, isDark: false);
+    final palette = AccentPalette.of(
+      spec.accent,
+      isDark: Theme.of(context).brightness == Brightness.dark,
+    );
     final theme = Theme.of(context);
 
     return _AccountTileFadeIn(
@@ -236,10 +239,10 @@ class _AccountTile extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                 ],
-                const Icon(
+                Icon(
                   Icons.chevron_right_rounded,
                   size: 18,
-                  color: AppColors.textDisabled,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ],
             ),

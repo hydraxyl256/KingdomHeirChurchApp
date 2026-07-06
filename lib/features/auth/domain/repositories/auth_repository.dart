@@ -24,7 +24,7 @@ abstract class AuthRepository {
   });
 
   /// Sign in with Google OAuth.
-  Future<Either<Failure, AppUser>> signInWithGoogle();
+  Future<Either<Failure, Unit>> signInWithGoogle();
 
   /// Sign out the current user.
   Future<Either<Failure, Unit>> signOut();

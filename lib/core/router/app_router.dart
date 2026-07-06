@@ -12,6 +12,7 @@ import 'package:kingdom_heir/features/admin/presentation/screens/admin_leader_ap
 import 'package:kingdom_heir/features/admin/presentation/screens/admin_leader_recognition_dashboard_screen.dart';
 import 'package:kingdom_heir/features/admin/presentation/screens/admin_members_screen.dart';
 import 'package:kingdom_heir/features/admin/presentation/screens/admin_moderation_screen.dart';
+import 'package:kingdom_heir/features/admin/presentation/screens/admin_prayer_moderation_screen.dart';
 import 'package:kingdom_heir/features/admin/presentation/screens/admin_sermons_screen.dart';
 import 'package:kingdom_heir/features/admin/presentation/screens/admin_shell.dart';
 import 'package:kingdom_heir/features/auth/presentation/providers/auth_provider.dart';
@@ -42,7 +43,6 @@ import 'package:kingdom_heir/features/events/presentation/screens/event_details_
 import 'package:kingdom_heir/features/events/presentation/screens/event_listing_screen.dart';
 import 'package:kingdom_heir/features/events/presentation/screens/events_calendar_screen.dart';
 import 'package:kingdom_heir/features/events/presentation/screens/tickets_attendance_screen.dart';
-import 'package:kingdom_heir/features/giving/presentation/screens/checkout_order_summary_screen.dart';
 import 'package:kingdom_heir/features/giving/presentation/screens/giving_history_screen.dart';
 import 'package:kingdom_heir/features/giving/presentation/screens/giving_stewardship_hub_screen.dart';
 import 'package:kingdom_heir/features/groups/presentation/screens/community_home_screen.dart';
@@ -66,6 +66,7 @@ import 'package:kingdom_heir/features/news/presentation/screens/news_article_det
 import 'package:kingdom_heir/features/notifications/presentation/screens/notifications_screen.dart';
 import 'package:kingdom_heir/features/onboarding/presentation/screens/profile_setup_screen.dart';
 import 'package:kingdom_heir/features/podcasts/presentation/screens/podcasts_audio_hub_screen.dart';
+import 'package:kingdom_heir/features/prayer_requests/presentation/screens/my_prayers_screen.dart';
 import 'package:kingdom_heir/features/prayer_requests/presentation/screens/prayer_feed_screen.dart';
 import 'package:kingdom_heir/features/prayer_requests/presentation/screens/submit_prayer_screen.dart';
 import 'package:kingdom_heir/features/profile/presentation/screens/my_profile_screen.dart';
@@ -378,9 +379,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'history',
                 builder: (_, __) => const GivingHistoryScreen(),
               ),
+              // The legacy `/home/giving/checkout` route used to open
+              // an in-app checkout form. Payment is now handled by a
+              // hosted page; the deep-link path is preserved but
+              // redirected to the Stewardship Hub so any old links,
+              // notifications, or web tests still land somewhere
+              // sensible.
               GoRoute(
                 path: 'checkout',
-                builder: (_, __) => const CheckoutOrderSummaryScreen(),
+                builder: (_, __) => const GivingStewardshipHubScreen(),
               ),
             ],
           ),
@@ -571,6 +578,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'submit',
                 builder: (_, __) => const SubmitPrayerScreen(),
               ),
+              GoRoute(
+                path: 'my-prayers',
+                builder: (_, __) => const MyPrayersScreen(),
+              ),
             ],
           ),
 
@@ -625,6 +636,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/admin/moderation',
             builder: (_, __) => const AdminModerationScreen(),
+          ),
+          GoRoute(
+            path: '/admin/prayer-moderation',
+            builder: (_, __) => const AdminPrayerModerationScreen(),
           ),
           GoRoute(
             path: '/admin/leader-applications',

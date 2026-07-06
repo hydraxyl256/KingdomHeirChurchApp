@@ -9,10 +9,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
+import 'package:kingdom_heir/core/utils/donation_launcher.dart';
 import 'package:kingdom_heir/features/live_service/domain/entities/live_service_models.dart';
 import 'package:kingdom_heir/features/live_service/presentation/providers/live_service_provider.dart';
 import 'package:kingdom_heir/features/live_service/presentation/widgets/live_prayer_panel.dart';
@@ -331,7 +331,7 @@ class LiveQuickActions extends ConsumerWidget {
         icon: Icons.favorite_border_rounded,
         label: 'Give',
         color: AppColors.gold,
-        onTap: () => unawaited(context.push('/home/giving')),
+        onTap: () => openDonationPage(context),
       ),
       _Action(
         icon: Icons.flag_outlined,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kingdom_heir/core/router/route_names.dart';
+import 'package:kingdom_heir/core/utils/donation_launcher.dart';
 import 'package:logger/logger.dart';
 
 class NotificationRouter {
@@ -59,12 +60,20 @@ class NotificationRouter {
           // Prayer has no per-item detail route — drop into the feed
           // either way. If we add one later, fall back to id-based path.
           context.go(RouteNames.prayerFeed);
+        case 'prayer_approved':
+        case 'prayer_rejected':
+          // Land on the member's "My Prayer Requests" screen so they
+          // can see the new status chip and any admin note.
+          context.go(RouteNames.myPrayers);
         case 'announcement':
           // Land on the news feed — announcements live alongside
           // regular news articles.
           context.go(RouteNames.news);
         case 'giving':
-          context.go(RouteNames.giving);
+          // Open the hosted donation page in the device's external
+          // browser. Keeping a centralized funnel ensures we never
+          // route users to a now-removed in-app checkout.
+          openDonationPage(context);
         default:
           logger.w('Unknown notification type: $type');
       }

@@ -23,7 +23,6 @@ import 'package:flutter/material.dart';
 
 import 'package:kingdom_heir/core/responsive/breakpoints.dart';
 import 'package:kingdom_heir/core/responsive/insets.dart';
-import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/motion.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
@@ -73,12 +72,12 @@ class _ResourcesExpandableSectionState
                   width: 30,
                   height: 30,
                   decoration: BoxDecoration(
-                    color: AppColors.gold.withValues(alpha: 0.15),
+                    color: theme.colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(AppRadius.sm),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.library_books_rounded,
-                    color: AppColors.goldDark,
+                    color: theme.colorScheme.primary,
                     size: 16,
                   ),
                 ),
@@ -108,9 +107,9 @@ class _ResourcesExpandableSectionState
                 AnimatedRotation(
                   turns: _expanded ? 0.5 : 0,
                   duration: AppMotion.standard,
-                  child: const Icon(
+                  child: Icon(
                     Icons.expand_more_rounded,
-                    color: AppColors.goldDark,
+                    color: theme.colorScheme.primary,
                   ),
                 ),
               ],

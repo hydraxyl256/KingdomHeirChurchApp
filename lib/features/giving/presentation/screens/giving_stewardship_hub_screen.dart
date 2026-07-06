@@ -5,8 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kingdom_heir/core/di/providers.dart';
 import 'package:kingdom_heir/core/router/route_names.dart';
-import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
+import 'package:kingdom_heir/core/utils/donation_launcher.dart';
 import 'package:kingdom_heir/features/giving/presentation/providers/giving_provider.dart';
 
 class GivingStewardshipHubScreen extends ConsumerWidget {
@@ -40,11 +40,10 @@ class GivingStewardshipHubScreen extends ConsumerWidget {
             const SizedBox(height: AppSpacing.md),
             _GivingChart().animate().fadeIn(delay: 200.ms),
             const SizedBox(height: AppSpacing.xl),
-            Text('Give Now', style: theme.textTheme.titleLarge)
+            const _DonateSecurelyCta()
                 .animate()
-                .fadeIn(delay: 300.ms),
-            const SizedBox(height: AppSpacing.md),
-            _GiveOptions(context: context).animate().fadeIn(delay: 400.ms),
+                .fadeIn(delay: 300.ms)
+                .slideY(begin: 0.05, end: 0, curve: Curves.easeOutCubic),
             const SizedBox(height: AppSpacing.xxl),
           ],
         ),
@@ -58,20 +57,21 @@ class _YearSummaryCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final summaryAsync = ref.watch(annualSummaryProvider);
     final currentYear = DateTime.now().year;
+    final scheme = Theme.of(context).colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.xl),
       width: double.infinity,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppColors.goldDark, AppColors.gold],
+        gradient: LinearGradient(
+          colors: [scheme.primary, scheme.tertiary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         boxShadow: [
           BoxShadow(
-            color: AppColors.gold.withValues(alpha: 0.35),
+            color: scheme.primary.withValues(alpha: 0.35),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -82,22 +82,25 @@ class _YearSummaryCard extends ConsumerWidget {
           Text(
             'Total Given in $currentYear',
             style: TextStyle(
-              color: AppColors.ink.withValues(alpha: 0.75),
+              color: scheme.onPrimary.withValues(alpha: 0.75),
               fontSize: 14,
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
           summaryAsync.when(
-            loading: () =>
-                const CircularProgressIndicator(color: AppColors.ink),
-            error: (err, _) => const Text('Error loading stats',
-                style: TextStyle(color: AppColors.error),),
+            loading: () => CircularProgressIndicator(
+              color: scheme.onPrimary,
+            ),
+            error: (_, __) => Text(
+              'Error loading stats',
+              style: TextStyle(color: scheme.onPrimary),
+            ),
             data: (total) {
               final currency = ref.watch(currencyProvider);
               return Text(
                 '$currency ${total.toStringAsFixed(2)}',
-                style: const TextStyle(
-                  color: AppColors.ink,
+                style: TextStyle(
+                  color: scheme.onPrimary,
                   fontSize: 40,
                   fontWeight: FontWeight.w700,
                 ),
@@ -108,7 +111,7 @@ class _YearSummaryCard extends ConsumerWidget {
           Text(
             'Stewardship and Generosity',
             style: TextStyle(
-              color: AppColors.ink.withValues(alpha: 0.65),
+              color: scheme.onPrimary.withValues(alpha: 0.65),
               fontSize: 13,
             ),
           ),
@@ -121,6 +124,7 @@ class _YearSummaryCard extends ConsumerWidget {
 class _GivingChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     // In a full implementation, you would use an aggregated monthly breakdown provider.
     // We are mocking the monthly distribution here as placeholder since the schema
     // provides a view for annual aggregates.
@@ -137,8 +141,8 @@ class _GivingChart extends StatelessWidget {
                 barRods: [
                   BarChartRodData(
                     toY: [50, 200, 180, 420, 190, 240][i].toDouble(),
-                    gradient: const LinearGradient(
-                      colors: [AppColors.goldDark, AppColors.gold],
+                    gradient: LinearGradient(
+                      colors: [scheme.tertiary, scheme.primary],
                       begin: Alignment.bottomCenter,
                       end: Alignment.topCenter,
                     ),
@@ -171,74 +175,183 @@ class _GivingChart extends StatelessWidget {
   }
 }
 
-class _GiveOptions extends StatelessWidget {
-  const _GiveOptions({required this.context});
-  final BuildContext context;
+/// Single premium "Donate Securely" CTA card that explains the
+/// redirect-to-hosted-page flow and exposes the primary donation
+/// action. Wraps the call in a local `StatefulWidget` so the button
+/// shows a spinner while `openDonationPage` is in flight, and so a
+/// rapid second tap is visually suppressed in addition to the
+/// `_inFlight` guard in the launcher itself.
+class _DonateSecurelyCta extends StatefulWidget {
+  const _DonateSecurelyCta();
 
   @override
-  Widget build(BuildContext ctx) {
-    final options = [
-      {
-        'label': 'Tithe',
-        'icon': Icons.favorite_rounded,
-        'color': AppColors.error,
-      },
-      {
-        'label': 'Offering',
-        'icon': Icons.volunteer_activism_rounded,
-        'color': AppColors.gold,
-      },
-      {
-        'label': 'Missions',
-        'icon': Icons.public_rounded,
-        'color': AppColors.tertiary,
-      },
-      {
-        'label': 'Building Fund',
-        'icon': Icons.church_rounded,
-        'color': AppColors.navyAccent,
-      },
-    ];
+  State<_DonateSecurelyCta> createState() => _DonateSecurelyCtaState();
+}
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: AppSpacing.md,
-        mainAxisSpacing: AppSpacing.md,
-        childAspectRatio: 1.6,
+class _DonateSecurelyCtaState extends State<_DonateSecurelyCta> {
+  bool _busy = false;
+
+  Future<void> _onDonate() async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    try {
+      await openDonationPage(context);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final onContainer = scheme.onPrimaryContainer;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.xl),
+      decoration: BoxDecoration(
+        color: scheme.primaryContainer,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        border: Border.all(
+          color: scheme.primary.withValues(alpha: 0.30),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: scheme.shadow.withValues(alpha: 0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
-      itemCount: options.length,
-      itemBuilder: (_, i) {
-        final o = options[i];
-        final color = o['color']! as Color;
-        return InkWell(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-          onTap: () => context.go(RouteNames.checkout),
-          child: Container(
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-              border: Border.all(color: color.withValues(alpha: 0.25)),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(o['icon']! as IconData, color: color, size: 28),
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  o['label']! as String,
-                  style: TextStyle(
-                    color: color,
-                    fontWeight: FontWeight.w600,
-                  ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: scheme.primary.withValues(alpha: 0.18),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                 ),
-              ],
+                child: Icon(
+                  Icons.lock_rounded,
+                  color: scheme.primary,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            'Donate Securely',
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: onContainer,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.xs),
+                        Icon(
+                          Icons.open_in_new_rounded,
+                          color: scheme.primary,
+                          size: 20,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      'Your gift supports the work of Kingdom Heirs Foundation.',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: onContainer.withValues(alpha: 0.75),
+                        height: 1.45,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          Text(
+            'You will be redirected to our secure hosted payment page to '
+            'complete your gift. Card and mobile money payments are '
+            'processed there — never inside this app.',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: onContainer.withValues(alpha: 0.65),
+              height: 1.5,
             ),
           ),
-        );
-      },
+          const SizedBox(height: AppSpacing.lg),
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: ElevatedButton(
+              onPressed: _busy ? null : _onDonate,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: scheme.primary,
+                foregroundColor: scheme.onPrimary,
+                disabledBackgroundColor:
+                    scheme.primary.withValues(alpha: 0.45),
+                shape: RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.circular(AppSpacing.radiusMd),
+                ),
+                elevation: 0,
+              ),
+              child: _busy
+                  ? SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          scheme.onPrimary,
+                        ),
+                      ),
+                    )
+                  : const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.lock_rounded, size: 18),
+                        SizedBox(width: AppSpacing.sm),
+                        Text(
+                          'Donate Securely',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                        SizedBox(width: AppSpacing.sm),
+                        Icon(Icons.open_in_new_rounded, size: 18),
+                      ],
+                    ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Center(
+            child: TextButton.icon(
+              onPressed: _busy
+                  ? null
+                  : () => context.go(RouteNames.givingHistory),
+              icon: const Icon(Icons.history_rounded, size: 18),
+              label: const Text('View giving history'),
+              style: TextButton.styleFrom(
+                foregroundColor: scheme.primary,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

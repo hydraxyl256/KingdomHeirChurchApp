@@ -23,8 +23,8 @@ import 'package:go_router/go_router.dart';
 import 'package:kingdom_heir/core/responsive/breakpoints.dart';
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/router/route_names.dart';
-import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
+import 'package:kingdom_heir/core/theme/more_section_theme.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/core/widgets/app_avatar.dart';
 import 'package:kingdom_heir/core/widgets/glass_card.dart';
@@ -39,6 +39,7 @@ class ProfileHeroSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final insets = Insets.of(context);
+    final section = MoreSectionTheme.of(context);
     final greeting = _greeting();
     final initial =
         (hero.displayName.isNotEmpty ? hero.displayName.characters.first : 'K')
@@ -56,7 +57,7 @@ class ProfileHeroSection extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: AppTypography.textTheme.labelMedium?.copyWith(
-              color: AppColors.gold.withValues(alpha: 0.85),
+              color: section.heroAccent.withValues(alpha: 0.85),
               fontWeight: FontWeight.w700,
               letterSpacing: 1.4,
             ),
@@ -67,7 +68,7 @@ class ProfileHeroSection extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: AppTypography.textTheme.headlineSmall?.copyWith(
-              color: AppColors.warmWhite,
+              color: section.heroAccentOnSurface,
               fontWeight: FontWeight.w800,
               letterSpacing: -0.3,
             ),
@@ -207,17 +208,18 @@ class _RoleChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final section = MoreSectionTheme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
-        color: AppColors.gold.withValues(alpha: 0.18),
+        color: section.heroAccent.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(AppRadius.full),
-        border: Border.all(color: AppColors.gold.withValues(alpha: 0.45)),
+        border: Border.all(color: section.heroAccent.withValues(alpha: 0.45)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.verified_rounded, color: AppColors.gold, size: 14),
+          Icon(Icons.verified_rounded, color: section.heroAccent, size: 14),
           const SizedBox(width: 6),
           Flexible(
             child: Text(
@@ -225,7 +227,7 @@ class _RoleChip extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: AppTypography.textTheme.labelSmall?.copyWith(
-                color: AppColors.gold,
+                color: section.heroAccent,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.6,
               ),
@@ -244,17 +246,18 @@ class _MetaRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final section = MoreSectionTheme.of(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: AppColors.gold, size: 16),
+        Icon(icon, color: section.heroAccent, size: 16),
         const SizedBox(width: 6),
         Text(
           label,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: AppTypography.textTheme.bodySmall?.copyWith(
-            color: AppColors.warmWhite.withValues(alpha: 0.85),
+            color: section.heroAccentOnSurface.withValues(alpha: 0.85),
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -271,11 +274,12 @@ class _ProfileAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final section = MoreSectionTheme.of(context);
     return Container(
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: AppColors.gold, width: 2),
+        border: Border.all(color: section.heroAccent, width: 2),
       ),
       child: AppAvatar(
         imageUrl: avatarUrl,
@@ -293,6 +297,7 @@ class ProfileHeroSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final insets = Insets.of(context);
+    final section = MoreSectionTheme.of(context);
     return Padding(
       padding: EdgeInsets.fromLTRB(insets.lg, insets.lg, insets.lg, insets.sm),
       child: GlassCard(
@@ -303,7 +308,7 @@ class ProfileHeroSkeleton extends StatelessWidget {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: AppColors.warmWhite.withValues(alpha: 0.2),
+                color: section.heroAccentOnSurface.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
             ),
@@ -317,7 +322,7 @@ class ProfileHeroSkeleton extends StatelessWidget {
                     height: 10,
                     width: 120,
                     decoration: BoxDecoration(
-                      color: AppColors.warmWhite.withValues(alpha: 0.3),
+                      color: section.heroAccentOnSurface.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(AppRadius.xs),
                     ),
                   ),
@@ -325,7 +330,7 @@ class ProfileHeroSkeleton extends StatelessWidget {
                   Container(
                     height: 18,
                     decoration: BoxDecoration(
-                      color: AppColors.warmWhite.withValues(alpha: 0.4),
+                      color: section.heroAccentOnSurface.withValues(alpha: 0.4),
                       borderRadius: BorderRadius.circular(AppRadius.xs),
                     ),
                   ),

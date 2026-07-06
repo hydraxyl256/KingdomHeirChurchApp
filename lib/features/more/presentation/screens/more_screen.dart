@@ -45,8 +45,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:kingdom_heir/core/responsive/insets.dart';
-import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
+import 'package:kingdom_heir/core/theme/more_section_theme.dart';
 import 'package:kingdom_heir/core/widgets/app_error_widget.dart';
 import 'package:kingdom_heir/features/more/domain/more_models.dart';
 import 'package:kingdom_heir/features/more/presentation/providers/more_providers.dart';
@@ -260,8 +260,9 @@ class _ScreenChrome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final insets = Insets.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    final section = MoreSectionTheme.of(context);
 
     return CustomScrollView(
       slivers: [
@@ -269,8 +270,7 @@ class _ScreenChrome extends StatelessWidget {
           pinned: true,
           floating: true,
           centerTitle: false,
-          backgroundColor:
-              isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
+          backgroundColor: scheme.surface,
           surfaceTintColor: Colors.transparent,
           elevation: 0,
           scrolledUnderElevation: 0.5,
@@ -289,16 +289,19 @@ class _ScreenChrome extends StatelessWidget {
                   width: 30,
                   height: 30,
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [AppColors.gold, AppColors.goldLight],
+                    gradient: LinearGradient(
+                      colors: [
+                        Theme.of(context).colorScheme.primary,
+                        Theme.of(context).colorScheme.tertiary,
+                      ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.diamond_rounded,
-                    color: AppColors.ink,
+                    color: Theme.of(context).colorScheme.onPrimary,
                     size: 16,
                   ),
                 ),
@@ -310,7 +313,7 @@ class _ScreenChrome extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: AppTypography.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w800,
-                      color: isDark ? AppColors.warmWhite : AppColors.navy,
+                      color: scheme.onSurface,
                       letterSpacing: -0.3,
                     ),
                   ),
@@ -320,12 +323,10 @@ class _ScreenChrome extends StatelessWidget {
             background: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: isDark
-                      ? [AppColors.navy, AppColors.backgroundDark]
-                      : [
-                          AppColors.warmWhite,
-                          AppColors.backgroundLight,
-                        ],
+                  colors: [
+                    section.heroBackgroundTop,
+                    scheme.surface,
+                  ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),

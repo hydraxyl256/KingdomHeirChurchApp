@@ -61,6 +61,15 @@ final currentUserProvider = Provider<AppUser?>((ref) {
   return ref.watch(authStateProvider).valueOrNull;
 });
 
+/// True if the current user has admin-level role. Used by admin-only
+/// widgets to gate UI elements and by the prayer moderation route to
+/// refuse non-admins before the screen is built. The DB RLS / RPC
+/// authorization is the final authority — this is just a fast client
+/// guard that mirrors the router-level admin check.
+final currentUserIsAdminProvider = Provider<bool>((ref) {
+  return ref.watch(currentUserProvider)?.isAdmin ?? false;
+});
+
 // ─────────────────────────────────────────────
 // Auth Notifier (Sign In / Up / Out / Change Password)
 // ─────────────────────────────────────────────

@@ -37,6 +37,11 @@ class AdminShell extends StatelessWidget {
         selectedIcon: Icon(Icons.gavel),
         label: Text('Moderation'),
       ),
+      const NavigationRailDestination(
+        icon: Icon(Icons.self_improvement_outlined),
+        selectedIcon: Icon(Icons.self_improvement),
+        label: Text('Prayer Mod'),
+      ),
     ];
 
     int getSelectedIndex() {
@@ -45,6 +50,7 @@ class AdminShell extends StatelessWidget {
       if (location.startsWith('/admin/sermons')) return 2;
       if (location.startsWith('/admin/events')) return 3;
       if (location.startsWith('/admin/moderation')) return 4;
+      if (location.startsWith('/admin/prayer-moderation')) return 5;
       return 0; // default to dashboard
     }
 
@@ -60,6 +66,8 @@ class AdminShell extends StatelessWidget {
           context.go('/admin/events');
         case 4:
           context.go('/admin/moderation');
+        case 5:
+          context.go('/admin/prayer-moderation');
       }
     }
 
@@ -90,6 +98,35 @@ class AdminShell extends StatelessWidget {
       );
     }
 
+    // The mobile bar has 4 destinations: Stats, Users, Content, Mod.
+    // The 5th desktop entry (Prayer Mod) is reachable from a button
+    // on the new AdminPrayerModerationScreen itself or via deep link.
+    // We highlight the Mod tab when the user is on either Moderation
+    // OR Prayer Moderation to keep the indicator consistent.
+    int getSelectedMobileIndex() {
+      final location = GoRouterState.of(context).uri.toString();
+      if (location.startsWith('/admin/members')) return 1;
+      if (location.startsWith('/admin/sermons')) return 2;
+      if (location.startsWith('/admin/moderation') ||
+          location.startsWith('/admin/prayer-moderation')) {
+        return 3;
+      }
+      return 0;
+    }
+
+    void onMobileSelected(int index) {
+      switch (index) {
+        case 0:
+          context.go('/admin');
+        case 1:
+          context.go('/admin/members');
+        case 2:
+          context.go('/admin/sermons');
+        case 3:
+          context.go('/admin/moderation');
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Kingdom Heir CMS'),
@@ -102,8 +139,8 @@ class AdminShell extends StatelessWidget {
       ),
       body: child,
       bottomNavigationBar: NavigationBar(
-        selectedIndex: getSelectedIndex(),
-        onDestinationSelected: onDestinationSelected,
+        selectedIndex: getSelectedMobileIndex(),
+        onDestinationSelected: onMobileSelected,
         destinations: const [
           NavigationDestination(
               icon: Icon(Icons.dashboard_outlined), label: 'Stats',),

@@ -8,6 +8,8 @@ enum NotificationKind {
   general,
   event,
   prayer,
+  prayerApproved,
+  prayerRejected,
   sermon,
   devotional,
   giving,

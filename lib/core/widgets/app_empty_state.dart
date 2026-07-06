@@ -1,3 +1,16 @@
+// Re-exports for the two app-level loading / error widgets.
+//
+// They are defined in their own files (`app_loading_indicator.dart`,
+// `app_error_widget.dart`) but historically callers import this single
+// file and rely on `AppEmptyState`, `AppLoadingIndicator`, and
+// `AppErrorWidget` all being available. We re-export them here so
+// `import '.../app_empty_state.dart';` is enough to get the full
+// empty/loading/error set. The `AppEmptyState` API takes
+// `icon` + `title` + optional `description` + optional CTA; the
+// loading and error widgets wrap that base API.
+export 'app_error_widget.dart' show AppErrorWidget;
+export 'app_loading_indicator.dart' show AppLoadingIndicator;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
@@ -84,6 +97,19 @@ class AppEmptyState extends StatelessWidget {
     );
   }
 }
+
+// Re-exports for the two app-level loading / error widgets.
+//
+// They are defined in their own files (`app_loading_indicator.dart`,
+// `app_error_widget.dart`) but historically callers import this single
+// file and rely on `AppEmptyState`, `AppLoadingIndicator`, and
+// `AppErrorWidget` all being available. We re-export them here so
+// `import '.../app_empty_state.dart';` is enough to get the full
+// empty/loading/error set. The new `AppEmptyState` API takes
+// `icon` + `title` + optional `description` + optional CTA; the
+// loading and error widgets wrap that base API.
+export 'app_error_widget.dart' show AppErrorWidget;
+export 'app_loading_indicator.dart' show AppLoadingIndicator;
 
 /// Gold gradient banner for important announcements / live service notice.
 class AppGoldBanner extends StatelessWidget {
@@ -179,69 +205,6 @@ class AppGoldBanner extends StatelessWidget {
           ],
         ],
       ),
-    );
-  }
-}
-
-/// Loading indicator — gold circular spinner with optional label.
-class AppLoadingIndicator extends StatelessWidget {
-  const AppLoadingIndicator({super.key, this.label, this.size = 32});
-
-  final String? label;
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: size,
-            height: size,
-            child: const CircularProgressIndicator(
-              strokeWidth: 2.5,
-              color: AppColors.gold,
-              backgroundColor: AppColors.goldContainer,
-            ),
-          ),
-          if (label != null) ...[
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              label!,
-              style: AppTypography.textTheme.bodySmall?.copyWith(
-                color: Theme.of(context)
-                    .colorScheme
-                    .onSurface
-                    .withValues(alpha: 0.55),
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-/// Error widget — shown when an async operation fails.
-class AppErrorWidget extends StatelessWidget {
-  const AppErrorWidget({
-    super.key,
-    this.message,
-    this.onRetry,
-  });
-
-  final String? message;
-  final VoidCallback? onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return AppEmptyState(
-      icon: Icons.wifi_off_rounded,
-      title: 'Something went wrong',
-      description: message ?? 'An unexpected error occurred. Please try again.',
-      actionLabel: onRetry != null ? 'Try Again' : null,
-      onAction: onRetry,
     );
   }
 }

@@ -27,6 +27,26 @@ abstract class NotificationsRepository {
 
   /// Number of unread notifications. Returns 0 if no user is signed in.
   Future<int> unreadCount();
+
+  /// Create a new notification row. Used by server-side admin actions
+  /// (e.g. the prayer moderation RPC) to deliver in-app notifications
+  /// to a specific user.
+  ///
+  /// RLS on the `notifications` table lets a caller insert only with
+  /// `user_id = auth.uid()`. For service-to-user notifications (e.g.
+  /// admin moderation), the caller must therefore either be signed in
+  /// as the recipient, or use the dedicated SQL helper
+  /// `public.notify_prayer_decision(...)` which is SECURITY DEFINER.
+  ///
+  /// Throws if the insert fails — callers should map to user-facing
+  /// copy via the prayer error mapper.
+  Future<void> create({
+    required String userId,
+    required String title,
+    required String body,
+    required NotificationKind kind,
+    Map<String, dynamic>? data,
+  });
 }
 
 class SupabaseNotificationsRepository implements NotificationsRepository {
@@ -107,4 +127,39 @@ class SupabaseNotificationsRepository implements NotificationsRepository {
       return 0;
     }
   }
+
+  @override
+  Future<void> create({
+    required String userId,
+    required String title,
+    required String body,
+    required NotificationKind kind,
+    Map<String, dynamic>? data,
+  }) async {
+    await _client.from('notifications').insert({
+      'user_id': userId,
+      'title': title,
+      'body': body,
+      'type': _kindToString(kind),
+      'is_read': false,
+      'data': data,
+    });
+  }
+
+  /// Maps the Flutter [NotificationKind] to the value stored in the
+  /// `notifications.type` column. The DB enum is
+  /// `('general','event','prayer','sermon','giving','prayer_approved',
+  ///   'prayer_rejected')` after the prayer moderation migration; values
+  /// not in the enum fall back to `'general'`.
+  static String _kindToString(NotificationKind k) => switch (k) {
+        NotificationKind.general => 'general',
+        NotificationKind.event => 'event',
+        NotificationKind.prayer => 'prayer',
+        NotificationKind.prayerApproved => 'prayer_approved',
+        NotificationKind.prayerRejected => 'prayer_rejected',
+        NotificationKind.sermon => 'sermon',
+        NotificationKind.devotional => 'general',
+        NotificationKind.giving => 'giving',
+        NotificationKind.unknown => 'general',
+      };
 }

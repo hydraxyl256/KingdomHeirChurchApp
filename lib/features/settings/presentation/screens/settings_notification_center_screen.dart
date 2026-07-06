@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:kingdom_heir/core/di/providers.dart';
 import 'package:kingdom_heir/core/localization/locale_provider.dart';
 import 'package:kingdom_heir/core/router/route_names.dart';
-import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/widgets/app_avatar.dart';
 import 'package:kingdom_heir/features/auth/presentation/providers/auth_provider.dart';
@@ -30,14 +29,13 @@ class _SettingsNotificationCenterScreenState
     final currency = ref.watch(currencyProvider);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final cardColor = isDark ? AppColors.navyMid : Colors.white;
-    final textMuted = theme.colorScheme.onSurface.withValues(alpha: 0.55);
+    final cardColor = theme.colorScheme.surface;
+    final textMuted = theme.colorScheme.onSurfaceVariant;
 
     return Scaffold(
-      backgroundColor:
-          isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: isDark ? AppColors.navyMid : AppColors.white,
+        backgroundColor: theme.colorScheme.surface,
         elevation: 0,
         title: const Text(
           'Settings',
@@ -65,7 +63,7 @@ class _SettingsNotificationCenterScreenState
               borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
+                  color: theme.colorScheme.shadow.withValues(alpha: 0.05),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -77,7 +75,7 @@ class _SettingsNotificationCenterScreenState
                   imageUrl: user?.avatarUrl,
                   name: user?.displayName ?? 'User',
                   size: AppSpacing.avatarLg,
-                  borderColor: AppColors.gold,
+                  borderColor: theme.colorScheme.primary,
                   borderWidth: 2.5,
                 ),
                 const SizedBox(width: AppSpacing.md),
@@ -103,16 +101,18 @@ class _SettingsNotificationCenterScreenState
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.gold.withValues(alpha: 0.15),
+                          color:
+                              theme.colorScheme.primary.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: AppColors.gold.withValues(alpha: 0.4),
+                            color: theme.colorScheme.primary
+                                .withValues(alpha: 0.4),
                           ),
                         ),
                         child: Text(
                           user?.role?.displayName ?? 'Member',
                           style: theme.textTheme.labelSmall?.copyWith(
-                            color: AppColors.gold,
+                            color: theme.colorScheme.primary,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -121,7 +121,10 @@ class _SettingsNotificationCenterScreenState
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.edit_rounded, color: AppColors.gold),
+                  icon: Icon(
+                    Icons.edit_rounded,
+                    color: theme.colorScheme.primary,
+                  ),
                   onPressed: () => context.push(RouteNames.myProfile),
                 ),
               ],
@@ -137,12 +140,12 @@ class _SettingsNotificationCenterScreenState
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF6366F1).withValues(alpha: 0.15),
+                    color: theme.colorScheme.secondary.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.dark_mode_rounded,
-                    color: Color(0xFF6366F1),
+                    color: theme.colorScheme.secondary,
                     size: 20,
                   ),
                 ),
@@ -163,12 +166,12 @@ class _SettingsNotificationCenterScreenState
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.gold.withValues(alpha: 0.15),
+                    color: theme.colorScheme.primary.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.monetization_on_rounded,
-                    color: AppColors.gold,
+                    color: theme.colorScheme.primary,
                     size: 20,
                   ),
                 ),
@@ -184,49 +187,65 @@ class _SettingsNotificationCenterScreenState
           const _SectionHeader(title: 'Notifications'),
           _SettingsCard(
             isDark: isDark,
-            children: const [
+            children: [
               _PersistentSwitchTile(
                 storageKey: 'notif_sunday',
                 title: 'Sunday Service Reminders',
                 subtitle: 'Remind me before Sunday worship',
                 defaultValue: true,
-                iconColor: Color(0xFFEF4444),
+                iconColor: theme.colorScheme.error,
                 icon: Icons.church_rounded,
               ),
-              Divider(height: 1, indent: 56),
+              Divider(
+                height: 1,
+                indent: 56,
+                color: theme.colorScheme.outlineVariant,
+              ),
               _PersistentSwitchTile(
                 storageKey: 'notif_events',
                 title: 'Event Updates',
                 subtitle: 'Notify me about new events',
                 defaultValue: true,
-                iconColor: Color(0xFF0EA5E9),
+                iconColor: theme.colorScheme.tertiary,
                 icon: Icons.event_rounded,
               ),
-              Divider(height: 1, indent: 56),
+              Divider(
+                height: 1,
+                indent: 56,
+                color: theme.colorScheme.outlineVariant,
+              ),
               _PersistentSwitchTile(
                 storageKey: 'notif_groups',
                 title: 'Group Messages',
                 subtitle: 'New messages in my groups',
                 defaultValue: true,
-                iconColor: Color(0xFF8B5CF6),
+                iconColor: theme.colorScheme.secondary,
                 icon: Icons.groups_rounded,
               ),
-              Divider(height: 1, indent: 56),
+              Divider(
+                height: 1,
+                indent: 56,
+                color: theme.colorScheme.outlineVariant,
+              ),
               _PersistentSwitchTile(
                 storageKey: 'notif_giving',
                 title: 'Giving Receipts',
                 subtitle: 'Email receipt for each gift',
                 defaultValue: false,
-                iconColor: Color(0xFF10B981),
+                iconColor: theme.colorScheme.tertiary,
                 icon: Icons.receipt_long_rounded,
               ),
-              Divider(height: 1, indent: 56),
+              Divider(
+                height: 1,
+                indent: 56,
+                color: theme.colorScheme.outlineVariant,
+              ),
               _PersistentSwitchTile(
                 storageKey: 'notif_devotional',
                 title: 'Daily Devotional',
                 subtitle: 'Morning reminder at 7 AM',
                 defaultValue: true,
-                iconColor: Color(0xFFF59E0B),
+                iconColor: theme.colorScheme.primary,
                 icon: Icons.wb_sunny_rounded,
               ),
             ],
@@ -240,17 +259,21 @@ class _SettingsNotificationCenterScreenState
               ListTile(
                 leading: _iconBox(
                   Icons.lock_outline_rounded,
-                  const Color(0xFF6366F1),
+                  theme.colorScheme.secondary,
                 ),
                 title: const Text('Change Password'),
                 trailing: const Icon(Icons.chevron_right_rounded),
                 onTap: () => context.push(RouteNames.changePassword),
               ),
-              const Divider(height: 1, indent: 56),
+              Divider(
+                height: 1,
+                indent: 56,
+                color: theme.colorScheme.outlineVariant,
+              ),
               ListTile(
                 leading: _iconBox(
                   Icons.language_rounded,
-                  const Color(0xFF0EA5E9),
+                  theme.colorScheme.tertiary,
                 ),
                 title: const Text('Language'),
                 subtitle: Text(
@@ -259,21 +282,29 @@ class _SettingsNotificationCenterScreenState
                 trailing: const Icon(Icons.chevron_right_rounded),
                 onTap: () => _showLanguageDialog(context, ref),
               ),
-              const Divider(height: 1, indent: 56),
+              Divider(
+                height: 1,
+                indent: 56,
+                color: theme.colorScheme.outlineVariant,
+              ),
               ListTile(
                 leading: _iconBox(
                   Icons.privacy_tip_outlined,
-                  const Color(0xFF8B5CF6),
+                  theme.colorScheme.secondary,
                 ),
                 title: const Text('Privacy Policy'),
                 trailing: const Icon(Icons.chevron_right_rounded),
                 onTap: () => _launchPrivacyPolicy(context),
               ),
-              const Divider(height: 1, indent: 56),
+              Divider(
+                height: 1,
+                indent: 56,
+                color: theme.colorScheme.outlineVariant,
+              ),
               ListTile(
                 leading: _iconBox(
                   Icons.info_outline_rounded,
-                  const Color(0xFF10B981),
+                  theme.colorScheme.tertiary,
                 ),
                 title: const Text('About Kingdom Heir'),
                 trailing: const Icon(Icons.chevron_right_rounded),
@@ -291,27 +322,27 @@ class _SettingsNotificationCenterScreenState
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.error.withValues(alpha: 0.12),
+                    color: theme.colorScheme.error.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: _isLoggingOut
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: AppColors.error,
+                            color: theme.colorScheme.error,
                           ),
                         )
-                      : const Icon(
+                      : Icon(
                           Icons.logout_rounded,
-                          color: AppColors.error,
+                          color: theme.colorScheme.error,
                           size: 20,
                         ),
                 ),
                 title: Text(
                   _isLoggingOut ? 'Signing out...' : 'Sign Out',
-                  style: const TextStyle(color: AppColors.error),
+                  style: TextStyle(color: theme.colorScheme.error),
                 ),
                 onTap: _isLoggingOut ? null : () async {
                   final outerContext = context;
@@ -329,9 +360,11 @@ class _SettingsNotificationCenterScreenState
                         ),
                         TextButton(
                           onPressed: () => Navigator.pop(dialogContext, true),
-                          child: const Text(
+                          child: Text(
                             'Sign Out',
-                            style: TextStyle(color: AppColors.error),
+                            style: TextStyle(
+                              color: Theme.of(dialogContext).colorScheme.error,
+                            ),
                           ),
                         ),
                       ],
@@ -346,13 +379,13 @@ class _SettingsNotificationCenterScreenState
 
                   try {
                     await ref.read(authNotifierProvider.notifier).signOut();
-                    
+
                     final authState = ref.read(authNotifierProvider);
                     if (authState.hasError) {
                       throw Exception(authState.error);
                     }
-                    
-                    // We don't call router.go() here. GoRouter's redirect logic 
+
+                    // We don't call router.go() here. GoRouter's redirect logic
                     // will automatically redirect to start-here because auth state changed.
 
                     if (mounted) {
@@ -366,9 +399,11 @@ class _SettingsNotificationCenterScreenState
                   } catch (e) {
                     if (mounted) {
                       messenger.showSnackBar(
-                        const SnackBar(
-                          content: Text('Sign out failed. Please try again.'),
-                          backgroundColor: AppColors.error,
+                        SnackBar(
+                          content: const Text(
+                            'Sign out failed. Please try again.',
+                          ),
+                          backgroundColor: theme.colorScheme.error,
                         ),
                       );
                     }
@@ -395,6 +430,7 @@ class _SettingsNotificationCenterScreenState
   ) {
     // Capture notifier BEFORE dialog opens — avoids 'ref after dispose' error
     final notifier = ref.read(themeModeProvider.notifier);
+    final scheme = Theme.of(context).colorScheme;
     showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
@@ -412,7 +448,7 @@ class _SettingsNotificationCenterScreenState
                   (m) => RadioListTile<ThemeMode>(
                     value: m,
                     title: Text(m.name.capitalize()),
-                    activeColor: AppColors.gold,
+                    activeColor: scheme.primary,
                   ),
                 )
                 .toList(),
@@ -429,6 +465,7 @@ class _SettingsNotificationCenterScreenState
   ) {
     // Capture notifier BEFORE dialog opens — avoids 'ref after dispose' error
     final notifier = ref.read(currencyProvider.notifier);
+    final scheme = Theme.of(context).colorScheme;
     showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
@@ -447,7 +484,7 @@ class _SettingsNotificationCenterScreenState
               children: kSupportedCurrencies.entries.map((entry) {
                 return RadioListTile<String>(
                   value: entry.key,
-                  activeColor: AppColors.gold,
+                  activeColor: scheme.primary,
                   title: Text(
                     entry.value,
                     style: const TextStyle(fontSize: 13),
@@ -475,6 +512,7 @@ class _SettingsNotificationCenterScreenState
     // Use localeProvider — the same provider app.dart watches — so changes apply immediately.
     final notifier = ref.read(localeProvider.notifier);
     final currentCode = ref.read(localeProvider).languageCode;
+    final scheme = Theme.of(context).colorScheme;
     showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
@@ -494,7 +532,7 @@ class _SettingsNotificationCenterScreenState
                 final code = lang['code']!;
                 return RadioListTile<String>(
                   value: code,
-                  activeColor: AppColors.gold,
+                  activeColor: scheme.primary,
                   title: Text(lang['label']!),
                 );
               }).toList(),
@@ -537,18 +575,19 @@ class _SettingsNotificationCenterScreenState
     final launched =
         await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!launched && ctx.mounted) {
+      final scheme = Theme.of(context).colorScheme;
       ScaffoldMessenger.of(ctx).showSnackBar(
         SnackBar(
           content: const Text(
             'Could not open Privacy Policy. Please try again.',
           ),
-          backgroundColor: AppColors.error,
+          backgroundColor: scheme.error,
           behavior: SnackBarBehavior.floating,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           action: SnackBarAction(
             label: 'Retry',
-            textColor: Colors.white,
+            textColor: scheme.onError,
             onPressed: () => _launchPrivacyPolicy(ctx),
           ),
         ),
@@ -576,7 +615,7 @@ class _SectionHeader extends StatelessWidget {
       child: Text(
         title.toUpperCase(),
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: AppColors.gold,
+              color: Theme.of(context).colorScheme.primary,
               fontWeight: FontWeight.w800,
               letterSpacing: 1.2,
             ),
@@ -592,15 +631,17 @@ class _SettingsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       margin:
           const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 4),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.navyMid : Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: theme.colorScheme.shadow.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -645,7 +686,8 @@ class _PersistentSwitchTileState extends ConsumerState<_PersistentSwitchTile> {
 
   @override
   Widget build(BuildContext context) {
-    final onSurface = Theme.of(context).colorScheme.onSurface;
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
 
     return ListTile(
       leading: Container(
@@ -674,11 +716,11 @@ class _PersistentSwitchTileState extends ConsumerState<_PersistentSwitchTile> {
           final storage = ref.read(localStorageServiceProvider);
           await storage.setBool(key: widget.storageKey, value: v);
         },
-        // Thumb: white when ON, muted when OFF
-        activeThumbColor: AppColors.warmWhite,
+        // Thumb: themed on-surface when ON, muted when OFF
+        activeThumbColor: theme.colorScheme.onPrimary,
         inactiveThumbColor: onSurface.withValues(alpha: 0.55),
         // Track colors — gold only inside the switch, never the tile
-        activeTrackColor: AppColors.gold,
+        activeTrackColor: theme.colorScheme.primary,
         inactiveTrackColor: onSurface.withValues(alpha: 0.12),
         // Remove track border in all states for a clean look
         trackOutlineColor: WidgetStateProperty.all(Colors.transparent),

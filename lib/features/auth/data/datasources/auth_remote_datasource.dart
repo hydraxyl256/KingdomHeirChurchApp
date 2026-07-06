@@ -1,4 +1,4 @@
-import 'package:google_sign_in/google_sign_in.dart';
+
 import 'package:kingdom_heir/core/auth/deep_links.dart';
 import 'package:kingdom_heir/features/auth/data/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -77,58 +77,18 @@ class AuthRemoteDataSource {
     return _fetchProfile(user);
   }
 
-  Future<UserModel> signInWithGoogle() async {
+  Future<void> signInWithGoogle() async {
     try {
-      const webClientId = String.fromEnvironment('GOOGLE_WEB_CLIENT_ID');
-      
-      if (webClientId.isEmpty || !webClientId.endsWith('.apps.googleusercontent.com')) {
-        throw const AuthException('Google sign-in is temporarily unavailable. Please use email and password.');
-      }
-
-      final googleSignIn = GoogleSignIn(
-        serverClientId: webClientId,
-        scopes: const ['email', 'profile'],
+      final success = await _client.auth.signInWithOAuth(
+        OAuthProvider.google,
+        redirectTo: DeepLinks.authCallbackUrl,
       );
-
-      final googleUser = await googleSignIn.signIn();
-      if (googleUser == null) {
-        throw GoogleAuthCancelledException();
-      }
-
-      final googleAuth = await googleUser.authentication;
-      final accessToken = googleAuth.accessToken;
-      final idToken = googleAuth.idToken;
-
-      if (idToken == null || idToken.isEmpty) {
-        throw const AuthException('Google sign-in could not be completed. Please try again.');
-      }
-
-      final response = await _client.auth.signInWithIdToken(
-        provider: OAuthProvider.google,
-        idToken: idToken,
-        accessToken: accessToken,
-      );
-
-      final user = response.user;
-      if (user == null) {
+      if (!success) {
         throw const AuthException('We could not sign you in with Google. Please try again or use email sign-in.');
       }
-
-      await _ensureProfileForCurrentUser();
-
-      return _fetchProfile(user);
-    } on GoogleAuthCancelledException {
-      rethrow;
-    } on AuthException {
-      rethrow;
     } catch (e) {
-      final errorStr = e.toString();
-      if (errorStr.contains('Sign_in_failed') || errorStr.contains('DEVELOPER_ERROR') || errorStr.contains('10:')) {
-        throw const AuthException('Google sign-in needs an app configuration update. Please try again later.');
-      } else if (errorStr.toLowerCase().contains('network') || errorStr.toLowerCase().contains('socket') || errorStr.toLowerCase().contains('connection')) {
-        throw const AuthException('Check your internet connection and try again.');
-      }
-      throw const AuthException('We could not sign you in with Google. Please try again or use email sign-in.');
+      if (e is AuthException) rethrow;
+      throw AuthException('Google sign-in failed: $e');
     }
   }
 
@@ -215,39 +175,6 @@ class AuthRemoteDataSource {
     }
   }
 
-  /// Creates a minimal profile for first-time OAuth users.
-  Future<void> _ensureProfileForCurrentUser() async {
-    final user = _client.auth.currentUser;
-    if (user == null) return;
-    
-    final existing = await _client
-        .from('profiles')
-        .select('id')
-        .eq('id', user.id)
-        .maybeSingle();
-        
-    if (existing == null) {
-      final meta = user.userMetadata ?? {};
-      final emailName = user.email?.split('@').first;
-      
-      final fullName = meta['full_name'] as String? ?? 
-                       meta['name'] as String? ?? 
-                       emailName ?? 
-                       'Kingdom Heirs Member';
-                       
-      final avatarUrl = meta['avatar_url'] as String? ?? 
-                        meta['picture'] as String?;
-
-      await _client.from('profiles').insert({
-        'id': user.id,
-        'email': user.email ?? '',
-        'full_name': fullName,
-        'avatar_url': avatarUrl,
-        'role': 'member',
-        'created_at': DateTime.now().toIso8601String(),
-      });
-    }
-  }
 }
 
 /// Thrown when the user cancels the Google Sign-In native picker.

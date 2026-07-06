@@ -14,7 +14,6 @@ import 'package:go_router/go_router.dart';
 
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/router/route_names.dart';
-import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/core/widgets/responsive_section_header.dart';
@@ -95,10 +94,15 @@ class _SearchSurface extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(
-                  Icons.search_rounded,
-                  color: AppColors.goldDark,
-                  size: 20,
+                Builder(
+                  builder: (context) {
+                    final scheme = Theme.of(context).colorScheme;
+                    return Icon(
+                      Icons.search_rounded,
+                      color: scheme.primary,
+                      size: 20,
+                    );
+                  },
                 ),
                 const SizedBox(width: 12),
                 Expanded(

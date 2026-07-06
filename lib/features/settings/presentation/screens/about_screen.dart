@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -51,19 +50,20 @@ class _AboutScreenState extends State<AboutScreen> {
     final launched =
         await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!launched && mounted) {
+      final scheme = Theme.of(context).colorScheme;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text(
             'Could not open the link. Please try again later.',
           ),
-          backgroundColor: AppColors.error,
+          backgroundColor: scheme.error,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           action: SnackBarAction(
             label: 'Retry',
-            textColor: Colors.white,
+            textColor: scheme.onError,
             onPressed: () => _launch(url),
           ),
         ),
@@ -74,16 +74,14 @@ class _AboutScreenState extends State<AboutScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final bgColor =
-        isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
-    final cardColor = isDark ? AppColors.navyMid : Colors.white;
+    final bgColor = theme.scaffoldBackgroundColor;
+    final cardColor = theme.colorScheme.surface;
     final now = DateTime.now();
 
     return Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
-        backgroundColor: isDark ? AppColors.navyMid : AppColors.white,
+        backgroundColor: theme.colorScheme.surface,
         elevation: 0,
         title: const Text(
           'About',
@@ -104,7 +102,7 @@ class _AboutScreenState extends State<AboutScreen> {
           child: Column(
             children: [
               // ── Logo ────────────────────────────────────────────────
-              _Logo().animate().fadeIn(duration: 400.ms).scale(
+              const _Logo().animate().fadeIn(duration: 400.ms).scale(
                     begin: const Offset(0.85, 0.85),
                     end: const Offset(1, 1),
                     duration: 400.ms,
@@ -118,7 +116,7 @@ class _AboutScreenState extends State<AboutScreen> {
                 'Kingdom Heirs Ministry',
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w800,
-                  color: isDark ? AppColors.warmWhite : AppColors.navy,
+                  color: theme.colorScheme.onSurface,
                   letterSpacing: 0.3,
                 ),
                 textAlign: TextAlign.center,
@@ -132,7 +130,7 @@ class _AboutScreenState extends State<AboutScreen> {
                     ? 'Loading version…'
                     : 'Version $_version (build $_buildNumber)',
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.gold,
+                  color: theme.colorScheme.primary,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.5,
                 ),
@@ -142,7 +140,7 @@ class _AboutScreenState extends State<AboutScreen> {
               const SizedBox(height: AppSpacing.xxxl),
 
               // ── Divider ───────────────────────────────────────────────
-              _GoldDivider(),
+              const _GoldDivider(),
 
               const SizedBox(height: AppSpacing.xxl),
 
@@ -163,19 +161,22 @@ class _AboutScreenState extends State<AboutScreen> {
 
               // ── Action buttons ───────────────────────────────────────
               _AboutCard(
-                isDark: isDark,
                 cardColor: cardColor,
                 children: [
                   _ActionTile(
                     icon: Icons.language_rounded,
-                    iconColor: const Color(0xFF0EA5E9),
+                    iconColor: theme.colorScheme.tertiary,
                     label: 'Visit Our Website',
                     onTap: () => _launch(_websiteUrl),
                   ),
-                  const Divider(height: 1, indent: 56),
+                  Divider(
+                    height: 1,
+                    indent: 56,
+                    color: theme.colorScheme.outlineVariant,
+                  ),
                   _ActionTile(
                     icon: Icons.privacy_tip_outlined,
-                    iconColor: const Color(0xFF8B5CF6),
+                    iconColor: theme.colorScheme.secondary,
                     label: 'Privacy Policy',
                     onTap: () => _launch(_privacyUrl),
                   ),
@@ -206,9 +207,12 @@ class _AboutScreenState extends State<AboutScreen> {
 // ─── Logo ─────────────────────────────────────────────────────────────────────
 
 class _Logo extends StatelessWidget {
+  const _Logo();
+
   @override
   Widget build(BuildContext context) {
     const size = 100.0;
+    final scheme = Theme.of(context).colorScheme;
     return Semantics(
       label: 'Kingdom Heirs Ministry logo',
       image: true,
@@ -217,10 +221,10 @@ class _Logo extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: AppColors.warmWhite,
+          color: scheme.surface,
           boxShadow: [
             BoxShadow(
-              color: AppColors.gold.withValues(alpha: 0.35),
+              color: scheme.primary.withValues(alpha: 0.35),
               blurRadius: 28,
               spreadRadius: 2,
               offset: const Offset(0, 10),
@@ -233,13 +237,13 @@ class _Logo extends StatelessWidget {
             'assets/images/logo.jpeg',
             fit: BoxFit.contain,
             semanticLabel: 'Kingdom Heirs logo',
-            errorBuilder: (_, __, ___) => const Center(
+            errorBuilder: (_, __, ___) => Center(
               child: Text(
                 'KH',
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.w800,
-                  color: AppColors.gold,
+                  color: scheme.primary,
                   letterSpacing: 1,
                 ),
               ),
@@ -254,8 +258,11 @@ class _Logo extends StatelessWidget {
 // ─── Gold divider ─────────────────────────────────────────────────────────────
 
 class _GoldDivider extends StatelessWidget {
+  const _GoldDivider();
+
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Row(
       children: [
         Expanded(
@@ -264,8 +271,8 @@ class _GoldDivider extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppColors.gold.withValues(alpha: 0),
-                  AppColors.gold.withValues(alpha: 0.5),
+                  scheme.primary.withValues(alpha: 0),
+                  scheme.primary.withValues(alpha: 0.5),
                 ],
               ),
             ),
@@ -276,11 +283,14 @@ class _GoldDivider extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: AppColors.gold.withValues(alpha: 0.12),
+              color: scheme.primaryContainer,
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.star_rounded,
-                color: AppColors.gold, size: 12,),
+            child: Icon(
+              Icons.star_rounded,
+              color: scheme.primary,
+              size: 12,
+            ),
           ),
         ),
         Expanded(
@@ -289,8 +299,8 @@ class _GoldDivider extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppColors.gold.withValues(alpha: 0.5),
-                  AppColors.gold.withValues(alpha: 0),
+                  scheme.primary.withValues(alpha: 0.5),
+                  scheme.primary.withValues(alpha: 0),
                 ],
               ),
             ),
@@ -305,12 +315,10 @@ class _GoldDivider extends StatelessWidget {
 
 class _AboutCard extends StatelessWidget {
   const _AboutCard({
-    required this.isDark,
     required this.cardColor,
     required this.children,
   });
 
-  final bool isDark;
   final Color cardColor;
   final List<Widget> children;
 
@@ -322,7 +330,7 @@ class _AboutCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.05),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),

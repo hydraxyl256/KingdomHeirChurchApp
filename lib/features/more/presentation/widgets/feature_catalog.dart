@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:kingdom_heir/core/router/route_names.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
+import 'package:kingdom_heir/core/utils/donation_launcher.dart';
 import 'package:kingdom_heir/features/more/domain/more_models.dart';
 
 /// Visual + navigation spec for every [MoreFeature]. The widget tree looks
@@ -19,12 +20,18 @@ class FeatureSpec {
     required this.icon,
     required this.accent,
     required this.route,
+    this.opensDonationPage = false,
   });
 
   final MoreFeature feature;
   final IconData icon;
   final FeatureAccent accent;
   final String route;
+
+  /// When true, tapping a tile for this feature should open the hosted
+  /// donation page in the device's external browser (via
+  /// `openDonationPage`) instead of pushing [route] onto the navigator.
+  final bool opensDonationPage;
 }
 
 /// Single source of truth. Adding a new feature is a one-line change here.
@@ -128,6 +135,7 @@ class FeatureCatalog {
       icon: Icons.volunteer_activism_rounded,
       accent: FeatureAccent.gold,
       route: RouteNames.giving,
+      opensDonationPage: true,
     ),
     MoreFeature.givingHistory: FeatureSpec(
       feature: MoreFeature.givingHistory,
@@ -140,6 +148,7 @@ class FeatureCatalog {
       icon: Icons.flag_rounded,
       accent: FeatureAccent.rose,
       route: RouteNames.giving,
+      opensDonationPage: true,
     ),
 
     // ── Family / Events ────────────────────────────────────────────────────
@@ -275,38 +284,52 @@ class AccentPalette {
     switch (a) {
       case FeatureAccent.gold:
         return AccentPalette._(
-          fg: AppColors.goldDark,
-          bg: AppColors.goldContainer,
-          border: AppColors.gold.withValues(alpha: isDark ? 0.35 : 0.45),
+          fg: isDark ? AppColors.goldLight : AppColors.goldDark,
+          bg: isDark
+              ? AppColors.goldContainer.withValues(alpha: 0.18)
+              : AppColors.goldContainer,
+          border: AppColors.gold.withValues(alpha: isDark ? 0.40 : 0.45),
         );
       case FeatureAccent.navy:
         return AccentPalette._(
-          fg: AppColors.navy,
-          bg: const Color(0xFFDBEAFE),
-          border: AppColors.navyAccent.withValues(alpha: 0.30),
+          fg: isDark ? AppColors.navyLight : AppColors.navy,
+          bg: isDark
+              ? AppColors.navyAccent.withValues(alpha: 0.22)
+              : const Color(0xFFDBEAFE),
+          border: isDark
+              ? AppColors.navyLight.withValues(alpha: 0.40)
+              : AppColors.navyAccent.withValues(alpha: 0.30),
         );
       case FeatureAccent.sky:
         return AccentPalette._(
-          fg: const Color(0xFF0369A1),
-          bg: const Color(0xFFE0F2FE),
+          fg: isDark ? const Color(0xFF7DD3FC) : const Color(0xFF0369A1),
+          bg: isDark
+              ? const Color(0xFF0369A1).withValues(alpha: 0.22)
+              : const Color(0xFFE0F2FE),
           border: const Color(0xFF38BDF8).withValues(alpha: 0.30),
         );
       case FeatureAccent.mint:
         return AccentPalette._(
-          fg: const Color(0xFF15803D),
-          bg: const Color(0xFFDCFCE7),
+          fg: isDark ? const Color(0xFF86EFAC) : const Color(0xFF15803D),
+          bg: isDark
+              ? AppColors.success.withValues(alpha: 0.20)
+              : const Color(0xFFDCFCE7),
           border: AppColors.success.withValues(alpha: 0.30),
         );
       case FeatureAccent.rose:
         return AccentPalette._(
-          fg: const Color(0xFFB91C1C),
-          bg: const Color(0xFFFFE4E4),
-          border: AppColors.error.withValues(alpha: 0.25),
+          fg: isDark ? const Color(0xFFFCA5A5) : const Color(0xFFB91C1C),
+          bg: isDark
+              ? AppColors.error.withValues(alpha: 0.18)
+              : const Color(0xFFFFE4E4),
+          border: AppColors.error.withValues(alpha: 0.30),
         );
       case FeatureAccent.violet:
         return AccentPalette._(
-          fg: const Color(0xFF6D28D9),
-          bg: const Color(0xFFEDE9FE),
+          fg: isDark ? const Color(0xFFC4B5FD) : const Color(0xFF6D28D9),
+          bg: isDark
+              ? const Color(0xFF8B5CF6).withValues(alpha: 0.20)
+              : const Color(0xFFEDE9FE),
           border: const Color(0xFF8B5CF6).withValues(alpha: 0.30),
         );
     }
@@ -315,6 +338,12 @@ class AccentPalette {
 
 /// Convenience extension that wraps the `context.push` call.
 extension MoreFeatureNav on BuildContext {
-  void goToFeature(MoreFeature feature) =>
-      GoRouter.of(this).push(FeatureCatalog.of(feature).route);
+  void goToFeature(MoreFeature feature) {
+    final spec = FeatureCatalog.of(feature);
+    if (spec.opensDonationPage) {
+      openDonationPage(this);
+      return;
+    }
+    GoRouter.of(this).push(spec.route);
+  }
 }

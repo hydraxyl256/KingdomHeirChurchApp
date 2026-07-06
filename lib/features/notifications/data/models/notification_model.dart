@@ -22,6 +22,8 @@ class NotificationModel {
     final kind = switch (rawType) {
       'event' => NotificationKind.event,
       'prayer' => NotificationKind.prayer,
+      'prayer_approved' => NotificationKind.prayerApproved,
+      'prayer_rejected' => NotificationKind.prayerRejected,
       'sermon' => NotificationKind.sermon,
       'devotional' => NotificationKind.devotional,
       'giving' => NotificationKind.giving,

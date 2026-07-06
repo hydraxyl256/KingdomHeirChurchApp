@@ -5,21 +5,27 @@ import 'package:shimmer/shimmer.dart';
 
 /// Full-screen centered loading indicator with optional message.
 class AppLoadingIndicator extends StatelessWidget {
-  const AppLoadingIndicator({super.key, this.message});
+  const AppLoadingIndicator({super.key, this.label, this.message});
+
+  /// Preferred constructor parameter — used by most screens.
+  final String? label;
+
+  /// Legacy alias kept for callers that still pass `message:`.
   final String? message;
 
   @override
   Widget build(BuildContext context) {
+    final text = label ?? message;
     final cs = Theme.of(context).colorScheme;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           CircularProgressIndicator(color: cs.primary),
-          if (message != null) ...[
+          if (text != null) ...[
             const SizedBox(height: AppSpacing.md),
             Text(
-              message!,
+              text,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ],

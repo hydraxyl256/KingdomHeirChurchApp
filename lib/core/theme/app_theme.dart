@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
+import 'package:kingdom_heir/core/theme/more_section_theme.dart';
 
 /// Kingdom Heir — Production Material 3 Theme
 ///
@@ -50,6 +51,9 @@ abstract final class AppTheme {
       textTheme: textTheme,
       scaffoldBackgroundColor:
           isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
+      extensions: <ThemeExtension<dynamic>>[
+        isDark ? MoreSectionTheme.dark : MoreSectionTheme.light,
+      ],
 
       // ── App Bar ──────────────────────────────────────────────────────────
       appBarTheme: AppBarTheme(

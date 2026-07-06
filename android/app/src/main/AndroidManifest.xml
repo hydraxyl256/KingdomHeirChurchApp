@@ -75,5 +75,16 @@
             <action android:name="android.intent.action.VIEW"/>
             <data android:scheme="mailto"/>
         </intent>
+        <!-- Required by `url_launcher` with `LaunchMode.externalApplication`
+             on Android 11+ so the platform can resolve an external browser
+             for the hosted donation page (https://pay.kingdomheirsfoundation.com). -->
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="https"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="http"/>
+        </intent>
     </queries>
 </manifest>

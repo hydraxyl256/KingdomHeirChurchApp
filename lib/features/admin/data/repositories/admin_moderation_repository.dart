@@ -6,6 +6,14 @@ final adminModerationRepositoryProvider = Provider((ref) {
   return AdminModerationRepository(ref.watch(supabaseClientProvider));
 });
 
+/// Admin-side moderation operations that are not prayer-related.
+///
+/// Prayer moderation lives behind SECURITY DEFINER RPCs
+/// (`approve_prayer_request`, `reject_prayer_request`,
+/// `set_prayer_request_pending`) and is called by the prayer repository
+/// — see `PrayerRepository.approvePrayerRequest` / `rejectPrayerRequest`
+/// / `returnPrayerRequestToPending`. This repository owns the legacy
+/// testimony moderation flow only.
 class AdminModerationRepository {
   AdminModerationRepository(this._supabase);
   final SupabaseClient _supabase;
@@ -15,15 +23,6 @@ class AdminModerationRepository {
         .from('testimonies')
         .select('*, profiles(full_name)')
         .eq('is_approved', false)
-        .order('created_at', ascending: false);
-    return List<Map<String, dynamic>>.from(response);
-  }
-
-  Future<List<Map<String, dynamic>>> getPendingPrayers() async {
-    final response = await _supabase
-        .from('prayer_requests')
-        .select('*, profiles!user_id(full_name)')
-        .eq('status', 'archived')
         .order('created_at', ascending: false);
     return List<Map<String, dynamic>>.from(response);
   }
@@ -40,18 +39,6 @@ class AdminModerationRepository {
   Future<void> rejectTestimony(String id) async {
     await _supabase.from('testimonies').delete().eq('id', id);
     await _logAction('REJECT_TESTIMONY', id, {});
-  }
-
-  Future<void> approvePrayer(String id) async {
-    await _supabase
-        .from('prayer_requests')
-        .update({'status': 'active'}).eq('id', id);
-    await _logAction('APPROVE_PRAYER', id, {});
-  }
-
-  Future<void> rejectPrayer(String id) async {
-    await _supabase.from('prayer_requests').delete().eq('id', id);
-    await _logAction('REJECT_PRAYER', id, {});
   }
 
   Future<void> _logAction(

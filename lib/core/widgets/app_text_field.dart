@@ -107,10 +107,10 @@ class _AppTextFieldState extends State<AppTextField> {
                   style: AppTypography.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
-                  children: const [
+                  children: [
                     TextSpan(
                       text: ' *',
-                      style: TextStyle(color: AppColors.gold),
+                      style: TextStyle(color: theme.colorScheme.primary),
                     ),
                   ],
                 ),

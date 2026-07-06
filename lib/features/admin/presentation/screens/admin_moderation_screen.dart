@@ -1,3 +1,10 @@
+// Kingdom Heir — Admin Moderation Queue
+//
+// Testimonies-only moderation. Prayer moderation was lifted out of
+// this screen and moved to its own route (`/admin/prayer-moderation`,
+// see `AdminPrayerModerationScreen`) backed by SECURITY DEFINER RPCs
+// (`approve_prayer_request` / `reject_prayer_request`).
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -7,11 +14,11 @@ import 'package:kingdom_heir/features/admin/data/repositories/admin_moderation_r
 final adminModerationProvider = FutureProvider.autoDispose
     .family<List<Map<String, dynamic>>, String>((ref, type) async {
   final repo = ref.watch(adminModerationRepositoryProvider);
-  if (type == 'testimonies') {
-    return repo.getPendingTestimonies();
-  } else {
-    return repo.getPendingPrayers();
-  }
+  // Only testimonies remain on this screen. The 'prayers' family entry
+  // is preserved for any in-flight call sites but returns an empty
+  // list — the prayer moderation UI is the dedicated screen now.
+  if (type == 'prayers') return const [];
+  return repo.getPendingTestimonies();
 });
 
 class AdminModerationScreen extends StatelessWidget {
@@ -19,25 +26,11 @@ class AdminModerationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Moderation Queue'),
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'Pending Testimonies'),
-              Tab(text: 'Pending Prayers'),
-            ],
-          ),
-        ),
-        body: const TabBarView(
-          children: [
-            _TestimonyModerationTab(),
-            _PrayerModerationTab(),
-          ],
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Testimony Moderation'),
       ),
+      body: const _TestimonyModerationTab(),
     );
   }
 }
@@ -106,68 +99,6 @@ class _TestimonyModerationTab extends ConsumerWidget {
                           label: const Text('Approve & Publish'),
                         ),
                       ],
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-}
-
-class _PrayerModerationTab extends ConsumerWidget {
-  const _PrayerModerationTab();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final asyncData = ref.watch(adminModerationProvider('prayers'));
-
-    return asyncData.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (err, _) => Center(child: Text('Error: $err')),
-      data: (items) {
-        if (items.isEmpty) {
-          return const Center(child: Text('No pending prayers.'));
-        }
-
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: items.length,
-          itemBuilder: (context, index) {
-            final item = items[index];
-            final itemId = item['id'] as String? ?? '';
-            final title = (item['title'] as String?) ?? 'No Title';
-            final body = (item['body'] as String?) ?? '';
-            return Card(
-              margin: const EdgeInsets.only(bottom: 16),
-              child: ListTile(
-                title: Text(title,
-                    style: const TextStyle(fontWeight: FontWeight.bold),),
-                subtitle: Text(body),
-                trailing: PopupMenuButton<String>(
-                  onSelected: (val) async {
-                    final repo = ref.read(adminModerationRepositoryProvider);
-                    if (val == 'approve') {
-                      await repo.approvePrayer(itemId);
-                      ref.invalidate(adminModerationProvider('prayers'));
-                    } else if (val == 'reject') {
-                      await repo.rejectPrayer(itemId);
-                      ref.invalidate(adminModerationProvider('prayers'));
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 'approve',
-                      child: Text('Approve & Publish',
-                          style: TextStyle(color: AppColors.success),),
-                    ),
-                    const PopupMenuItem(
-                      value: 'reject',
-                      child: Text('Reject & Delete',
-                          style: TextStyle(color: AppColors.error),),
                     ),
                   ],
                 ),

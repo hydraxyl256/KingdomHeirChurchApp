@@ -22,6 +22,7 @@ import 'package:flutter/material.dart';
 import 'package:kingdom_heir/core/responsive/breakpoints.dart';
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
+import 'package:kingdom_heir/core/theme/more_section_theme.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 
 enum GlassCardTone { navyGold, warm, pure }
@@ -54,14 +55,16 @@ class GlassCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final scheme = Theme.of(context).colorScheme;
+    final sectionTheme = MoreSectionTheme.of(context);
     final metrics = MediaQuery.of(context);
     final band = layoutBandFromWidth(metrics.size.width);
 
     final effectiveRadius = radius ?? BorderRadius.circular(AppRadius.xxl);
     final effectiveSigma = blurSigma ?? _defaultSigma(band);
 
-    final baseColor = _baseColor(tone, isDark);
-    final highlightColor = _highlightColor(tone, isDark);
+    final baseColor = _baseColor(tone, isDark, sectionTheme);
+    final highlightColor = _highlightColor(tone, isDark, sectionTheme);
     final effectiveBorder = borderColor ??
         (isDark
             ? AppColors.gold.withValues(alpha: 0.32)
@@ -86,7 +89,7 @@ class GlassCard extends StatelessWidget {
             border: Border.all(color: effectiveBorder),
             boxShadow: [
               BoxShadow(
-                color: AppColors.navy.withValues(alpha: 0.08),
+                color: scheme.shadow.withValues(alpha: 0.08),
                 blurRadius: elevation * 4,
                 offset: Offset(0, elevation),
               ),
@@ -121,15 +124,23 @@ class GlassCard extends StatelessWidget {
         LayoutBand.xxl => 26,
       };
 
-  static Color _baseColor(GlassCardTone tone, bool isDark) => switch (tone) {
-        GlassCardTone.navyGold => isDark ? AppColors.navyMid : AppColors.navy,
-        GlassCardTone.warm =>
-          isDark ? AppColors.navyAccent : AppColors.goldContainer,
+  static Color _baseColor(
+    GlassCardTone tone,
+    bool isDark,
+    MoreSectionTheme section,
+  ) =>
+      switch (tone) {
+        GlassCardTone.navyGold => section.heroBackgroundTop,
+        GlassCardTone.warm => isDark ? AppColors.navyAccent : AppColors.goldContainer,
         GlassCardTone.pure =>
           isDark ? AppColors.surfaceContainerHighLight : AppColors.warmWhite,
       };
 
-  static Color _highlightColor(GlassCardTone tone, bool isDark) =>
+  static Color _highlightColor(
+    GlassCardTone tone,
+    bool isDark,
+    MoreSectionTheme section,
+  ) =>
       switch (tone) {
         GlassCardTone.navyGold =>
           isDark ? AppColors.goldDark.withValues(alpha: 0.55) : AppColors.gold,

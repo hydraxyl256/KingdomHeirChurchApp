@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kingdom_heir/core/router/route_names.dart';
-import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/widgets/app_button.dart';
 import 'package:kingdom_heir/core/widgets/app_text_field.dart';
@@ -106,52 +105,63 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
             padding: const EdgeInsets.all(AppSpacing.xl),
             children: [
               // Avatar Section
-              Center(
-                child: Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundColor: AppColors.gold.withValues(alpha: 0.2),
-                      backgroundImage: profile.avatarUrl != null
-                          ? NetworkImage(profile.avatarUrl!)
-                          : null,
-                      child: profile.avatarUrl == null
-                          ? Text(
-                              profile.fullName.isNotEmpty
-                                  ? profile.fullName[0].toUpperCase()
-                                  : '?',
-                              style: const TextStyle(
-                                  fontSize: 40,
-                                  color: AppColors.goldDark,
-                                  fontWeight: FontWeight.bold,),
-                            )
-                          : null,
-                    ),
-                    if (_isUploadingAvatar)
-                      const Positioned.fill(
-                        child: Center(
-                          child: CircularProgressIndicator(
-                              color: AppColors.primary,),
+              Builder(
+                builder: (context) {
+                  final scheme = Theme.of(context).colorScheme;
+                  return Center(
+                    child: Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundColor:
+                              scheme.primary.withValues(alpha: 0.2),
+                          backgroundImage: profile.avatarUrl != null
+                              ? NetworkImage(profile.avatarUrl!)
+                              : null,
+                          child: profile.avatarUrl == null
+                              ? Text(
+                                  profile.fullName.isNotEmpty
+                                      ? profile.fullName[0].toUpperCase()
+                                      : '?',
+                                  style: TextStyle(
+                                    fontSize: 40,
+                                    color: scheme.onPrimaryContainer,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )
+                              : null,
                         ),
-                      ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: GestureDetector(
-                        onTap: _isUploadingAvatar ? null : _pickImage,
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: const BoxDecoration(
-                            color: AppColors.primary,
-                            shape: BoxShape.circle,
+                        if (_isUploadingAvatar)
+                          Positioned.fill(
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: scheme.primary,
+                              ),
+                            ),
                           ),
-                          child: const Icon(Icons.camera_alt,
-                              color: Colors.white, size: 20,),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: GestureDetector(
+                            onTap: _isUploadingAvatar ? null : _pickImage,
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: scheme.primary,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.camera_alt,
+                                color: scheme.onPrimary,
+                                size: 20,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
               const SizedBox(height: AppSpacing.xxl),
 

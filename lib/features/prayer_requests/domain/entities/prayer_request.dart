@@ -1,7 +1,13 @@
 import 'package:equatable/equatable.dart';
 
 /// Status lifecycle of a prayer request.
-enum PrayerStatus { active, answered, archived }
+///
+/// Maps 1:1 to the `prayer_status` Postgres enum after the moderation
+/// migration (`20260706000000_prayer_moderation_workflow.sql`):
+///   * [pending]  — newly submitted, awaiting admin review (NOT public)
+///   * [approved] — admin-approved, visible on the public Prayer Wall
+///   * [rejected] — admin-decided as "not published" (NOT public)
+enum PrayerStatus { pending, approved, rejected }
 
 /// Domain entity for a prayer request.
 class PrayerRequest extends Equatable {
@@ -11,7 +17,7 @@ class PrayerRequest extends Equatable {
     required this.title,
     required this.content,
     required this.category,
-    required this.isPublic,
+    required this.visibility,
     required this.isAnonymous,
     required this.status,
     required this.prayerCount,
@@ -20,6 +26,10 @@ class PrayerRequest extends Equatable {
     required this.updatedAt,
     this.authorName,
     this.authorAvatarUrl,
+    this.displayName,
+    this.adminNote,
+    this.reviewedAt,
+    this.approvedAt,
   });
 
   final String id;
@@ -27,15 +37,36 @@ class PrayerRequest extends Equatable {
   final String title;
   final String content;
   final String category;
-  final bool isPublic;
+
+  /// Public visibility of the request. Maps to the `prayer_visibility`
+  /// Postgres enum. Submitters who pick "Private" get `private`; the
+  /// default is `public`. The Prayer Wall view only returns `public` +
+  /// `leaders_only`.
+  final String visibility;
+
   final bool isAnonymous;
   final PrayerStatus status;
   final int prayerCount;
   final bool hasPrayed;
   final DateTime createdAt;
   final DateTime updatedAt;
+
+  /// The full name of the requester (only populated when the user is
+  /// allowed to see it — admins and the owner).
   final String? authorName;
   final String? authorAvatarUrl;
+
+  /// Safe display name from the public view. For anonymous requests this
+  /// is always `'Anonymous'`. For non-anonymous it is the requester's
+  /// full name.
+  final String? displayName;
+
+  /// Optional note from the admin who moderated the request. Surfaced to
+  /// the owner when the request is rejected.
+  final String? adminNote;
+
+  final DateTime? reviewedAt;
+  final DateTime? approvedAt;
 
   PrayerRequest copyWith({
     String? id,
@@ -43,7 +74,7 @@ class PrayerRequest extends Equatable {
     String? title,
     String? content,
     String? category,
-    bool? isPublic,
+    String? visibility,
     bool? isAnonymous,
     PrayerStatus? status,
     int? prayerCount,
@@ -52,6 +83,10 @@ class PrayerRequest extends Equatable {
     DateTime? updatedAt,
     String? authorName,
     String? authorAvatarUrl,
+    String? displayName,
+    String? adminNote,
+    DateTime? reviewedAt,
+    DateTime? approvedAt,
   }) =>
       PrayerRequest(
         id: id ?? this.id,
@@ -59,7 +94,7 @@ class PrayerRequest extends Equatable {
         title: title ?? this.title,
         content: content ?? this.content,
         category: category ?? this.category,
-        isPublic: isPublic ?? this.isPublic,
+        visibility: visibility ?? this.visibility,
         isAnonymous: isAnonymous ?? this.isAnonymous,
         status: status ?? this.status,
         prayerCount: prayerCount ?? this.prayerCount,
@@ -68,6 +103,10 @@ class PrayerRequest extends Equatable {
         updatedAt: updatedAt ?? this.updatedAt,
         authorName: authorName ?? this.authorName,
         authorAvatarUrl: authorAvatarUrl ?? this.authorAvatarUrl,
+        displayName: displayName ?? this.displayName,
+        adminNote: adminNote ?? this.adminNote,
+        reviewedAt: reviewedAt ?? this.reviewedAt,
+        approvedAt: approvedAt ?? this.approvedAt,
       );
 
   @override
@@ -77,7 +116,7 @@ class PrayerRequest extends Equatable {
         title,
         content,
         category,
-        isPublic,
+        visibility,
         isAnonymous,
         status,
         prayerCount,
@@ -86,6 +125,10 @@ class PrayerRequest extends Equatable {
         updatedAt,
         authorName,
         authorAvatarUrl,
+        displayName,
+        adminNote,
+        reviewedAt,
+        approvedAt,
       ];
 }
 

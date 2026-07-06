@@ -1,7 +1,15 @@
+// Kingdom Heir — Submit Prayer Request screen
+//
+// Form for a member to share a prayer request. On successful submit,
+// the form is replaced (in-place) with a polished confirmation card.
+// The DB trigger forces the row to `status = 'pending'`; the request
+// will appear on the public Prayer Wall only after an admin approves it.
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kingdom_heir/core/router/route_names.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
@@ -26,6 +34,10 @@ const _visibilityOptions = [
   'Private — only you can see',
 ];
 
+// Length limits — mirror the DB constraints from the moderation migration.
+const int _kTitleMaxLength = 80;
+const int _kContentMaxLength = 1000;
+
 class SubmitPrayerScreen extends ConsumerStatefulWidget {
   const SubmitPrayerScreen({super.key});
 
@@ -40,6 +52,7 @@ class _SubmitPrayerScreenState extends ConsumerState<SubmitPrayerScreen> {
   int _selectedCategory = 0;
   int _selectedVisibility = 0;
   bool _isAnonymous = false;
+  bool _justSubmitted = false;
 
   @override
   void dispose() {
@@ -57,9 +70,9 @@ class _SubmitPrayerScreenState extends ConsumerState<SubmitPrayerScreen> {
       title: _titleController.text.trim(),
       content: _bodyController.text.trim(),
       category: _categories[_selectedCategory],
-      isPublic: _selectedVisibility == 0,
+      visibility: _selectedVisibility == 0 ? 'public' : 'private',
       isAnonymous: _isAnonymous,
-      status: 'active',
+      status: 'pending', // overwritten by DB trigger; kept for tests
       prayerCount: 0,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
@@ -67,190 +80,412 @@ class _SubmitPrayerScreenState extends ConsumerState<SubmitPrayerScreen> {
 
     await ref.read(submitPrayerProvider.notifier).submit(model.toInsertJson());
 
-    if (mounted) {
-      final error = ref.read(submitPrayerProvider).error;
-      if (error != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $error')),
-        );
-      } else {
-        // Invalidate the prayer wall so it re-fetches and shows the new request.
-        // The Realtime stream will also push it automatically for other users.
-        ref.invalidate(prayerFeedProvider);
-        if (mounted) context.pop();
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('🙏 Your prayer request has been submitted.'),
-              backgroundColor: AppColors.success,
-            ),
-          );
-        }
-      }
+    if (!mounted) return;
+
+    final error = ref.read(submitPrayerProvider).error;
+    if (error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $error'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } else {
+      // Invalidate the public wall so it re-fetches and reflects the
+      // new state once the request is approved. We do NOT navigate
+      // away — the confirmation card takes the form's place in-place.
+      ref.invalidate(prayerFeedProvider);
+      ref.invalidate(myPrayersProvider);
+      setState(() {
+        _justSubmitted = true;
+      });
     }
+  }
+
+  void _submitAnother() {
+    _titleController.clear();
+    _bodyController.clear();
+    setState(() {
+      _selectedCategory = 0;
+      _selectedVisibility = 0;
+      _isAnonymous = false;
+      _justSubmitted = false;
+    });
+    ref.read(submitPrayerProvider.notifier).reset();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isLoading = ref.watch(submitPrayerProvider).isLoading;
+    final isDark = theme.brightness == Brightness.dark;
+    final cs = theme.colorScheme;
+    final submitState = ref.watch(submitPrayerProvider);
+    final isLoading = submitState.isLoading;
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Submit Prayer Request'),
         leading: const BackButton(),
       ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          children: [
-            // ── Header ────────────────────────────────────────────────
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppColors.navy, AppColors.navyMid],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+      body: _justSubmitted
+          ? _ConfirmationCard(
+              onViewMyRequests: () => context.go(RouteNames.myPrayers),
+              onSubmitAnother: _submitAnother,
+            ).animate().fadeIn(duration: 300.ms).slideY(
+              begin: 0.1,
+              end: 0,
+              curve: Curves.easeOutCubic,
+            )
+          : _buildForm(theme, isDark, cs, isLoading),
+    );
+  }
+
+  Widget _buildForm(ThemeData theme, bool isDark, ColorScheme cs, bool isLoading) {
+    return Form(
+      key: _formKey,
+      child: ListView(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        children: [
+          // ── Header banner ──────────────────────────────────────────
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: isDark
+                    ? [AppColors.navyMid, AppColors.navyLight]
+                    : [AppColors.navy, AppColors.navyAccent],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.self_improvement_rounded,
-                    color: AppColors.gold,
-                    size: 32,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.self_improvement_rounded,
+                  color: AppColors.gold,
+                  size: 32,
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Share your heart',
+                        style: AppTypography.textTheme.titleMedium?.copyWith(
+                          color: AppColors.warmWhite,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      Text(
+                        'The church is standing with you in prayer.',
+                        style: AppTypography.textTheme.bodySmall
+                            ?.copyWith(color: Colors.white70),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Share your heart',
-                          style: AppTypography.textTheme.titleMedium?.copyWith(
-                            color: AppColors.white,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        Text(
-                          'The church is standing with you in prayer.',
-                          style: AppTypography.textTheme.bodySmall
-                              ?.copyWith(color: Colors.white70),
-                        ),
-                      ],
+                ),
+              ],
+            ),
+          ).animate().fadeIn(),
+
+          const SizedBox(height: AppSpacing.xl),
+
+          // ── Category selector ─────────────────────────────────────
+          Text(
+            'Category',
+            style: AppTypography.textTheme.titleSmall
+                ?.copyWith(color: cs.onSurface),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            children: _categories.asMap().entries.map((e) {
+              final i = e.key;
+              final label = e.value;
+              final isSelected = i == _selectedCategory;
+              return FilterChip(
+                label: Text(label),
+                selected: isSelected,
+                onSelected: (_) => setState(() => _selectedCategory = i),
+                backgroundColor: isDark
+                    ? AppColors.surfaceContainerDark
+                    : cs.surfaceContainerLow,
+                selectedColor: AppColors.gold.withValues(alpha: 0.15),
+                checkmarkColor: AppColors.gold,
+                side: BorderSide(
+                  color: isSelected
+                      ? AppColors.gold
+                      : isDark
+                          ? AppColors.dividerDark
+                          : theme.dividerColor,
+                ),
+                labelStyle: AppTypography.textTheme.labelSmall?.copyWith(
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
+                  color: isSelected
+                      ? AppColors.gold
+                      : cs.onSurface.withValues(alpha: 0.75),
+                ),
+              );
+            }).toList(),
+          ).animate().fadeIn(delay: 100.ms),
+
+          const SizedBox(height: AppSpacing.xl),
+
+          // ── Title ─────────────────────────────────────────────────
+          AppTextField(
+            controller: _titleController,
+            label: 'Prayer title',
+            hint: 'Brief description of your request',
+            prefixIcon: Icons.title_rounded,
+            isRequired: true,
+            maxLength: _kTitleMaxLength,
+            validator: (v) {
+              if (v == null || v.trim().isEmpty) {
+                return 'Please add a title';
+              }
+              if (v.trim().length > _kTitleMaxLength) {
+                return 'Please keep the title under $_kTitleMaxLength characters';
+              }
+              return null;
+            },
+          ).animate().fadeIn(delay: 150.ms),
+
+          const SizedBox(height: AppSpacing.lg),
+
+          // ── Body ──────────────────────────────────────────────────
+          AppTextField(
+            controller: _bodyController,
+            label: 'Your prayer request',
+            hint: "Share the details of what you're believing God for...",
+            maxLines: 6,
+            minLines: 4,
+            isRequired: true,
+            maxLength: _kContentMaxLength,
+            validator: (v) {
+              if (v == null || v.trim().isEmpty) {
+                return 'Please describe your request';
+              }
+              if (v.trim().length > _kContentMaxLength) {
+                return 'Please keep the request under $_kContentMaxLength characters';
+              }
+              return null;
+            },
+          ).animate().fadeIn(delay: 200.ms),
+
+          const SizedBox(height: AppSpacing.xl),
+
+          // ── Visibility ────────────────────────────────────────────
+          Text(
+            'Visibility',
+            style: AppTypography.textTheme.titleSmall
+                ?.copyWith(color: cs.onSurface),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          AppRadioGroup<int>(
+            options: List.generate(_visibilityOptions.length, (i) => i),
+            labels: _visibilityOptions,
+            value: _selectedVisibility,
+            onChanged: (v) => setState(() => _selectedVisibility = v ?? 0),
+          ).animate().fadeIn(delay: 250.ms),
+
+          const SizedBox(height: AppSpacing.lg),
+
+          // ── Anonymous ─────────────────────────────────────────────
+          Card(
+            margin: EdgeInsets.zero,
+            color: isDark ? AppColors.surfaceDark : cs.surface,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              side: BorderSide(
+                color: isDark ? AppColors.dividerDark : AppColors.dividerLight,
+                width: 0.5,
+              ),
+            ),
+            child: SwitchListTile(
+              title: Text(
+                'Submit anonymously',
+                style: TextStyle(color: cs.onSurface),
+              ),
+              subtitle: Text(
+                'Your name will not be shown on the Prayer Wall.',
+                style: TextStyle(
+                  color: cs.onSurface.withValues(alpha: 0.6),
+                ),
+              ),
+              value: _isAnonymous,
+              onChanged: (v) => setState(() => _isAnonymous = v),
+              activeThumbColor: AppColors.ink,
+              activeTrackColor: AppColors.gold,
+            ),
+          ).animate().fadeIn(delay: 300.ms),
+
+          const SizedBox(height: AppSpacing.xxxl),
+
+          // ── Submit ────────────────────────────────────────────────
+          AppButton(
+            label: 'Submit Prayer Request',
+            icon: Icons.send_rounded,
+            isLoading: isLoading,
+            onPressed: isLoading ? null : _submit,
+          ).animate().fadeIn(delay: 350.ms),
+
+          const SizedBox(height: AppSpacing.lg),
+
+          Text(
+            'For urgent emergencies, contact local emergency services or a '
+            'trusted person nearby. Prayer requests are reviewed before '
+            'appearing publicly.',
+            style: AppTypography.textTheme.bodySmall?.copyWith(
+              color: cs.onSurface.withValues(alpha: 0.45),
+              height: 1.5,
+            ),
+            textAlign: TextAlign.center,
+          ),
+
+          const SizedBox(height: AppSpacing.lg),
+
+          Text(
+            'By submitting, you agree that this request may be reviewed by '
+            'church moderators. Approved requests will be visible to church '
+            'members according to your visibility setting.',
+            style: AppTypography.textTheme.bodySmall?.copyWith(
+              color: cs.onSurface.withValues(alpha: 0.45),
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ConfirmationCard extends StatelessWidget {
+  const _ConfirmationCard({
+    required this.onViewMyRequests,
+    required this.onSubmitAnother,
+  });
+
+  final VoidCallback onViewMyRequests;
+  final VoidCallback onSubmitAnother;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final cs = theme.colorScheme;
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 480),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(AppSpacing.xxl),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: isDark
+                    ? [AppColors.navyMid, AppColors.navyLight]
+                    : [AppColors.navy, AppColors.navyAccent],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+              boxShadow: [
+                BoxShadow(
+                  color: theme.colorScheme.shadow.withValues(alpha: 0.25),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Container(
+                  width: 88,
+                  height: 88,
+                  decoration: BoxDecoration(
+                    color: AppColors.gold.withValues(alpha: 0.18),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.check_circle_rounded,
+                    color: AppColors.gold,
+                    size: 56,
+                  ),
+                ).animate().scale(
+                      begin: const Offset(0.6, 0.6),
+                      end: const Offset(1, 1),
+                      duration: 400.ms,
+                      curve: Curves.elasticOut,
+                    ),
+                const SizedBox(height: AppSpacing.lg),
+                Text(
+                  'Prayer request received',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  'Your request has been submitted for review. Once approved, '
+                  'it may be shared on the Prayer Wall.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: Colors.white70,
+                    height: 1.55,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.xl),
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ElevatedButton.icon(
+                    onPressed: onViewMyRequests,
+                    icon: const Icon(Icons.list_alt_rounded, size: 20),
+                    label: const Text(
+                      'View my requests',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.gold,
+                      foregroundColor: AppColors.ink,
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.radiusMd),
+                      ),
+                      elevation: 0,
                     ),
                   ),
-                ],
-              ),
-            ).animate().fadeIn(),
-
-            const SizedBox(height: AppSpacing.xl),
-
-            // ── Category selector ─────────────────────────────────────
-            Text('Category', style: AppTypography.textTheme.titleSmall),
-            const SizedBox(height: AppSpacing.sm),
-            Wrap(
-              spacing: AppSpacing.sm,
-              runSpacing: AppSpacing.sm,
-              children: _categories.asMap().entries.map((e) {
-                final i = e.key;
-                final label = e.value;
-                final isSelected = i == _selectedCategory;
-                return FilterChip(
-                  label: Text(label),
-                  selected: isSelected,
-                  onSelected: (_) => setState(() => _selectedCategory = i),
-                  selectedColor: AppColors.gold.withValues(alpha: 0.15),
-                  checkmarkColor: AppColors.goldDark,
-                  side: BorderSide(
-                    color: isSelected ? AppColors.gold : theme.dividerColor,
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                TextButton.icon(
+                  onPressed: onSubmitAnother,
+                  icon: Icon(
+                    Icons.refresh_rounded,
+                    size: 18,
+                    color: cs.onPrimary.withValues(alpha: 0.85),
                   ),
-                  labelStyle: AppTypography.textTheme.labelSmall?.copyWith(
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
-                    color: isSelected ? AppColors.goldDark : null,
+                  label: Text(
+                    'Submit another',
+                    style: TextStyle(
+                      color: cs.onPrimary.withValues(alpha: 0.85),
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                );
-              }).toList(),
-            ).animate().fadeIn(delay: 100.ms),
-
-            const SizedBox(height: AppSpacing.xl),
-
-            // ── Title ─────────────────────────────────────────────────
-            AppTextField(
-              controller: _titleController,
-              label: 'Prayer title',
-              hint: 'Brief description of your request',
-              prefixIcon: Icons.title_rounded,
-              isRequired: true,
-              validator: (v) =>
-                  (v?.isEmpty ?? true) ? 'Please add a title' : null,
-            ).animate().fadeIn(delay: 150.ms),
-
-            const SizedBox(height: AppSpacing.lg),
-
-            // ── Body ──────────────────────────────────────────────────
-            AppTextField(
-              controller: _bodyController,
-              label: 'Your prayer request',
-              hint: "Share the details of what you're believing God for...",
-              maxLines: 6,
-              minLines: 4,
-              isRequired: true,
-              validator: (v) =>
-                  (v?.isEmpty ?? true) ? 'Please describe your request' : null,
-            ).animate().fadeIn(delay: 200.ms),
-
-            const SizedBox(height: AppSpacing.xl),
-
-            // ── Visibility ────────────────────────────────────────────
-            Text('Visibility', style: AppTypography.textTheme.titleSmall),
-            const SizedBox(height: AppSpacing.sm),
-            AppRadioGroup<int>(
-              options: List.generate(_visibilityOptions.length, (i) => i),
-              labels: _visibilityOptions,
-              value: _selectedVisibility,
-              onChanged: (v) => setState(() => _selectedVisibility = v ?? 0),
-            ).animate().fadeIn(delay: 250.ms),
-
-            const SizedBox(height: AppSpacing.lg),
-
-            // ── Anonymous ─────────────────────────────────────────────
-            Card(
-              margin: EdgeInsets.zero,
-              child: SwitchListTile(
-                title: const Text('Submit anonymously'),
-                subtitle: const Text('Your name will be hidden from others'),
-                value: _isAnonymous,
-                onChanged: (v) => setState(() => _isAnonymous = v),
-                activeThumbColor: AppColors.ink,
-                activeTrackColor: AppColors.gold,
-              ),
-            ).animate().fadeIn(delay: 300.ms),
-
-            const SizedBox(height: AppSpacing.xxxl),
-
-            // ── Submit ────────────────────────────────────────────────
-            AppButton(
-              label: 'Submit Prayer Request',
-              icon: Icons.send_rounded,
-              isLoading: isLoading,
-              onPressed: isLoading ? null : _submit,
-            ).animate().fadeIn(delay: 350.ms),
-
-            const SizedBox(height: AppSpacing.lg),
-
-            Text(
-              'By submitting, you agree that this request may be seen '
-              'by church members according to your visibility setting.',
-              style: AppTypography.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
-              ),
-              textAlign: TextAlign.center,
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

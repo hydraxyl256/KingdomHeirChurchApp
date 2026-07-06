@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/features/auth/presentation/providers/auth_provider.dart';
 
@@ -82,10 +81,11 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     if (authState.hasError) {
       _showError(_friendlyError(authState.error));
     } else {
+      final scheme = Theme.of(context).colorScheme;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Password changed successfully.'),
-          backgroundColor: AppColors.success,
+          backgroundColor: scheme.tertiary,
           behavior: SnackBarBehavior.floating,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -123,7 +123,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: AppColors.error,
+        backgroundColor: Theme.of(context).colorScheme.error,
         behavior: SnackBarBehavior.floating,
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -170,15 +170,14 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     final isLoading = authState.isLoading;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final bgColor =
-        isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
-    final cardColor = isDark ? AppColors.navyMid : Colors.white;
-    final textMuted = theme.colorScheme.onSurface.withValues(alpha: 0.55);
+    final bgColor = theme.scaffoldBackgroundColor;
+    final cardColor = theme.colorScheme.surface;
+    final textMuted = theme.colorScheme.onSurfaceVariant;
 
     return Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
-        backgroundColor: isDark ? AppColors.navyMid : AppColors.white,
+        backgroundColor: theme.colorScheme.surface,
         elevation: 0,
         title: const Text(
           'Change Password',
@@ -311,7 +310,6 @@ class _OAuthInfoView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return Center(
       child: Padding(
@@ -322,13 +320,13 @@ class _OAuthInfoView extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.xl),
               decoration: BoxDecoration(
-                color: const Color(0xFF0EA5E9).withValues(alpha: 0.12),
+                color: theme.colorScheme.tertiaryContainer,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.lock_person_rounded,
                 size: 48,
-                color: Color(0xFF0EA5E9),
+                color: theme.colorScheme.tertiary,
               ),
             ),
             const SizedBox(height: AppSpacing.xxl),
@@ -350,7 +348,6 @@ class _OAuthInfoView extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            if (isDark) const SizedBox(height: 2),
           ],
         ),
       ),
@@ -368,24 +365,29 @@ class _InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: AppColors.gold.withValues(alpha: 0.10),
+        color: theme.colorScheme.primaryContainer,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        border: Border.all(color: AppColors.gold.withValues(alpha: 0.30)),
+        border: Border.all(
+          color: theme.colorScheme.primary.withValues(alpha: 0.30),
+        ),
       ),
       child: Row(
         children: [
-          const Icon(Icons.info_outline_rounded,
-              color: AppColors.gold, size: 20,),
+          Icon(
+            Icons.info_outline_rounded,
+            color: theme.colorScheme.primary,
+            size: 20,
+          ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Text(
               'Use at least 8 characters with one uppercase letter and one number.',
-              style: TextStyle(
-                color: AppColors.gold.withValues(alpha: 0.85),
-                fontSize: 13,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onPrimaryContainer,
                 height: 1.4,
               ),
             ),
@@ -426,7 +428,6 @@ class _PasswordField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -456,9 +457,7 @@ class _PasswordField extends StatelessWidget {
               fontSize: 13,
             ),
             filled: true,
-            fillColor: isDark
-                ? AppColors.navyMid.withValues(alpha: 0.6)
-                : Colors.grey.shade50,
+            fillColor: theme.colorScheme.surfaceContainerLow,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
               borderSide: BorderSide(
@@ -473,17 +472,21 @@ class _PasswordField extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-              borderSide:
-                  const BorderSide(color: AppColors.gold, width: 1.5),
+              borderSide: BorderSide(
+                color: theme.colorScheme.primary,
+                width: 1.5,
+              ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-              borderSide: const BorderSide(color: AppColors.error),
+              borderSide: BorderSide(color: theme.colorScheme.error),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-              borderSide:
-                  const BorderSide(color: AppColors.error, width: 1.5),
+              borderSide: BorderSide(
+                color: theme.colorScheme.error,
+                width: 1.5,
+              ),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.lg,
@@ -517,26 +520,27 @@ class _SubmitButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return SizedBox(
       height: 52,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.gold,
-          foregroundColor: AppColors.navy,
-          disabledBackgroundColor: AppColors.gold.withValues(alpha: 0.45),
+          backgroundColor: scheme.primary,
+          foregroundColor: scheme.onPrimary,
+          disabledBackgroundColor: scheme.primary.withValues(alpha: 0.45),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           ),
           elevation: 0,
         ),
         child: isLoading
-            ? const SizedBox(
+            ? SizedBox(
                 width: 22,
                 height: 22,
                 child: CircularProgressIndicator(
                   strokeWidth: 2.5,
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.navy),
+                  valueColor: AlwaysStoppedAnimation<Color>(scheme.onPrimary),
                 ),
               )
             : const Text(
