@@ -19,8 +19,6 @@ import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/widgets/app_empty_state.dart';
-import 'package:kingdom_heir/core/widgets/app_error_widget.dart';
-import 'package:kingdom_heir/core/widgets/app_loading_indicator.dart';
 import 'package:kingdom_heir/core/widgets/app_text_field.dart';
 import 'package:kingdom_heir/features/auth/presentation/providers/auth_provider.dart';
 import 'package:kingdom_heir/features/prayer_requests/domain/entities/prayer_request.dart';
@@ -457,9 +455,9 @@ class _PrayerModerationCard extends ConsumerWidget {
 
           // Actions
           if (inFlight)
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
+              children: [
                 SizedBox(
                   width: 22,
                   height: 22,

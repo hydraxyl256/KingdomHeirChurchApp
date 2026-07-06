@@ -103,7 +103,7 @@ void main() {
     test('has a code and a message', () {
       // Sanity check on the upstream class — the repository's error
       // mapper depends on both fields being present.
-      final ex = supabase.PostgrestException(message: 'oops', code: '22000');
+      const ex = supabase.PostgrestException(message: 'oops', code: '22000');
       expect(ex.code, '22000');
       expect(ex.message, 'oops');
     });

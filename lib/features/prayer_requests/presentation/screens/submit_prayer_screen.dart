@@ -411,7 +411,7 @@ class _ConfirmationCard extends StatelessWidget {
                     color: AppColors.gold.withValues(alpha: 0.18),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.check_circle_rounded,
                     color: AppColors.gold,
                     size: 56,

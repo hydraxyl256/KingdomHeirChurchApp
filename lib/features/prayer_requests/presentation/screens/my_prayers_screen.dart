@@ -18,8 +18,6 @@ import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/widgets/app_empty_state.dart';
-import 'package:kingdom_heir/core/widgets/app_error_widget.dart';
-import 'package:kingdom_heir/core/widgets/app_loading_indicator.dart';
 import 'package:kingdom_heir/features/prayer_requests/domain/entities/prayer_request.dart';
 import 'package:kingdom_heir/features/prayer_requests/presentation/providers/prayer_provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -61,7 +59,7 @@ class MyPrayersScreen extends ConsumerWidget {
                     height: MediaQuery.of(context).size.height * 0.7,
                     child: AppEmptyState(
                       icon: Icons.self_improvement_rounded,
-                      title: 'You haven\'t shared any prayer requests yet',
+                      title: "You haven't shared any prayer requests yet",
                       description:
                           'When you share a request, it will appear here while '
                           'our team reviews it. Approved requests will also be '
@@ -179,7 +177,7 @@ class _MyPrayerCard extends StatelessWidget {
               if (request.status == PrayerStatus.approved &&
                   request.prayerCount > 0) ...[
                 const SizedBox(width: AppSpacing.md),
-                Icon(
+                const Icon(
                   Icons.favorite_rounded,
                   size: 14,
                   color: AppColors.gold,

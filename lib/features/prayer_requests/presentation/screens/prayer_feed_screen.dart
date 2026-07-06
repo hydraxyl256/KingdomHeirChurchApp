@@ -16,8 +16,6 @@ import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/widgets/app_avatar.dart';
 import 'package:kingdom_heir/core/widgets/app_empty_state.dart';
-import 'package:kingdom_heir/core/widgets/app_error_widget.dart';
-import 'package:kingdom_heir/core/widgets/app_loading_indicator.dart';
 import 'package:kingdom_heir/features/prayer_requests/domain/entities/prayer_request.dart';
 import 'package:kingdom_heir/features/prayer_requests/presentation/providers/prayer_provider.dart';
 import 'package:timeago/timeago.dart' as timeago;

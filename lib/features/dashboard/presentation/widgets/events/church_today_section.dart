@@ -13,7 +13,6 @@ import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/iconography.dart';
-import 'package:kingdom_heir/core/widgets/app_empty_state.dart';
 import 'package:kingdom_heir/features/dashboard/domain/dashboard_categories.dart';
 import 'package:kingdom_heir/features/dashboard/domain/home_dashboard_models.dart';
 

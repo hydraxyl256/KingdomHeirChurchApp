@@ -52,7 +52,7 @@ abstract final class AppTheme {
       scaffoldBackgroundColor:
           isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
       extensions: <ThemeExtension<dynamic>>[
-        isDark ? MoreSectionTheme.dark : MoreSectionTheme.light,
+        if (isDark) MoreSectionTheme.dark else MoreSectionTheme.light,
       ],
 
       // ── App Bar ──────────────────────────────────────────────────────────

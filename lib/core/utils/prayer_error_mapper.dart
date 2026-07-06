@@ -95,7 +95,7 @@ String _mapPostgrest(supabase.PostgrestException e) {
     case '42501':
       return "You don't have permission to perform this action.";
     case 'PGRST116':
-      return 'We couldn\'t find that request.';
+      return "We couldn't find that request.";
     case 'PGRST301':
       return 'The server is taking too long. Please try again.';
     default:
@@ -129,11 +129,11 @@ String _mapRpcError(String code) {
     case 'not_authenticated':
       return 'Please sign in to continue.';
     case 'not_authorized':
-      return 'You don\'t have permission to perform this action.';
+      return "You don't have permission to perform this action.";
     case 'invalid_state':
       return 'This prayer request is no longer pending review.';
     case 'not_found':
-      return 'We couldn\'t find that request.';
+      return "We couldn't find that request.";
     default:
       return 'Something went wrong. Please try again.';
   }
