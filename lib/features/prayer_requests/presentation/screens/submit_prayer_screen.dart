@@ -94,8 +94,9 @@ class _SubmitPrayerScreenState extends ConsumerState<SubmitPrayerScreen> {
       // Invalidate the public wall so it re-fetches and reflects the
       // new state once the request is approved. We do NOT navigate
       // away — the confirmation card takes the form's place in-place.
-      ref.invalidate(prayerFeedProvider);
-      ref.invalidate(myPrayersProvider);
+      ref
+        ..invalidate(prayerFeedProvider)
+        ..invalidate(myPrayersProvider);
       setState(() {
         _justSubmitted = true;
       });

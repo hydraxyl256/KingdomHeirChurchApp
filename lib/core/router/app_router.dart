@@ -6,10 +6,13 @@ import 'package:kingdom_heir/core/notifications/notification_router.dart';
 import 'package:kingdom_heir/core/router/route_names.dart';
 import 'package:kingdom_heir/core/storage/local_storage_service.dart';
 import 'package:kingdom_heir/features/admin/presentation/screens/admin_dashboard_screen.dart';
+import 'package:kingdom_heir/features/admin/presentation/screens/admin_devotional_day_editor_screen.dart';
+import 'package:kingdom_heir/features/admin/presentation/screens/admin_devotional_series_screen.dart';
 import 'package:kingdom_heir/features/admin/presentation/screens/admin_events_screen.dart';
 import 'package:kingdom_heir/features/admin/presentation/screens/admin_global_impact_dashboard_screen.dart';
 import 'package:kingdom_heir/features/admin/presentation/screens/admin_leader_applications_screen.dart';
 import 'package:kingdom_heir/features/admin/presentation/screens/admin_leader_recognition_dashboard_screen.dart';
+import 'package:kingdom_heir/features/admin/presentation/screens/admin_media_review_screen.dart';
 import 'package:kingdom_heir/features/admin/presentation/screens/admin_members_screen.dart';
 import 'package:kingdom_heir/features/admin/presentation/screens/admin_moderation_screen.dart';
 import 'package:kingdom_heir/features/admin/presentation/screens/admin_prayer_moderation_screen.dart';
@@ -32,8 +35,11 @@ import 'package:kingdom_heir/features/challenge/presentation/screens/challenge_h
 import 'package:kingdom_heir/features/challenge/presentation/screens/group_reporting_screen.dart';
 import 'package:kingdom_heir/features/challenge/presentation/screens/participant_journey_screen.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/screens/dashboard_screen.dart';
+import 'package:kingdom_heir/features/devotionals/presentation/screens/devotional_day_reader_screen.dart';
 import 'package:kingdom_heir/features/devotionals/presentation/screens/devotional_prayer_screen.dart';
 import 'package:kingdom_heir/features/devotionals/presentation/screens/devotional_reader_screen.dart';
+import 'package:kingdom_heir/features/devotionals/presentation/screens/devotional_series_detail_screen.dart';
+import 'package:kingdom_heir/features/devotionals/presentation/screens/devotional_series_list_screen.dart';
 import 'package:kingdom_heir/features/devotionals/presentation/screens/devotionals_screen.dart';
 import 'package:kingdom_heir/features/devotionals/presentation/screens/journal_screen.dart';
 import 'package:kingdom_heir/features/devotionals/presentation/screens/journey_complete_screen.dart';
@@ -489,6 +495,31 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             ],
           ),
 
+          // Devotional Series (90-Day Journey)
+          GoRoute(
+            path: 'devotionals/series',
+            builder: (_, __) => const DevotionalSeriesListScreen(),
+            routes: [
+              GoRoute(
+                path: ':seriesId',
+                builder: (_, state) => DevotionalSeriesDetailScreen(
+                  seriesId: state.pathParameters['seriesId']!,
+                ),
+                routes: [
+                  GoRoute(
+                    path: 'day/:dayNumber',
+                    builder: (_, state) => DevotionalDayReaderScreen(
+                      seriesId:  state.pathParameters['seriesId']!,
+                      dayNumber: int.parse(
+                        state.pathParameters['dayNumber'] ?? '1',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+
           // Podcasts
           GoRoute(
             path: RouteNames.podcasts,
@@ -652,6 +683,24 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/admin/leader-recognition',
             builder: (_, __) => const AdminLeaderRecognitionDashboardScreen(),
+          ),
+          // ── New admin routes ───────────────────────────────────────
+          GoRoute(
+            path: '/admin/media-review',
+            builder: (_, __) => const AdminMediaReviewScreen(),
+          ),
+          GoRoute(
+            path: '/admin/devotional-series',
+            builder: (_, __) => const AdminDevotionalSeriesScreen(),
+          ),
+          GoRoute(
+            path: '/admin/devotional-series/:seriesId/days/:dayNumber',
+            builder: (_, state) => AdminDevotionalDayEditorScreen(
+              seriesId:  state.pathParameters['seriesId']!,
+              dayNumber: int.parse(
+                state.pathParameters['dayNumber'] ?? '1',
+              ),
+            ),
           ),
         ],
       ),

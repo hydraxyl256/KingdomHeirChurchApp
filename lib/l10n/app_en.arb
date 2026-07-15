@@ -161,5 +161,46 @@
   "noSermonsWatchedDescription": "Tap “See all” to browse the latest sermons.",
   "@noSermonsWatchedDescription": {
     "description": "Empty state body"
-  }
+  },
+  "devotionalSeries": "Devotional Series",
+  "@devotionalSeries": {"description": "Section title for devotional series"},
+  "dayOf": "Day {current} of {total}",
+  "@dayOf": {
+    "description": "Progress label",
+    "placeholders": {
+      "current": {"type": "int"},
+      "total":   {"type": "int"}
+    }
+  },
+  "currentStreak": "{count} day streak",
+  "@currentStreak": {
+    "description": "Streak label",
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "markComplete": "Mark as Complete",
+  "@markComplete": {"description": "CTA button on day reader"},
+  "buyPhysicalCopy": "Buy Physical Copy on Amazon",
+  "@buyPhysicalCopy": {"description": "Amazon purchase CTA"},
+  "availableInEnglish": "Available in English — translation coming soon.",
+  "@availableInEnglish": {"description": "Banner shown when translation is missing"},
+  "startChallenge": "Start the 90-Day Challenge",
+  "@startChallenge": {"description": "CTA to join the challenge"},
+  "continueDayN": "Continue Day {day}",
+  "@continueDayN": {
+    "description": "CTA to continue the challenge",
+    "placeholders": {"day": {"type": "int"}}
+  },
+  "completedToday": "Day {day} Complete — return tomorrow",
+  "@completedToday": {
+    "description": "Message after completing today's day",
+    "placeholders": {"day": {"type": "int"}}
+  },
+  "allDaysComplete": "You've completed all 90 days!",
+  "@allDaysComplete": {"description": "Celebration message"},
+  "syncYouTube": "Sync YouTube Channel",
+  "@syncYouTube": {"description": "Admin button to trigger YouTube sync"},
+  "pendingReview": "Pending Review",
+  "@pendingReview": {"description": "Status label for media content"},
+  "mediaReviewQueue": "Media Review Queue",
+  "@mediaReviewQueue": {"description": "Admin screen title"}
 }

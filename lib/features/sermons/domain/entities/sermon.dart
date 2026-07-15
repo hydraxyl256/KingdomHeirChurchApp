@@ -150,6 +150,36 @@ class Sermon extends Equatable {
     );
   }
 
+  /// Maps a `media_content` row (YouTube catalog) to a [Sermon].
+  ///
+  /// Admin-editable fields are read directly from the row.
+  /// Fields that the old `sermons` table provided but `media_content` does not
+  /// (audioUrl, hlsStreamUrl, scriptures) are left null/empty; the player
+  /// falls back to the YouTube embed via [youtubeId].
+  factory Sermon.fromMediaContent(Map<String, dynamic> json) {
+    final tags = (json['tags'] as List<dynamic>?)?.cast<String>() ?? const <String>[];
+    return Sermon(
+      id:               json['id'] as String,
+      title:            json['title'] as String,
+      speakerName:      json['speaker_name'] as String? ?? 'Kingdom Heirs',
+      seriesName:       json['series_name'] as String? ?? 'General',
+      publishedAt:      json['published_at'] != null
+                            ? DateTime.parse(json['published_at'] as String)
+                            : DateTime.now(),
+      durationSeconds:  json['duration_seconds'] as int? ?? 0,
+      mediaType:        SermonMediaType.video,
+      videoUrl:         json['youtube_url'] as String?,
+      thumbnailUrl:     json['thumbnail_url'] as String?,
+      description:      json['description'] as String?,
+      youtubeId:        json['youtube_video_id'] as String?,
+      tags:             tags,
+      trendingScore:    json['is_featured'] == true ? 100 : 0,
+      updatedAt:        json['updated_at'] != null
+                            ? DateTime.tryParse(json['updated_at'] as String)
+                            : null,
+    );
+  }
+
   final String id;
   final String title;
   final String speakerName;

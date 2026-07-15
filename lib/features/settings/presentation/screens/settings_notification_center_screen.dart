@@ -575,7 +575,7 @@ class _SettingsNotificationCenterScreenState
     final launched =
         await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!launched && ctx.mounted) {
-      final scheme = Theme.of(context).colorScheme;
+      final scheme = Theme.of(ctx).colorScheme;
       ScaffoldMessenger.of(ctx).showSnackBar(
         SnackBar(
           content: const Text(

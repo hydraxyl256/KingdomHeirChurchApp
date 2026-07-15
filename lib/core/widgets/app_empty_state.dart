@@ -1,31 +1,98 @@
-// Re-exports for the two app-level loading / error widgets.
-//
-// They are defined in their own files (`app_loading_indicator.dart`,
-// `app_error_widget.dart`) but historically callers import this single
-// file and rely on `AppEmptyState`, `AppLoadingIndicator`, and
-// `AppErrorWidget` all being available. We re-export them here so
-// `import '.../app_empty_state.dart';` is enough to get the full
-// empty/loading/error set. The `AppEmptyState` API takes
-// `icon` + `title` + optional `description` + optional CTA; the
-// loading and error widgets wrap that base API.
+// Re-exports for the two app-level loading / error widgets, plus the
+// in-file `AppEmptyState` widget used across the app for empty list /
+// error states. The umbrella file gives callers a single import that
+// exposes `AppEmptyState`, `AppLoadingIndicator`, and `AppErrorWidget`.
+// The `AppEmptyState` API takes `icon` + `title` + optional
+// `description` + optional CTA + optional `isCompact` flag.
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
+import 'package:kingdom_heir/core/widgets/app_button.dart';
 
-// Re-exports for the two app-level loading / error widgets.
-//
-// They are defined in their own files (`app_loading_indicator.dart`,
-// `app_error_widget.dart`) but historically callers import this single
-// file and rely on `AppEmptyState`, `AppLoadingIndicator`, and
-// `AppErrorWidget` all being available. We re-export them here so
-// `import '.../app_empty_state.dart';` is enough to get the full
-// empty/loading/error set. The new `AppEmptyState` API takes
-// `icon` + `title` + optional `description` + optional CTA; the
-// loading and error widgets wrap that base API.
-export 'app_error_widget.dart' show AppErrorWidget;
 export 'app_error_widget.dart' show AppErrorWidget;
 export 'app_loading_indicator.dart' show AppLoadingIndicator;
+
+/// A generic empty state with an icon, title, description, and optional CTA.
+class AppEmptyState extends StatelessWidget {
+  const AppEmptyState({
+    required this.icon,
+    required this.title,
+    super.key,
+    this.description,
+    this.actionLabel,
+    this.onAction,
+    this.isCompact = false,
+  });
+
+  final IconData icon;
+  final String title;
+  final String? description;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+
+  /// Compact variant for list sections (smaller padding).
+  final bool isCompact;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(isCompact ? AppSpacing.xl : AppSpacing.huge),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: isCompact ? 60 : 80,
+              height: isCompact ? 60 : 80,
+              decoration: BoxDecoration(
+                color: AppColors.gold.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: isCompact ? AppSpacing.iconLg : AppSpacing.iconXl,
+                color: AppColors.gold.withValues(alpha: 0.6),
+              ),
+            ).animate().scale(duration: 400.ms, curve: Curves.elasticOut),
+            SizedBox(height: isCompact ? AppSpacing.md : AppSpacing.lg),
+            Text(
+              title,
+              style: (isCompact
+                      ? AppTypography.textTheme.titleSmall
+                      : AppTypography.textTheme.titleMedium)
+                  ?.copyWith(color: theme.colorScheme.onSurface),
+              textAlign: TextAlign.center,
+            ).animate().fadeIn(delay: 100.ms),
+            if (description != null) ...[
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                description!,
+                style: AppTypography.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ).animate().fadeIn(delay: 200.ms),
+            ],
+            if (actionLabel != null && onAction != null) ...[
+              SizedBox(height: isCompact ? AppSpacing.lg : AppSpacing.xxl),
+              AppButton(
+                label: actionLabel!,
+                onPressed: onAction,
+                width: 200,
+                height: AppSpacing.buttonHeightSm,
+              ).animate().fadeIn(delay: 300.ms),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 /// Gold gradient banner for important announcements / live service notice.
 class AppGoldBanner extends StatelessWidget {

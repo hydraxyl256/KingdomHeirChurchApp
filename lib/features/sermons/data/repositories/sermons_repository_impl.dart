@@ -26,10 +26,31 @@ class SermonsRepositoryImpl implements SermonsRepository {
   static const String _kReflectionsPrefix = 'sermon_reflections_v1::';
   static const String _kPrayerPrefix = 'sermon_prayer_v1::';
 
-  // ─── Legacy (kept) ────────────────────────────────────────────────
+  // ─── Primary source: media_content (YouTube catalog) ─────────────────
 
   @override
   Future<Either<String, List<Sermon>>> getSermons() async {
+    // 1. Try the new YouTube media catalog first
+    try {
+      final response = await _supabase
+          .from('media_content')
+          .select()
+          .eq('status', 'published')
+          .eq('content_type', 'sermon')
+          .order('published_at', ascending: false);
+
+      if (response.isNotEmpty) {
+        return right(
+          response
+              .map(Sermon.fromMediaContent)
+              .toList(),
+        );
+      }
+    } catch (_) {
+      // media_content table not yet migrated — fall through
+    }
+
+    // 2. Fall back to the legacy sermons table
     try {
       final response = await _supabase
           .from('sermons')
@@ -37,15 +58,39 @@ class SermonsRepositoryImpl implements SermonsRepository {
           .eq('status', 'published')
           .order('preached_on', ascending: false);
 
+      if (response.isNotEmpty) {
+        return right(
+          response
+              .map(Sermon.fromJson)
+              .toList(),
+        );
+      }
+    } catch (_) {
+      // Legacy table also unavailable — fall through to mock
+    }
+
+    // 3. Mock seed (development / CI only)
+    return right(MockSermonSeed.allSermons);
+  }
+
+  /// Returns only featured media_content sermons (is_featured = true).
+  Future<Either<String, List<Sermon>>> getFeaturedSermons() async {
+    try {
+      final response = await _supabase
+          .from('media_content')
+          .select()
+          .eq('status', 'published')
+          .eq('content_type', 'sermon')
+          .eq('is_featured', true)
+          .order('sort_order', ascending: true);
+
       return right(
         (response as List<dynamic>)
-            .map((json) => Sermon.fromJson(json as Map<String, dynamic>))
+            .map((json) => Sermon.fromMediaContent(json as Map<String, dynamic>))
             .toList(),
       );
     } catch (_) {
-      // Backend missing or schema absent — fall back to the mock seed
-      // so the UI works end-to-end.
-      return right(MockSermonSeed.allSermons);
+      return right(const []);
     }
   }
 

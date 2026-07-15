@@ -19,7 +19,8 @@ class AppConfig {
         supabaseUrl: Env.supabaseUrl,
         supabaseAnonKey: Env.supabaseAnonKey,
         sentryDsn: Env.sentryDsn,
-        stripePublishableKey: Env.stripePublishableKey,
+        // Stripe is not yet configured — provide empty string until key is added to env.dart
+        stripePublishableKey: String.fromEnvironment('STRIPE_PUBLISHABLE_KEY'),
         enableAnalytics: Env.enableAnalytics,
         enableCrashReporting: Env.enableCrashReporting,
       );

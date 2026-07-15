@@ -42,6 +42,16 @@ class AdminShell extends StatelessWidget {
         selectedIcon: Icon(Icons.self_improvement),
         label: Text('Prayer Mod'),
       ),
+      const NavigationRailDestination(
+        icon: Icon(Icons.video_library_outlined),
+        selectedIcon: Icon(Icons.video_library),
+        label: Text('Media'),
+      ),
+      const NavigationRailDestination(
+        icon: Icon(Icons.menu_book_outlined),
+        selectedIcon: Icon(Icons.menu_book),
+        label: Text('Devotions'),
+      ),
     ];
 
     int getSelectedIndex() {
@@ -51,6 +61,8 @@ class AdminShell extends StatelessWidget {
       if (location.startsWith('/admin/events')) return 3;
       if (location.startsWith('/admin/moderation')) return 4;
       if (location.startsWith('/admin/prayer-moderation')) return 5;
+      if (location.startsWith('/admin/media-review')) return 6;
+      if (location.startsWith('/admin/devotional-series')) return 7;
       return 0; // default to dashboard
     }
 
@@ -68,6 +80,10 @@ class AdminShell extends StatelessWidget {
           context.go('/admin/moderation');
         case 5:
           context.go('/admin/prayer-moderation');
+        case 6:
+          context.go('/admin/media-review');
+        case 7:
+          context.go('/admin/devotional-series');
       }
     }
 
@@ -106,7 +122,11 @@ class AdminShell extends StatelessWidget {
     int getSelectedMobileIndex() {
       final location = GoRouterState.of(context).uri.toString();
       if (location.startsWith('/admin/members')) return 1;
-      if (location.startsWith('/admin/sermons')) return 2;
+      if (location.startsWith('/admin/sermons') ||
+          location.startsWith('/admin/media-review') ||
+          location.startsWith('/admin/devotional-series')) {
+        return 2;
+      }
       if (location.startsWith('/admin/moderation') ||
           location.startsWith('/admin/prayer-moderation')) {
         return 3;

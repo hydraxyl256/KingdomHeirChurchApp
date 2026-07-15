@@ -120,4 +120,14 @@ abstract final class RouteNames {
   static const leaderApplicationStatus = '/home/leadership/status';
   static const leaderCovenantSignature = '/home/leadership/covenant';
   static const leaderResources = '/home/leadership/resources';
+
+  // ── Devotional Series (90-Day Journey) ───────────────────────────────────
+  static const devotionalSeriesList   = '/home/devotionals/series';
+  static const devotionalSeriesDetail = '/home/devotionals/series/:seriesId';
+  static const devotionalDayReader    = '/home/devotionals/series/:seriesId/day/:dayNumber';
+
+  // ── Admin CMS Extended ────────────────────────────────────────────────────
+  static const adminMediaReview        = '/admin/media-review';
+  static const adminDevotionalSeries   = '/admin/devotional-series';
+  static const adminDevotionalDayEditor= '/admin/devotional-series/:seriesId/days/:dayNumber';
 }

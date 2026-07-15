@@ -31,24 +31,24 @@ abstract final class Env {
         'https://68fdf02e00592149ace23ef579e9f07b@o4510588022226944.ingest.de.sentry.io/4511545273942096',
   );
 
-  static const String stripePublishableKey = String.fromEnvironment(
-    'STRIPE_PUBLISHABLE_KEY',
-  );
+  // static const String stripePublishableKey = String.fromEnvironment(
+  //   'STRIPE_PUBLISHABLE_KEY',
+  // );
 
   static const String apiBibleKey = String.fromEnvironment(
-    'API_BIBLE_KEY',
-    defaultValue: 'PPcS2G1H3E2igx0Yvprab',
+    'YOU_VERSION_KEY',
+    defaultValue: '490kxH8f7HvmTZuMvG4c1Fnec6ARpWAr9gE6atPAvBnwJTNa',
   );
 
   // NOTE: In production, secret keys should be kept in your Supabase backend (.env)
   // and not exposed in the Flutter app. These are provided here for local/admin testing.
-  static const String paystackSecretKey = String.fromEnvironment(
-    'PAYSTACK_SECRET_KEY',
-  );
+  // static const String paystackSecretKey = String.fromEnvironment(
+  //   'PAYSTACK_SECRET_KEY',
+  // );
 
-  static const String flutterwaveSecretHash = String.fromEnvironment(
-    'FLUTTERWAVE_SECRET_HASH',
-  );
+  // static const String flutterwaveSecretHash = String.fromEnvironment(
+  //   'FLUTTERWAVE_SECRET_HASH',
+  // );
 
   static const bool enableAnalytics = bool.fromEnvironment(
     'ENABLE_ANALYTICS',
