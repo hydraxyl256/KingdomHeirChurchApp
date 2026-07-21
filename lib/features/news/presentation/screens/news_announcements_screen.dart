@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/features/news/presentation/providers/news_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class NewsAnnouncementsScreen extends ConsumerWidget {
   const NewsAnnouncementsScreen({super.key});
@@ -17,10 +18,12 @@ class NewsAnnouncementsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('News & Announcements'),
+        title: Text(AppLocalizations.of(context)!.newsAnnouncements),
         actions: [
           IconButton(
-              icon: const Icon(Icons.notifications_outlined), onPressed: () {},),
+            icon: const Icon(Icons.notifications_outlined),
+            onPressed: () {},
+          ),
         ],
       ),
       body: ListView(
@@ -49,33 +52,44 @@ class NewsAnnouncementsScreen extends ConsumerWidget {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.push_pin_rounded,
-                              color: AppColors.onSecondary, size: 16,),
+                          const Icon(
+                            Icons.push_pin_rounded,
+                            color: AppColors.onSecondary,
+                            size: 16,
+                          ),
                           const SizedBox(width: 4),
-                          Text('PINNED',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                  color: AppColors.onSecondary,
-                                  fontWeight: FontWeight.w700,),),
+                          Text(
+                            'PINNED',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: AppColors.onSecondary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: AppSpacing.sm),
-                      Text(pinned.title,
-                          style: theme.textTheme.titleMedium
-                              ?.copyWith(color: AppColors.onSecondary),),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(pinned.preview,
-                          style: TextStyle(
-                              color:
-                                  AppColors.onSecondary.withValues(alpha: 0.8),
-                              height: 1.5,),
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,),
+                      Text(
+                        pinned.title,
+                        style: theme.textTheme.titleMedium
+                            ?.copyWith(color: AppColors.onSecondary),
+                      ),
                       const SizedBox(height: AppSpacing.sm),
                       Text(
-                          '${pinned.publishedAt.day}/${pinned.publishedAt.month}/${pinned.publishedAt.year}',
-                          style: theme.textTheme.labelSmall?.copyWith(
-                              color: AppColors.onSecondary
-                                  .withValues(alpha: 0.6),),),
+                        pinned.preview,
+                        style: TextStyle(
+                          color: AppColors.onSecondary.withValues(alpha: 0.8),
+                          height: 1.5,
+                        ),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        '${pinned.publishedAt.day}/${pinned.publishedAt.month}/${pinned.publishedAt.year}',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: AppColors.onSecondary.withValues(alpha: 0.6),
+                        ),
+                      ),
                     ],
                   ),
                 ).animate().fadeIn(),
@@ -94,7 +108,9 @@ class NewsAnnouncementsScreen extends ConsumerWidget {
             error: (err, _) => Center(child: Text('Error: $err')),
             data: (articles) {
               if (articles.isEmpty) {
-                return const Center(child: Text('No news articles yet.'));
+                return Center(
+                    child:
+                        Text(AppLocalizations.of(context)!.noNewsArticlesYet),);
               }
               return Column(
                 children: articles.asMap().entries.map((entry) {
@@ -112,34 +128,42 @@ class NewsAnnouncementsScreen extends ConsumerWidget {
                               if (n.categoryName != null)
                                 Container(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 3,),
+                                    horizontal: 8,
+                                    vertical: 3,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: AppColors.primary
                                         .withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(4),
                                   ),
-                                  child: Text(n.categoryName!,
-                                      style: theme.textTheme.labelSmall
-                                          ?.copyWith(color: AppColors.primary),),
+                                  child: Text(
+                                    n.categoryName!,
+                                    style: theme.textTheme.labelSmall
+                                        ?.copyWith(color: AppColors.primary),
+                                  ),
                                 ),
                               const Spacer(),
                               Text(
-                                  '${n.publishedAt.day}/${n.publishedAt.month}/${n.publishedAt.year}',
-                                  style: theme.textTheme.bodySmall,),
+                                '${n.publishedAt.day}/${n.publishedAt.month}/${n.publishedAt.year}',
+                                style: theme.textTheme.bodySmall,
+                              ),
                             ],
                           ),
                           const SizedBox(height: AppSpacing.sm),
                           Text(n.title, style: theme.textTheme.titleSmall),
                           const SizedBox(height: 4),
-                          Text(n.preview,
-                              style: theme.textTheme.bodySmall,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,),
+                          Text(
+                            n.preview,
+                            style: theme.textTheme.bodySmall,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                           const SizedBox(height: AppSpacing.sm),
                           TextButton(
-                              onPressed: () =>
-                                  context.push('/news-details', extra: n),
-                              child: const Text('Read More'),),
+                            onPressed: () =>
+                                context.push('/news-details', extra: n),
+                            child: Text(AppLocalizations.of(context)!.readMore),
+                          ),
                         ],
                       ),
                     ),

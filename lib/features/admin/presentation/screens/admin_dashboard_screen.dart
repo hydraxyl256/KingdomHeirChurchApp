@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kingdom_heir/core/di/providers.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/iconography.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 final analyticsDashboardProvider =
     FutureProvider.autoDispose<Map<String, dynamic>>((ref) async {
@@ -52,19 +53,24 @@ class AdminAnalyticsDashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Analytics & Intelligence'),
+        title: Text(AppLocalizations.of(context)!.analyticsIntelligence),
         actions: [
           IconButton(
             icon: const Icon(Iconography.adminDownload),
-            tooltip: 'Export Financial Data (CSV)',
+            tooltip: AppLocalizations.of(context)!.exportFinancialDataCsv,
             onPressed: () {
               final data = asyncData.valueOrNull;
               if (data != null && data['financial'] != null) {
                 _exportToCsv(
-                    context, data['financial'] as Map<String, dynamic>,);
+                  context,
+                  data['financial'] as Map<String, dynamic>,
+                );
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('No data to export')),);
+                  SnackBar(
+                      content:
+                          Text(AppLocalizations.of(context)!.noDataToExport),),
+                );
               }
             },
           ),
@@ -88,49 +94,89 @@ class AdminAnalyticsDashboardScreen extends ConsumerWidget {
                 _buildSectionTitle(context, 'Realtime Engagement'),
                 const SizedBox(height: 16),
                 _buildKpiGrid(context, [
-                  _Kpi('Online Now', data['online'].toString(),
-                      Iconography.adminOnline, AppColors.success,),
-                  _Kpi('Daily Active (DAU)', data['dau'].toString(),
-                      Iconography.adminDaily, AppColors.info,),
-                  _Kpi('Weekly Active (WAU)', data['wau'].toString(),
-                      Iconography.adminWeekly, AppColors.tertiary,),
-                  _Kpi('Monthly Active (MAU)', data['mau'].toString(),
-                      Iconography.adminMonthly, AppColors.navyAccent,),
-                  _Kpi('Total Users', data['total_users'].toString(),
-                      Iconography.adminUsers, AppColors.warning,),
-                  _Kpi('Total Installs', data['total_installs'].toString(),
-                      Iconography.adminDownload, AppColors.goldDark,),
+                  _Kpi(
+                    'Online Now',
+                    data['online'].toString(),
+                    Iconography.adminOnline,
+                    AppColors.success,
+                  ),
+                  _Kpi(
+                    'Daily Active (DAU)',
+                    data['dau'].toString(),
+                    Iconography.adminDaily,
+                    AppColors.info,
+                  ),
+                  _Kpi(
+                    'Weekly Active (WAU)',
+                    data['wau'].toString(),
+                    Iconography.adminWeekly,
+                    AppColors.tertiary,
+                  ),
+                  _Kpi(
+                    'Monthly Active (MAU)',
+                    data['mau'].toString(),
+                    Iconography.adminMonthly,
+                    AppColors.navyAccent,
+                  ),
+                  _Kpi(
+                    'Total Users',
+                    data['total_users'].toString(),
+                    Iconography.adminUsers,
+                    AppColors.warning,
+                  ),
+                  _Kpi(
+                    'Total Installs',
+                    data['total_installs'].toString(),
+                    Iconography.adminDownload,
+                    AppColors.goldDark,
+                  ),
                 ]),
                 const SizedBox(height: 32),
                 _buildSectionTitle(context, 'Financial Analytics'),
                 const SizedBox(height: 16),
                 _buildKpiGrid(context, [
-                  _Kpi('Revenue Today', '\$${financial['donations_today']}',
-                      Iconography.adminPayments, AppColors.success,),
                   _Kpi(
-                      'Revenue (30d)',
-                      '\$${financial['donations_this_month']}',
-                      Iconography.adminBalance,
-                      AppColors.info,),
-                  _Kpi('Average Gift', '\$${financial['average_donation']}',
-                      Iconography.adminChart, AppColors.tertiary,),
+                    'Revenue Today',
+                    '\$${financial['donations_today']}',
+                    Iconography.adminPayments,
+                    AppColors.success,
+                  ),
                   _Kpi(
-                      'Top Campaign',
-                      (financial['top_giving_fund'] as String?) ?? 'N/A',
-                      Iconography.adminStar,
-                      AppColors.warning,),
+                    'Revenue (30d)',
+                    '\$${financial['donations_this_month']}',
+                    Iconography.adminBalance,
+                    AppColors.info,
+                  ),
+                  _Kpi(
+                    'Average Gift',
+                    '\$${financial['average_donation']}',
+                    Iconography.adminChart,
+                    AppColors.tertiary,
+                  ),
+                  _Kpi(
+                    'Top Campaign',
+                    (financial['top_giving_fund'] as String?) ?? 'N/A',
+                    Iconography.adminStar,
+                    AppColors.warning,
+                  ),
                 ]),
                 const SizedBox(height: 32),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                        child: _buildGeographyTable(
-                            context, data['geography'] as List<dynamic>,),),
+                      child: _buildGeographyTable(
+                        context,
+                        data['geography'] as List<dynamic>,
+                      ),
+                    ),
                     const SizedBox(width: 24),
                     Expanded(
-                        child: _buildLanguageTable(
-                            context, data['languages'] as List<dynamic>,),),
+                      child: _buildLanguageTable(
+                        context,
+                        data['languages'] as List<dynamic>,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 32),
@@ -147,13 +193,13 @@ class AdminAnalyticsDashboardScreen extends ConsumerWidget {
                           borderData: FlBorderData(show: false),
                           lineBarsData: [
                             LineChartBarData(
-                              spots: const [
-                                FlSpot(0, 3),
-                                FlSpot(1, 4),
-                                FlSpot(2, 6),
-                                FlSpot(3, 8),
-                                FlSpot(4, 12),
-                                FlSpot(5, 18),
+                              spots: [
+                                const FlSpot(0, 3),
+                                const FlSpot(1, 4),
+                                const FlSpot(2, 6),
+                                const FlSpot(3, 8),
+                                const FlSpot(4, 12),
+                                const FlSpot(5, 18),
                               ],
                               isCurved: true,
                               color: Theme.of(context).colorScheme.primary,
@@ -230,9 +276,10 @@ class AdminAnalyticsDashboardScreen extends ConsumerWidget {
                           child: Text(
                             kpi.title,
                             style: TextStyle(
-                                color: kpi.color,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13,),
+                              color: kpi.color,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -242,9 +289,10 @@ class AdminAnalyticsDashboardScreen extends ConsumerWidget {
                     Text(
                       kpi.value,
                       style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: kpi.color.withValues(alpha: 0.8),),
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: kpi.color.withValues(alpha: 0.8),
+                      ),
                     ),
                   ],
                 ),
@@ -257,7 +305,9 @@ class AdminAnalyticsDashboardScreen extends ConsumerWidget {
   }
 
   Future<void> _exportToCsv(
-      BuildContext context, Map<String, dynamic> financial,) async {
+    BuildContext context,
+    Map<String, dynamic> financial,
+  ) async {
     try {
       final rows = <List<dynamic>>[
         ['Metric', 'Value'],
@@ -280,7 +330,9 @@ class AdminAnalyticsDashboardScreen extends ConsumerWidget {
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Exported successfully!')),
+          SnackBar(
+              content:
+                  Text(AppLocalizations.of(context)!.exportedSuccessfully),),
         );
       }
     } catch (e) {
@@ -299,15 +351,17 @@ class AdminAnalyticsDashboardScreen extends ConsumerWidget {
         children: [
           const Padding(
             padding: EdgeInsets.all(16),
-            child: Text('Top Countries',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
+            child: Text(
+              'Top Countries',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
           ),
           const Divider(height: 1),
           DataTable(
-            columns: const [
-              DataColumn(label: Text('Country')),
-              DataColumn(label: Text('Users')),
-              DataColumn(label: Text('Online Now')),
+            columns: [
+              DataColumn(label: Text(AppLocalizations.of(context)!.country)),
+              DataColumn(label: Text(AppLocalizations.of(context)!.users)),
+              DataColumn(label: Text(AppLocalizations.of(context)!.onlineNow)),
             ],
             rows: geoData.map((dynamic raw) {
               final row = raw as Map<String, dynamic>;
@@ -332,21 +386,25 @@ class AdminAnalyticsDashboardScreen extends ConsumerWidget {
         children: [
           const Padding(
             padding: EdgeInsets.all(16),
-            child: Text('Language Demographics',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
+            child: Text(
+              'Language Demographics',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
           ),
           const Divider(height: 1),
           DataTable(
-            columns: const [
-              DataColumn(label: Text('Language')),
-              DataColumn(label: Text('Users')),
+            columns: [
+              DataColumn(
+                  label: Text(AppLocalizations.of(context)!.settingsLanguage),),
+              DataColumn(label: Text(AppLocalizations.of(context)!.users)),
             ],
             rows: langData.map((dynamic raw) {
               final row = raw as Map<String, dynamic>;
               return DataRow(
                 cells: [
                   DataCell(
-                      Text(row['preferred_language'].toString().toUpperCase()),),
+                    Text(row['preferred_language'].toString().toUpperCase()),
+                  ),
                   DataCell(Text(row['users_count'].toString())),
                 ],
               );

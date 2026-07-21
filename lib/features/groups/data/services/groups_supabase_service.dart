@@ -70,7 +70,11 @@ class GroupsSupabaseService {
       final user = _client.auth.currentUser;
       if (user == null) return left('User not authenticated');
 
-      await _client.from('group_members').delete().eq('group_id', groupId).eq('user_id', user.id);
+      await _client
+          .from('group_members')
+          .delete()
+          .eq('group_id', groupId)
+          .eq('user_id', user.id);
       return right(null);
     } catch (e) {
       return left(e.toString());
@@ -357,7 +361,11 @@ class GroupsSupabaseService {
     required String userId,
   }) async {
     try {
-      await _client.from('group_members').delete().eq('group_id', groupId).eq('user_id', userId);
+      await _client
+          .from('group_members')
+          .delete()
+          .eq('group_id', groupId)
+          .eq('user_id', userId);
       return right(null);
     } catch (_) {
       return right(null);
@@ -377,7 +385,11 @@ class GroupsSupabaseService {
           'user_id': user.id,
         });
       } else {
-        await _client.from('group_event_rsvps').delete().eq('event_id', eventId).eq('user_id', user.id);
+        await _client
+            .from('group_event_rsvps')
+            .delete()
+            .eq('event_id', eventId)
+            .eq('user_id', user.id);
       }
       return right(null);
     } catch (_) {

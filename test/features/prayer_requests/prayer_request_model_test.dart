@@ -201,7 +201,8 @@ void main() {
       expect(entity.displayName, 'Anonymous');
     });
 
-    test('non-anonymous row: displayName from view, falls back to authorName', () {
+    test('non-anonymous row: displayName from view, falls back to authorName',
+        () {
       final fromView = PrayerRequestModel.fromJson({
         'id': '1',
         'user_id': '2',

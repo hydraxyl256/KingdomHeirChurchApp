@@ -43,7 +43,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/more_section_theme.dart';
@@ -87,8 +86,8 @@ class MoreScreen extends ConsumerWidget {
   // ── LOADING ────────────────────────────────────────────────────────
   // One `SliverToBoxAdapter` per skeleton section — never a bare
   // `ListView` inside a sliver (would throw on unbounded height).
-  List<Widget> _loadingSlivers() => const [
-        SliverToBoxAdapter(child: MoreScreenSkeleton()),
+  List<Widget> _loadingSlivers() => [
+        const SliverToBoxAdapter(child: MoreScreenSkeleton()),
       ];
 
   // ── ERROR ──────────────────────────────────────────────────────────
@@ -100,7 +99,7 @@ class MoreScreen extends ConsumerWidget {
         hasScrollBody: false,
         child: Center(
           child: AppErrorWidget(
-            message: "Couldn't load the Kingdom Center. $err",
+            message: r"Couldn't load the Kingdom Center. $err",
             onRetry: () => ref.invalidate(moreDataProvider),
           ),
         ),

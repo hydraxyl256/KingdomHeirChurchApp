@@ -137,7 +137,14 @@ class ServiceStatus {
 // Daily Spiritual Journey
 // ─────────────────────────────────────────────────────────────────────────────
 
-enum SpiritualTaskKind { scripture, devotional, prayer, reflection, worship, journal }
+enum SpiritualTaskKind {
+  scripture,
+  devotional,
+  prayer,
+  reflection,
+  worship,
+  journal
+}
 
 @immutable
 class SpiritualTask {

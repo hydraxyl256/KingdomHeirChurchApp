@@ -6,13 +6,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/router/route_names.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/motion.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class QuickActionsRow extends StatelessWidget {
   const QuickActionsRow({super.key});
@@ -41,9 +41,9 @@ class QuickActionsRow extends StatelessWidget {
             tone: _Tone.outlined,
             onTap: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content:
-                      Text('Group creation coming soon — talk to your leader'),
+                SnackBar(
+                  content: Text(AppLocalizations.of(context)!
+                      .groupCreationComingSoonTalkTo,),
                 ),
               );
             },
@@ -57,8 +57,9 @@ class QuickActionsRow extends StatelessWidget {
             tone: _Tone.outlined,
             onTap: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Tap a group to share an invite link'),
+                SnackBar(
+                  content:
+                      Text(AppLocalizations.of(context)!.tapAGroupToShareAn),
                 ),
               );
             },

@@ -11,13 +11,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
-
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/features/sermons/data/services/audio_player_service.dart';
 import 'package:kingdom_heir/features/sermons/presentation/providers/sermons_provider.dart';
 import 'package:kingdom_heir/features/sermons/presentation/widgets/player/playback_speed_picker.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class PremiumVideoControls extends ConsumerStatefulWidget {
   const PremiumVideoControls({
@@ -137,11 +137,12 @@ class _TopBar extends StatelessWidget {
             ),
           ),
           IconButton(
-            tooltip: 'Picture-in-picture',
+            tooltip: AppLocalizations.of(context)!.pictureinpicture,
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Picture-in-picture — coming soon'),
+                SnackBar(
+                  content: Text(
+                      AppLocalizations.of(context)!.pictureinpictureComingSoon,),
                   behavior: SnackBarBehavior.floating,
                 ),
               );
@@ -152,11 +153,12 @@ class _TopBar extends StatelessWidget {
             ),
           ),
           IconButton(
-            tooltip: 'Captions',
+            tooltip: AppLocalizations.of(context)!.captions,
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Captions — coming soon'),
+                SnackBar(
+                  content:
+                      Text(AppLocalizations.of(context)!.captionsComingSoon),
                   behavior: SnackBarBehavior.floating,
                 ),
               );
@@ -167,7 +169,7 @@ class _TopBar extends StatelessWidget {
             ),
           ),
           IconButton(
-            tooltip: 'Speed',
+            tooltip: AppLocalizations.of(context)!.speed,
             onPressed: () => showPlaybackSpeedPicker(context),
             icon: const Icon(
               Icons.speed_rounded,
@@ -175,11 +177,11 @@ class _TopBar extends StatelessWidget {
             ),
           ),
           IconButton(
-            tooltip: 'Cast',
+            tooltip: AppLocalizations.of(context)!.cast,
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Cast — coming soon'),
+                SnackBar(
+                  content: Text(AppLocalizations.of(context)!.castComingSoon),
                   behavior: SnackBarBehavior.floating,
                 ),
               );
@@ -203,15 +205,17 @@ class _TopBar extends StatelessWidget {
                 ),
               );
             },
-            itemBuilder: (context) => const [
-              PopupMenuItem(value: 'Quality', child: Text('Quality')),
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                  value: 'Quality',
+                  child: Text(AppLocalizations.of(context)!.quality),),
               PopupMenuItem(
                 value: 'Sleep timer',
-                child: Text('Sleep timer'),
+                child: Text(AppLocalizations.of(context)!.sleepTimer),
               ),
               PopupMenuItem(
                 value: 'Report a problem',
-                child: Text('Report a problem'),
+                child: Text(AppLocalizations.of(context)!.reportAProblem),
               ),
             ],
           ),

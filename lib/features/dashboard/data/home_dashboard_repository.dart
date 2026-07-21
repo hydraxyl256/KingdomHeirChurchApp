@@ -54,11 +54,12 @@ class HomeDashboardRepository {
         () async {
           final uid = _userId;
           if (uid == null) return HomeDashboardMock.greeting(_rng);
-          final dynamic data = await _client
-              .rpc<dynamic>('get_dashboard_greeting', params: <String, dynamic>{
-                'p_user_id': uid,
-              },)
-              .single();
+          final dynamic data = await _client.rpc<dynamic>(
+            'get_dashboard_greeting',
+            params: <String, dynamic>{
+              'p_user_id': uid,
+            },
+          ).single();
           return DashboardGreeting(
             firstName: (data['first_name'] as String?) ?? 'Friend',
             moment: resolveGreetingMoment(DateTime.now()),
@@ -75,16 +76,19 @@ class HomeDashboardRepository {
   Future<List<ScriptureCard>> fetchScriptureRoster() => _guardList(
         'fetchScriptureRoster',
         () async {
-          final dynamic rows = await _client.rpc<dynamic>('get_dashboard_scripture');
+          final dynamic rows =
+              await _client.rpc<dynamic>('get_dashboard_scripture');
           final list = rows as List<dynamic>;
           if (list.isEmpty) return HomeDashboardMock.scriptureRoster;
           return list
-              .map((dynamic row) => ScriptureCard(
-                    verseText: row['verse_text'] as String,
-                    reference: row['reference'] as String,
-                    translation: row['translation'] as String,
-                    isBookmarked: row['is_bookmarked'] as bool? ?? false,
-                  ),)
+              .map(
+                (dynamic row) => ScriptureCard(
+                  verseText: row['verse_text'] as String,
+                  reference: row['reference'] as String,
+                  translation: row['translation'] as String,
+                  isBookmarked: row['is_bookmarked'] as bool? ?? false,
+                ),
+              )
               .toList(growable: false);
         },
         HomeDashboardMock.scriptureRoster,
@@ -111,16 +115,17 @@ class HomeDashboardRepository {
           final list = rows as List<dynamic>;
           if (list.isEmpty) return HomeDashboardMock.continueCards;
           return list
-              .map((dynamic row) => ContinueCard(
-                    id: row['content_id'] as String,
-                    kind: _kindFromString(row['kind'] as String),
-                    title: row['title'] as String,
-                    subtitle: row['subtitle'] as String? ?? '',
-                    progress:
-                        (row['progress'] as num?)?.toDouble() ?? 0,
-                    thumbnailUrl: row['thumbnail_url'] as String?,
-                    durationLabel: row['duration_label'] as String?,
-                  ),)
+              .map(
+                (dynamic row) => ContinueCard(
+                  id: row['content_id'] as String,
+                  kind: _kindFromString(row['kind'] as String),
+                  title: row['title'] as String,
+                  subtitle: row['subtitle'] as String? ?? '',
+                  progress: (row['progress'] as num?)?.toDouble() ?? 0,
+                  thumbnailUrl: row['thumbnail_url'] as String?,
+                  durationLabel: row['duration_label'] as String?,
+                ),
+              )
               .toList(growable: false);
         },
         HomeDashboardMock.continueCards,
@@ -131,9 +136,8 @@ class HomeDashboardRepository {
   Future<ServiceStatus> fetchServiceStatus() => _guard(
         'fetchServiceStatus',
         () async {
-          final dynamic data = await _client
-              .rpc<dynamic>('get_dashboard_service')
-              .maybeSingle();
+          final dynamic data =
+              await _client.rpc<dynamic>('get_dashboard_service').maybeSingle();
           if (data == null) return HomeDashboardMock.serviceStatus(_rng);
           return ServiceStatus(
             isLive: data['is_live'] as bool? ?? false,
@@ -169,11 +173,13 @@ class HomeDashboardRepository {
           return DailyJourney(
             streakDays: HomeDashboardMock.dailyJourney.streakDays,
             tasks: HomeDashboardMock.dailyJourney.tasks
-                .map((task) => SpiritualTask(
-                      kind: task.kind,
-                      isCompleted: completed.contains(task.kind),
-                      label: task.label,
-                    ),)
+                .map(
+                  (task) => SpiritualTask(
+                    kind: task.kind,
+                    isCompleted: completed.contains(task.kind),
+                    label: task.label,
+                  ),
+                )
                 .toList(growable: false),
           );
         },
@@ -211,22 +217,25 @@ class HomeDashboardRepository {
   Future<List<TodayEvent>> fetchTodayEvents() => _guardList(
         'fetchTodayEvents',
         () async {
-          final dynamic rows = await _client.rpc<dynamic>('get_dashboard_events');
+          final dynamic rows =
+              await _client.rpc<dynamic>('get_dashboard_events');
           final list = rows as List<dynamic>;
           if (list.isEmpty) return HomeDashboardMock.todayEvents();
           return list
-              .map((dynamic row) => TodayEvent(
-                    id: row['id'] as String,
-                    title: row['title'] as String,
-                    startsAt: DateTime.parse(row['starts_at'] as String),
-                    locationLabel: row['location_label'] as String? ?? '',
-                    isOnline: row['is_online'] as bool? ?? false,
-                    joinUrl: row['join_url'] as String?,
-                    leaderName: row['leader_name'] as String?,
-                    category: _categoryFromString(
-                      row['category'] as String?,
-                    ),
-                  ),)
+              .map(
+                (dynamic row) => TodayEvent(
+                  id: row['id'] as String,
+                  title: row['title'] as String,
+                  startsAt: DateTime.parse(row['starts_at'] as String),
+                  locationLabel: row['location_label'] as String? ?? '',
+                  isOnline: row['is_online'] as bool? ?? false,
+                  joinUrl: row['join_url'] as String?,
+                  leaderName: row['leader_name'] as String?,
+                  category: _categoryFromString(
+                    row['category'] as String?,
+                  ),
+                ),
+              )
               .toList(growable: false);
         },
         HomeDashboardMock.todayEvents(),
@@ -249,13 +258,15 @@ class HomeDashboardRepository {
             requests: list.isEmpty
                 ? HomeDashboardMock.prayerCorner.requests
                 : list
-                    .map((dynamic row) => PrayerRequest(
-                          id: row['id'] as String,
-                          authorName: row['author_name'] as String,
-                          preview: row['preview'] as String,
-                          avatarUrl: row['avatar_url'] as String?,
-                          prayerCount: row['pray_count'] as int? ?? 0,
-                        ),)
+                    .map(
+                      (dynamic row) => PrayerRequest(
+                        id: row['id'] as String,
+                        authorName: row['author_name'] as String,
+                        preview: row['preview'] as String,
+                        avatarUrl: row['avatar_url'] as String?,
+                        prayerCount: row['pray_count'] as int? ?? 0,
+                      ),
+                    )
                     .toList(growable: false),
           );
         },
@@ -284,11 +295,12 @@ class HomeDashboardRepository {
         () async {
           final uid = _userId;
           if (uid == null) return HomeDashboardMock.communityHighlight;
-          final dynamic data = await _client
-              .rpc<dynamic>('get_dashboard_community', params: <String, dynamic>{
-                'p_user_id': uid,
-              },)
-              .maybeSingle();
+          final dynamic data = await _client.rpc<dynamic>(
+            'get_dashboard_community',
+            params: <String, dynamic>{
+              'p_user_id': uid,
+            },
+          ).maybeSingle();
           if (data == null) return HomeDashboardMock.communityHighlight;
           return CommunityHighlight(
             unreadGroupMessages: data['unread_group_messages'] as int? ?? 0,
@@ -314,18 +326,20 @@ class HomeDashboardRepository {
           final list = rows as List<dynamic>;
           if (list.isEmpty) return HomeDashboardMock.watchCards;
           return list
-              .map((dynamic row) => WatchCard(
-                    id: row['content_id'] as String,
-                    kind: row['kind'] == 'podcast'
-                        ? WatchKind.podcast
-                        : WatchKind.sermon,
-                    title: row['title'] as String,
-                    speakerName: row['subtitle'] as String? ?? '',
-                    progress: (row['progress'] as num?)?.toDouble() ?? 0,
-                    thumbnailUrl: row['thumbnail_url'] as String?,
-                    durationLabel: row['duration_label'] as String?,
-                    isDownloaded: row['is_downloaded'] as bool? ?? false,
-                  ),)
+              .map(
+                (dynamic row) => WatchCard(
+                  id: row['content_id'] as String,
+                  kind: row['kind'] == 'podcast'
+                      ? WatchKind.podcast
+                      : WatchKind.sermon,
+                  title: row['title'] as String,
+                  speakerName: row['subtitle'] as String? ?? '',
+                  progress: (row['progress'] as num?)?.toDouble() ?? 0,
+                  thumbnailUrl: row['thumbnail_url'] as String?,
+                  durationLabel: row['duration_label'] as String?,
+                  isDownloaded: row['is_downloaded'] as bool? ?? false,
+                ),
+              )
               .toList(growable: false);
         },
         HomeDashboardMock.watchCards,
@@ -405,10 +419,12 @@ class HomeDashboardRepository {
     try {
       return await live();
     } catch (e, st) {
-      _log.w('HomeDashboardRepository.$label live fetch failed; '
-          'using offline fallback',
-          error: e,
-          stackTrace: st,);
+      _log.w(
+        'HomeDashboardRepository.$label live fetch failed; '
+        'using offline fallback',
+        error: e,
+        stackTrace: st,
+      );
       return fallback();
     }
   }

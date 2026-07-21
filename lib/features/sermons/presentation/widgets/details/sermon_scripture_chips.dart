@@ -81,8 +81,11 @@ class _ScriptureChip extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.menu_book_rounded,
-                  size: 14, color: AppColors.gold,),
+              const Icon(
+                Icons.menu_book_rounded,
+                size: 14,
+                color: AppColors.gold,
+              ),
               const SizedBox(width: 4),
               Text(
                 label,

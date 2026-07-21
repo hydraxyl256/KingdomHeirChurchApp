@@ -18,6 +18,7 @@ import 'package:kingdom_heir/features/admin/presentation/screens/admin_moderatio
 import 'package:kingdom_heir/features/admin/presentation/screens/admin_prayer_moderation_screen.dart';
 import 'package:kingdom_heir/features/admin/presentation/screens/admin_sermons_screen.dart';
 import 'package:kingdom_heir/features/admin/presentation/screens/admin_shell.dart';
+import 'package:kingdom_heir/features/admin/presentation/screens/admin_tools_screen.dart';
 import 'package:kingdom_heir/features/auth/presentation/providers/auth_provider.dart';
 import 'package:kingdom_heir/features/auth/presentation/screens/auth_callback_screen.dart';
 import 'package:kingdom_heir/features/auth/presentation/screens/check_your_email_screen.dart';
@@ -135,15 +136,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         return RouteNames.roleSelection;
       }
 
-      if (isLoggedIn && onboardingDone && roleSelected && (isAtAuth || isAtStartHere)) {
+      if (isLoggedIn &&
+          onboardingDone &&
+          roleSelected &&
+          (isAtAuth || isAtStartHere)) {
         return RouteNames.dashboard;
       }
 
-      // Admin Guard
+      // Admin Guard — allows admin, super_admin, and pastor roles.
       if (isAtAdmin) {
         final role = localStorage.getString(LocalStorageKeys.userRole);
-        if (role != 'admin') {
-          return RouteNames.dashboard; // Kick out unauthorized users
+        const allowedRoles = {'admin', 'super_admin', 'pastor'};
+        if (role == null || !allowedRoles.contains(role)) {
+          return RouteNames.dashboard;
         }
       }
 
@@ -233,7 +238,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
 
       // ── Deep-Link Auth Callback ──────────────────────────────────────────
-      // Reached when the user taps the verification link in their email but Supabase 
+      // Reached when the user taps the verification link in their email but Supabase
       // returns an error (e.g. link expired, invalid).
       GoRoute(
         path: RouteNames.authCallback,
@@ -509,7 +514,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'day/:dayNumber',
                     builder: (_, state) => DevotionalDayReaderScreen(
-                      seriesId:  state.pathParameters['seriesId']!,
+                      seriesId: state.pathParameters['seriesId']!,
                       dayNumber: int.parse(
                         state.pathParameters['dayNumber'] ?? '1',
                       ),
@@ -696,11 +701,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/admin/devotional-series/:seriesId/days/:dayNumber',
             builder: (_, state) => AdminDevotionalDayEditorScreen(
-              seriesId:  state.pathParameters['seriesId']!,
+              seriesId: state.pathParameters['seriesId']!,
               dayNumber: int.parse(
                 state.pathParameters['dayNumber'] ?? '1',
               ),
             ),
+          ),
+          // ── Admin Utility Tools (temporary, pre-CMS) ───────────────
+          GoRoute(
+            path: RouteNames.adminTools,
+            builder: (_, __) => const AdminToolsScreen(),
           ),
         ],
       ),

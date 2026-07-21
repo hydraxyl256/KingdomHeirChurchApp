@@ -9,6 +9,7 @@ import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/features/auth/presentation/providers/auth_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 /// Handles errors during the Supabase Auth deep link callback.
@@ -40,7 +41,8 @@ class _AuthCallbackScreenState extends ConsumerState<AuthCallbackScreen> {
     super.initState();
     // Retrieve the email we stored during signup/password reset
     final storage = ref.read(localStorageServiceProvider);
-    _pendingEmail = storage.getString(LocalStorageKeys.pendingVerificationEmail);
+    _pendingEmail =
+        storage.getString(LocalStorageKeys.pendingVerificationEmail);
   }
 
   Future<void> _resend() async {
@@ -57,7 +59,8 @@ class _AuthCallbackScreenState extends ConsumerState<AuthCallbackScreen> {
           .resendVerificationEmail(_pendingEmail!);
       if (!mounted) return;
       setState(() {
-        _resendFeedback = 'A new verification link has been sent to your email.';
+        _resendFeedback =
+            'A new verification link has been sent to your email.';
       });
     } on supabase.AuthException catch (e) {
       if (!mounted) return;
@@ -76,13 +79,13 @@ class _AuthCallbackScreenState extends ConsumerState<AuthCallbackScreen> {
   @override
   Widget build(BuildContext context) {
     // Polished default error
-    final displayError = widget.errorDescription ?? 
+    final displayError = widget.errorDescription ??
         'This verification link has expired or is invalid. Please request a new one.';
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
-        title: const Text('Authentication Error'),
+        title: Text(AppLocalizations.of(context)!.authenticationError),
         centerTitle: true,
       ),
       body: Center(
@@ -97,7 +100,8 @@ class _AuthCallbackScreenState extends ConsumerState<AuthCallbackScreen> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: AppColors.error.withValues(alpha: 0.1),
-                  border: Border.all(color: AppColors.error.withValues(alpha: 0.5)),
+                  border:
+                      Border.all(color: AppColors.error.withValues(alpha: 0.5)),
                 ),
                 child: const Icon(
                   Icons.error_outline_rounded,
@@ -123,7 +127,6 @@ class _AuthCallbackScreenState extends ConsumerState<AuthCallbackScreen> {
                 ),
               ),
               const SizedBox(height: AppSpacing.xxl),
-              
               if (_pendingEmail != null && _pendingEmail!.isNotEmpty) ...[
                 Text(
                   'Send a new link to:\n$_pendingEmail',
@@ -147,7 +150,8 @@ class _AuthCallbackScreenState extends ConsumerState<AuthCallbackScreen> {
                               color: AppColors.ink,
                             ),
                           )
-                        : const Icon(Icons.refresh_rounded, color: AppColors.ink),
+                        : const Icon(Icons.refresh_rounded,
+                            color: AppColors.ink,),
                     label: Text(
                       _isResending ? 'Sending...' : 'Resend Link',
                       style: AppTypography.textTheme.labelLarge?.copyWith(
@@ -175,14 +179,14 @@ class _AuthCallbackScreenState extends ConsumerState<AuthCallbackScreen> {
                 ],
                 const SizedBox(height: AppSpacing.lg),
               ],
-
               SizedBox(
                 width: double.infinity,
                 height: AppSpacing.buttonHeight,
                 child: OutlinedButton(
                   onPressed: () => context.go(RouteNames.login),
                   style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+                    side:
+                        BorderSide(color: Colors.white.withValues(alpha: 0.3)),
                     shape: const RoundedRectangleBorder(
                       borderRadius: AppRadius.brFull,
                     ),

@@ -147,9 +147,11 @@ Future<List<Override>> _testOverrides() async {
   return [
     sharedPreferencesProvider.overrideWithValue(prefs),
     greetingProvider.overrideWith((ref) async => stub.greeting),
-    scriptureProvider.overrideWith((ref) async => <ScriptureCard>[
-          stub.scripture,
-        ],),
+    scriptureProvider.overrideWith(
+      (ref) async => <ScriptureCard>[
+        stub.scripture,
+      ],
+    ),
     continueCardsProvider.overrideWith((ref) async => stub.continueCards),
     serviceStatusProvider.overrideWith((ref) async => stub.serviceStatus),
     journeyProvider.overrideWith((ref) async => stub.dailyJourney),

@@ -68,8 +68,11 @@ class AppButton extends StatelessWidget {
             ? Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(icon,
-                      size: AppSpacing.iconSm, color: _foreground(scheme),),
+                  Icon(
+                    icon,
+                    size: AppSpacing.iconSm,
+                    color: _foreground(scheme),
+                  ),
                   const SizedBox(width: AppSpacing.sm),
                   // Wrap the label in Flexible + ellipsis so an
                   // icon+label row never overflows a narrow parent.
@@ -90,11 +93,13 @@ class AppButton extends StatelessWidget {
                   ),
                 ],
               )
-            : Text(label,
+            : Text(
+                label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 softWrap: false,
-                style: effectiveStyle?.copyWith(color: _foreground(scheme)),);
+                style: effectiveStyle?.copyWith(color: _foreground(scheme)),
+              );
 
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(AppSpacing.radiusFull),

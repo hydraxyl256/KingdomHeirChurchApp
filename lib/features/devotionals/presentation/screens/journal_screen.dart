@@ -18,7 +18,7 @@ import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/features/devotionals/domain/entities/devotional_journey_models.dart';
 import 'package:kingdom_heir/features/devotionals/presentation/providers/devotional_journey_provider.dart';
 import 'package:kingdom_heir/features/devotionals/presentation/providers/devotionals_provider.dart';
-
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class JournalScreen extends ConsumerStatefulWidget {
   const JournalScreen({
@@ -44,7 +44,7 @@ class _JournalScreenState extends ConsumerState<JournalScreen> {
     super.initState();
     final draft = ref.read(devotionalStreakServiceProvider).getDraft() ?? '';
     _bodyController = TextEditingController(text: draft)
-        ..addListener(_onTextChange);
+      ..addListener(_onTextChange);
   }
 
   void _onTextChange() {
@@ -104,8 +104,10 @@ class _JournalScreenState extends ConsumerState<JournalScreen> {
             behavior: SnackBarBehavior.floating,
             backgroundColor: AppColors.success,
             shape: RoundedRectangleBorder(borderRadius: AppRadius.brFull),
-            content: Text('Journal entry saved!',
-                style: TextStyle(color: Colors.white),),
+            content: Text(
+              'Journal entry saved!',
+              style: TextStyle(color: Colors.white),
+            ),
             duration: Duration(milliseconds: 1800),
           ),
         );
@@ -164,8 +166,11 @@ class _JournalScreenState extends ConsumerState<JournalScreen> {
                     ? Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.cloud_done_rounded,
-                              color: AppColors.success, size: 14,),
+                          const Icon(
+                            Icons.cloud_done_rounded,
+                            color: AppColors.success,
+                            size: 14,
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             'Saved',
@@ -220,7 +225,9 @@ class _JournalScreenState extends ConsumerState<JournalScreen> {
                       color: AppColors.navy,
                       fontWeight: FontWeight.w800,
                     ),
-                  ).animate().fadeIn(delay: 80.ms, duration: AppMotion.standard),
+                  )
+                      .animate()
+                      .fadeIn(delay: 80.ms, duration: AppMotion.standard),
 
                   const SizedBox(height: AppSpacing.xl),
 
@@ -229,7 +236,9 @@ class _JournalScreenState extends ConsumerState<JournalScreen> {
                     selected: mood,
                     onSelect: (m) =>
                         ref.read(journalMoodProvider.notifier).state = m,
-                  ).animate().fadeIn(delay: 150.ms, duration: AppMotion.standard),
+                  )
+                      .animate()
+                      .fadeIn(delay: 150.ms, duration: AppMotion.standard),
 
                   const SizedBox(height: AppSpacing.lg),
 
@@ -245,7 +254,9 @@ class _JournalScreenState extends ConsumerState<JournalScreen> {
                       }
                       ref.read(journalTagsProvider.notifier).state = current;
                     },
-                  ).animate().fadeIn(delay: 220.ms, duration: AppMotion.standard),
+                  )
+                      .animate()
+                      .fadeIn(delay: 220.ms, duration: AppMotion.standard),
 
                   const SizedBox(height: AppSpacing.xl),
 
@@ -277,8 +288,8 @@ class _JournalScreenState extends ConsumerState<JournalScreen> {
                         letterSpacing: 0.1,
                       ),
                       decoration: InputDecoration(
-                        hintText:
-                            'What is God speaking to your heart today? Write freely…',
+                        hintText: AppLocalizations.of(context)!
+                            .whatIsGodSpeakingToYour,
                         hintStyle: AppTypography.textTheme.bodyLarge?.copyWith(
                           color: AppColors.textDisabled,
                           height: 1.75,
@@ -384,9 +395,8 @@ class _MoodSelector extends StatelessWidget {
                       vertical: AppSpacing.xs,
                     ),
                     decoration: BoxDecoration(
-                      color: isSelected
-                          ? AppColors.goldContainer
-                          : Colors.white,
+                      color:
+                          isSelected ? AppColors.goldContainer : Colors.white,
                       borderRadius: AppRadius.brFull,
                       border: Border.all(
                         color: isSelected
@@ -398,8 +408,10 @@ class _MoodSelector extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(m.emoji,
-                            style: const TextStyle(fontSize: 16),),
+                        Text(
+                          m.emoji,
+                          style: const TextStyle(fontSize: 16),
+                        ),
                         const SizedBox(width: 6),
                         Text(
                           m.label,
@@ -407,9 +419,8 @@ class _MoodSelector extends StatelessWidget {
                             color: isSelected
                                 ? AppColors.goldDark
                                 : AppColors.textSecondary,
-                            fontWeight: isSelected
-                                ? FontWeight.w700
-                                : FontWeight.w500,
+                            fontWeight:
+                                isSelected ? FontWeight.w700 : FontWeight.w500,
                           ),
                         ),
                       ],
@@ -516,8 +527,10 @@ class _JournalEntryCard extends StatelessWidget {
                 ),
                 const Spacer(),
                 if (entry.mood != null)
-                  Text(entry.mood!.emoji,
-                      style: const TextStyle(fontSize: 16),),
+                  Text(
+                    entry.mood!.emoji,
+                    style: const TextStyle(fontSize: 16),
+                  ),
               ],
             ),
             const SizedBox(height: AppSpacing.sm),

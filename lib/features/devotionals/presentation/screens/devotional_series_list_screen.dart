@@ -14,6 +14,7 @@ import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/features/devotionals/domain/entities/devotional_series_models.dart';
 import 'package:kingdom_heir/features/devotionals/presentation/providers/devotional_series_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DevotionalSeriesListScreen extends ConsumerWidget {
@@ -26,7 +27,7 @@ class DevotionalSeriesListScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Devotional Series'),
+        title: Text(AppLocalizations.of(context)!.devotionalSeries),
         backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
       ),
@@ -59,11 +60,12 @@ class _SeriesCard extends ConsumerWidget {
 
   Future<void> _launchAmazon(BuildContext context) async {
     final uri = Uri.parse(series.amazonPurchaseUrl ?? _amazonUrl);
-    final launched =
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!launched && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not open Amazon. Please try again.')),
+        SnackBar(
+            content: Text(
+                AppLocalizations.of(context)!.couldNotOpenAmazonPleaseTry,),),
       );
     }
   }
@@ -111,16 +113,22 @@ class _SeriesCard extends ConsumerWidget {
                     height: 160,
                     color: AppColors.navyMid,
                     child: const Center(
-                      child: Icon(Icons.menu_book_rounded,
-                          color: AppColors.gold, size: 40,),
+                      child: Icon(
+                        Icons.menu_book_rounded,
+                        color: AppColors.gold,
+                        size: 40,
+                      ),
                     ),
                   ),
                   errorWidget: (_, __, ___) => Container(
                     height: 160,
                     color: AppColors.navyMid,
                     child: const Center(
-                      child: Icon(Icons.menu_book_rounded,
-                          color: AppColors.gold, size: 40,),
+                      child: Icon(
+                        Icons.menu_book_rounded,
+                        color: AppColors.gold,
+                        size: 40,
+                      ),
                     ),
                   ),
                 ),
@@ -137,8 +145,11 @@ class _SeriesCard extends ConsumerWidget {
                   ),
                 ),
                 child: const Center(
-                  child: Icon(Icons.menu_book_rounded,
-                      color: AppColors.gold, size: 48,),
+                  child: Icon(
+                    Icons.menu_book_rounded,
+                    color: AppColors.gold,
+                    size: 48,
+                  ),
                 ),
               ),
 
@@ -151,7 +162,9 @@ class _SeriesCard extends ConsumerWidget {
                   if (series.isPrimaryChallengesSeries) ...[
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 3,),
+                        horizontal: 10,
+                        vertical: 3,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.gold,
                         borderRadius:
@@ -195,8 +208,8 @@ class _SeriesCard extends ConsumerWidget {
                       overflow: TextOverflow.ellipsis,
                       style: AppTypography.textTheme.bodySmall?.copyWith(
                         height: 1.5,
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.75),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.75),
                       ),
                     ),
                   ],
@@ -205,35 +218,36 @@ class _SeriesCard extends ConsumerWidget {
 
                   // ── Progress bar ────────────────────────────────
                   progressAsync.whenData((progress) {
-                    if (progress == null) return const SizedBox.shrink();
-                    final fraction =
-                        progress.completedDays.length / series.totalDays;
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${progress.completedDays.length} / ${series.totalDays} days',
-                          style: AppTypography.textTheme.labelSmall?.copyWith(
-                            color: AppColors.gold,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        LinearProgressIndicator(
-                          value: fraction.clamp(0.0, 1.0),
-                          backgroundColor:
-                              theme.colorScheme.surfaceContainerHigh,
-                          valueColor: const AlwaysStoppedAnimation<Color>(
-                            AppColors.gold,
-                          ),
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusFull,
-                          ),
-                          minHeight: 4,
-                        ),
-                      ],
-                    );
-                  }).value ??
+                        if (progress == null) return const SizedBox.shrink();
+                        final fraction =
+                            progress.completedDays.length / series.totalDays;
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${progress.completedDays.length} / ${series.totalDays} days',
+                              style:
+                                  AppTypography.textTheme.labelSmall?.copyWith(
+                                color: AppColors.gold,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.xs),
+                            LinearProgressIndicator(
+                              value: fraction.clamp(0.0, 1.0),
+                              backgroundColor:
+                                  theme.colorScheme.surfaceContainerHigh,
+                              valueColor: const AlwaysStoppedAnimation<Color>(
+                                AppColors.gold,
+                              ),
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusFull,
+                              ),
+                              minHeight: 4,
+                            ),
+                          ],
+                        );
+                      }).value ??
                       Text(
                         '${series.totalDays} days',
                         style: AppTypography.textTheme.labelSmall?.copyWith(
@@ -262,15 +276,18 @@ class _SeriesCard extends ConsumerWidget {
                             ),
                             elevation: 0,
                           ),
-                          child: const Text('View Journey'),
+                          child:
+                              Text(AppLocalizations.of(context)!.viewJourney),
                         ),
                       ),
                       const SizedBox(width: AppSpacing.sm),
                       OutlinedButton.icon(
                         onPressed: () => _launchAmazon(context),
-                        icon: const Icon(Icons.shopping_cart_outlined,
-                            size: 16,),
-                        label: const Text('Buy Book'),
+                        icon: const Icon(
+                          Icons.shopping_cart_outlined,
+                          size: 16,
+                        ),
+                        label: Text(AppLocalizations.of(context)!.buyBook),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: theme.colorScheme.onSurface,
                           side: BorderSide(
@@ -308,14 +325,19 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.menu_book_rounded,
-                size: 56, color: AppColors.gold,),
+            const Icon(
+              Icons.menu_book_rounded,
+              size: 56,
+              color: AppColors.gold,
+            ),
             const SizedBox(height: AppSpacing.md),
             Text(
               'No devotional series available yet.',
               style: AppTypography.textTheme.bodyMedium?.copyWith(
-                color:
-                    Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.6),
               ),
               textAlign: TextAlign.center,
             ),
@@ -338,7 +360,8 @@ class _ErrorState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.cloud_off_rounded, size: 48, color: AppColors.error),
+            const Icon(Icons.cloud_off_rounded,
+                size: 48, color: AppColors.error,),
             const SizedBox(height: AppSpacing.md),
             Text(
               'Could not load series.\n$message',

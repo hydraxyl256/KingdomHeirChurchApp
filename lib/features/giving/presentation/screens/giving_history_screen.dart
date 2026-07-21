@@ -6,6 +6,7 @@ import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/widgets/app_empty_state.dart';
 import 'package:kingdom_heir/features/giving/presentation/providers/giving_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class GivingHistoryScreen extends ConsumerWidget {
   const GivingHistoryScreen({super.key});
@@ -17,12 +18,12 @@ class GivingHistoryScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Giving History'),
+        title: Text(AppLocalizations.of(context)!.givingHistory),
         actions: [
           TextButton.icon(
             onPressed: () {},
             icon: const Icon(Icons.download_rounded),
-            label: const Text('Export'),
+            label: Text(AppLocalizations.of(context)!.export),
           ),
         ],
       ),
@@ -61,7 +62,7 @@ class GivingHistoryScreen extends ConsumerWidget {
                 ),
                 TextButton(
                   onPressed: () {},
-                  child: const Text('Manage'),
+                  child: Text(AppLocalizations.of(context)!.manage),
                 ),
               ],
             ),
@@ -70,7 +71,8 @@ class GivingHistoryScreen extends ConsumerWidget {
           Expanded(
             child: historyAsync.when(
               loading: () => const Center(
-                  child: CircularProgressIndicator(color: AppColors.gold),),
+                child: CircularProgressIndicator(color: AppColors.gold),
+              ),
               error: (err, stack) =>
                   Center(child: Text('Error loading history: $err')),
               data: (transactions) {
@@ -111,8 +113,9 @@ class GivingHistoryScreen extends ConsumerWidget {
                         child: Icon(icon, color: iconColor),
                       ),
                       title: Text(t.fund.toUpperCase()),
-                      subtitle: Text(DateFormat('MMM d, yyyy • h:mm a')
-                          .format(t.createdAt),),
+                      subtitle: Text(
+                        DateFormat('MMM d, yyyy • h:mm a').format(t.createdAt),
+                      ),
                       trailing: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.end,

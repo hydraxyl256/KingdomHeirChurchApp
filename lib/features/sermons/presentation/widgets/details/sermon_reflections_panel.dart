@@ -7,7 +7,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
@@ -15,6 +14,7 @@ import 'package:kingdom_heir/features/sermons/data/mock/reflection_prompts.dart'
 import 'package:kingdom_heir/features/sermons/domain/entities/sermon.dart';
 import 'package:kingdom_heir/features/sermons/domain/entities/sermon_reflection.dart';
 import 'package:kingdom_heir/features/sermons/presentation/providers/sermon_engagement_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class SermonReflectionsPanel extends ConsumerStatefulWidget {
   const SermonReflectionsPanel({required this.sermon, super.key});
@@ -87,8 +87,11 @@ class _SermonReflectionsPanelState
             children: [
               Row(
                 children: [
-                  const Icon(Icons.auto_awesome_rounded,
-                      color: AppColors.gold, size: 18,),
+                  const Icon(
+                    Icons.auto_awesome_rounded,
+                    color: AppColors.gold,
+                    size: 18,
+                  ),
                   const SizedBox(width: AppSpacing.xs),
                   Text(
                     'Reflections',
@@ -123,18 +126,21 @@ class _SermonReflectionsPanelState
                       controller: _answerController,
                       minLines: 2,
                       maxLines: 5,
-                      decoration: const InputDecoration(
-                        hintText: 'Write your reflection…',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        hintText:
+                            AppLocalizations.of(context)!.writeYourReflection,
+                        border: const OutlineInputBorder(),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Row(
                       children: [
                         TextButton(
-                          onPressed: () => setState(() => _promptIndex =
-                              (_promptIndex + 1) % prompts.length,),
-                          child: const Text('Next prompt'),
+                          onPressed: () => setState(
+                            () => _promptIndex =
+                                (_promptIndex + 1) % prompts.length,
+                          ),
+                          child: Text(AppLocalizations.of(context)!.nextPrompt),
                         ),
                         const Spacer(),
                         FilledButton(
@@ -143,7 +149,8 @@ class _SermonReflectionsPanelState
                             backgroundColor: AppColors.gold,
                             foregroundColor: AppColors.ink,
                           ),
-                          child: const Text('Save'),
+                          child:
+                              Text(AppLocalizations.of(context)!.scriptureSave),
                         ),
                       ],
                     ),
@@ -165,40 +172,45 @@ class _SermonReflectionsPanelState
                             .toList(),
                       ),
                 loading: () => const Padding(
-                      padding: EdgeInsets.all(AppSpacing.md),
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
+                  padding: EdgeInsets.all(AppSpacing.md),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
                 error: (_, __) => Padding(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.cloud_off_rounded,
-                              color: AppColors.error, size: 32,),
-                          const SizedBox(height: AppSpacing.md),
-                          const Text(
-                            'Could not load reflections.',
-                            style: TextStyle(
-                              color: AppColors.error,
-                              fontSize: 16,
-                            ),
-                          ),
-                          const SizedBox(height: AppSpacing.lg),
-                          FilledButton(
-                            onPressed: () => ref
-                                .refresh(reflectionsBySermonProvider(
-                                    widget.sermon.id,),),
-                            style: ButtonStyle(
-                              backgroundColor:
-                                  WidgetStateProperty.all(AppColors.gold),
-                              foregroundColor:
-                                  WidgetStateProperty.all(AppColors.ink),
-                            ),
-                            child: const Text('Try Again'),
-                          ),
-                        ],
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.cloud_off_rounded,
+                        color: AppColors.error,
+                        size: 32,
                       ),
-                    ),
+                      const SizedBox(height: AppSpacing.md),
+                      const Text(
+                        'Could not load reflections.',
+                        style: TextStyle(
+                          color: AppColors.error,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      FilledButton(
+                        onPressed: () => ref.refresh(
+                          reflectionsBySermonProvider(
+                            widget.sermon.id,
+                          ),
+                        ),
+                        style: ButtonStyle(
+                          backgroundColor:
+                              WidgetStateProperty.all(AppColors.gold),
+                          foregroundColor:
+                              WidgetStateProperty.all(AppColors.ink),
+                        ),
+                        child: Text(AppLocalizations.of(context)!.tryAgain_1),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),

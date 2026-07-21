@@ -8,6 +8,7 @@ import 'package:kingdom_heir/core/widgets/app_button.dart';
 import 'package:kingdom_heir/core/widgets/app_empty_state.dart';
 import 'package:kingdom_heir/features/events/domain/entities/event.dart';
 import 'package:kingdom_heir/features/events/presentation/providers/events_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class EventDetailsScreen extends ConsumerWidget {
   const EventDetailsScreen({required this.eventId, super.key});
@@ -27,8 +28,10 @@ class EventDetailsScreen extends ConsumerWidget {
     }
 
     if (event == null) {
-      return const Scaffold(
-        body: Center(child: Text('Event not found or has passed.')),
+      return Scaffold(
+        body: Center(
+            child:
+                Text(AppLocalizations.of(context)!.eventNotFoundOrHasPassed),),
       );
     }
 
@@ -50,8 +53,11 @@ class EventDetailsScreen extends ConsumerWidget {
                         ),
                       ),
                       child: const Center(
-                        child: Icon(Icons.church_rounded,
-                            color: Colors.white54, size: 80,),
+                        child: Icon(
+                          Icons.church_rounded,
+                          color: Colors.white54,
+                          size: 80,
+                        ),
                       ),
                     ),
               title: Container(
@@ -60,7 +66,8 @@ class EventDetailsScreen extends ConsumerWidget {
                   color: AppColors.ink,
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: Text(event.title, style: const TextStyle(fontSize: 16, color: Colors.white)),
+                child: Text(event.title,
+                    style: const TextStyle(fontSize: 16, color: Colors.white),),
               ),
             ),
           ),
@@ -75,7 +82,9 @@ class EventDetailsScreen extends ConsumerWidget {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.sm, vertical: AppSpacing.xs,),
+                          horizontal: AppSpacing.sm,
+                          vertical: AppSpacing.xs,
+                        ),
                         decoration: BoxDecoration(
                           color: event.isSoldOut
                               ? AppColors.error.withValues(alpha: 0.15)
@@ -95,7 +104,9 @@ class EventDetailsScreen extends ConsumerWidget {
                       const SizedBox(width: AppSpacing.sm),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.sm, vertical: AppSpacing.xs,),
+                          horizontal: AppSpacing.sm,
+                          vertical: AppSpacing.xs,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.gold.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(4),
@@ -201,9 +212,10 @@ class _RsvpSection extends ConsumerWidget {
                 Text(
                   "You're going!",
                   style: TextStyle(
-                      color: AppColors.success,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,),
+                    color: AppColors.success,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
               ],
             ),
@@ -216,8 +228,10 @@ class _RsvpSection extends ConsumerWidget {
                         status: RsvpStatus.notGoing,
                         guestCount: 0,
                       ),
-              child: const Text('Cancel Registration',
-                  style: TextStyle(color: AppColors.error),),
+              child: const Text(
+                'Cancel Registration',
+                style: TextStyle(color: AppColors.error),
+              ),
             ),
           ],
         ),

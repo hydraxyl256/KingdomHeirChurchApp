@@ -35,27 +35,30 @@ class FavoritesStrip extends ConsumerWidget {
 
     return favsAsync.when(
       loading: () => const Padding(
-            padding: EdgeInsets.all(8),
-            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-          ),
+        padding: EdgeInsets.all(8),
+        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      ),
       error: (_, __) => Padding(
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.error_outline,
-                    color: Theme.of(context).colorScheme.error, size: 20,),
-                const SizedBox(height: 4),
-                Text(
-                  'Could not load favorites.',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.error,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.error_outline,
+              color: Theme.of(context).colorScheme.error,
+              size: 20,
             ),
-          ),
+            const SizedBox(height: 4),
+            Text(
+              'Could not load favorites.',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.error,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
       data: (favorites) {
         if (favorites.ids.isEmpty) {
           return const _EmptyFavorites();

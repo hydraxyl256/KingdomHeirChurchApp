@@ -16,6 +16,7 @@ import 'package:kingdom_heir/core/theme/motion.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/features/devotionals/presentation/providers/devotional_journey_provider.dart';
 import 'package:kingdom_heir/features/devotionals/presentation/providers/devotionals_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 // ─── Timer durations ──────────────────────────────────────────────────────────
 
@@ -193,10 +194,7 @@ class _DevotionalPrayerScreenState
                       color: AppColors.ink,
                       size: 36,
                     ),
-                  )
-                      .animate()
-                      .fadeIn(duration: AppMotion.reverent)
-                      .scale(
+                  ).animate().fadeIn(duration: AppMotion.reverent).scale(
                         begin: const Offset(0.8, 0.8),
                         end: const Offset(1, 1),
                         duration: AppMotion.reverent,
@@ -241,8 +239,11 @@ class _DevotionalPrayerScreenState
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.menu_book_rounded,
-                                color: AppColors.goldLight, size: 16,),
+                            const Icon(
+                              Icons.menu_book_rounded,
+                              color: AppColors.goldLight,
+                              size: 16,
+                            ),
                             const SizedBox(width: AppSpacing.xs),
                             Text(
                               'Guided Prayer',
@@ -301,7 +302,8 @@ class _DevotionalPrayerScreenState
 
                   // Complete toggle
                   GestureDetector(
-                    onTap: () => setState(() => _prayerComplete = !_prayerComplete),
+                    onTap: () =>
+                        setState(() => _prayerComplete = !_prayerComplete),
                     child: AnimatedContainer(
                       duration: AppMotion.standard,
                       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -309,7 +311,8 @@ class _DevotionalPrayerScreenState
                         color: _prayerComplete
                             ? AppColors.gold.withValues(alpha: 0.15)
                             : Colors.white.withValues(alpha: 0.04),
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.radiusLg),
                         border: Border.all(
                           color: _prayerComplete
                               ? AppColors.gold
@@ -336,8 +339,11 @@ class _DevotionalPrayerScreenState
                               ),
                             ),
                             child: _prayerComplete
-                                ? const Icon(Icons.check_rounded,
-                                    color: Colors.white, size: 14,)
+                                ? const Icon(
+                                    Icons.check_rounded,
+                                    color: Colors.white,
+                                    size: 14,
+                                  )
                                 : null,
                           ),
                           const SizedBox(width: AppSpacing.md),
@@ -393,8 +399,11 @@ class _DevotionalPrayerScreenState
                             ),
                           ),
                           const SizedBox(width: AppSpacing.sm),
-                          const Icon(Icons.arrow_forward_rounded,
-                              color: AppColors.ink, size: 18,),
+                          const Icon(
+                            Icons.arrow_forward_rounded,
+                            color: AppColors.ink,
+                            size: 18,
+                          ),
                         ],
                       ),
                     ),
@@ -475,9 +484,8 @@ class _TimerSection extends StatelessWidget {
                     d.label,
                     style: AppTypography.textTheme.labelSmall?.copyWith(
                       color: isSelected ? AppColors.ink : Colors.white70,
-                      fontWeight: isSelected
-                          ? FontWeight.w800
-                          : FontWeight.w400,
+                      fontWeight:
+                          isSelected ? FontWeight.w800 : FontWeight.w400,
                     ),
                   ),
                 ),
@@ -500,11 +508,9 @@ class _TimerSection extends StatelessWidget {
                       color: AppColors.goldLight,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 4,
-                      fontFeatures: const [FontFeature.tabularFigures()],
+                      fontFeatures: [const FontFeature.tabularFigures()],
                     ),
-                  )
-                      .animate(onPlay: (c) => c.repeat())
-                      .fadeIn(duration: 500.ms),
+                  ).animate(onPlay: (c) => c.repeat()).fadeIn(duration: 500.ms),
                 const SizedBox(height: AppSpacing.md),
                 GestureDetector(
                   onTap: timerRunning ? onStop : onStart,
@@ -527,7 +533,8 @@ class _TimerSection extends StatelessWidget {
                     child: Text(
                       timerRunning ? 'Stop Timer' : 'Start Timer',
                       style: AppTypography.textTheme.labelMedium?.copyWith(
-                        color: timerRunning ? Colors.white70 : AppColors.goldLight,
+                        color:
+                            timerRunning ? Colors.white70 : AppColors.goldLight,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -577,8 +584,11 @@ class _WritePrayerFieldState extends State<_WritePrayerField> {
           children: [
             Row(
               children: [
-                const Icon(Icons.edit_rounded,
-                    color: AppColors.goldLight, size: 16,),
+                const Icon(
+                  Icons.edit_rounded,
+                  color: AppColors.goldLight,
+                  size: 16,
+                ),
                 const SizedBox(width: AppSpacing.sm),
                 Text(
                   'Write Your Prayer',
@@ -602,7 +612,7 @@ class _WritePrayerFieldState extends State<_WritePrayerField> {
                   height: 1.65,
                 ),
                 decoration: InputDecoration(
-                  hintText: 'Speak to God in your own words…',
+                  hintText: AppLocalizations.of(context)!.speakToGodInYourOwn,
                   hintStyle: AppTypography.textTheme.bodyLarge?.copyWith(
                     color: Colors.white.withValues(alpha: 0.3),
                   ),

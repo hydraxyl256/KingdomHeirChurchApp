@@ -11,16 +11,16 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/features/live_service/domain/entities/live_service_models.dart';
 import 'package:kingdom_heir/features/live_service/presentation/providers/live_service_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 // ─── Profanity filter ─────────────────────────────────────────────────────────
 
-const _blockedWords = <String>[];   // populate from remote config in production
+const _blockedWords = <String>[]; // populate from remote config in production
 bool _isProfane(String text) => _blockedWords.any(
       (w) => text.toLowerCase().contains(w),
     );
@@ -51,8 +51,7 @@ class _LiveChatPanelState extends ConsumerState<LiveChatPanel> {
   @override
   void initState() {
     super.initState();
-    _scrollController
-      .addListener(_onScroll);
+    _scrollController.addListener(_onScroll);
   }
 
   void _onScroll() {
@@ -86,10 +85,10 @@ class _LiveChatPanelState extends ConsumerState<LiveChatPanel> {
     // Slow mode check
     if (ref.read(chatSlowModeProvider)) {
       final last = ref.read(chatLastSentProvider);
-      if (last != null &&
-          DateTime.now().difference(last).inSeconds < 30) {
+      if (last != null && DateTime.now().difference(last).inSeconds < 30) {
         _showSnack(
-            'Slow mode: wait ${30 - DateTime.now().difference(last).inSeconds}s',);
+          'Slow mode: wait ${30 - DateTime.now().difference(last).inSeconds}s',
+        );
         return;
       }
     }
@@ -241,9 +240,11 @@ class _LiveChatPanelState extends ConsumerState<LiveChatPanel> {
             ),
 
             // Emoji quick-react bar
-            _EmojiQuickBar(onSelect: (emoji) {
-              _inputController.text += emoji;
-            },),
+            _EmojiQuickBar(
+              onSelect: (emoji) {
+                _inputController.text += emoji;
+              },
+            ),
 
             // Reply-to banner
             if (replyTo != null)
@@ -270,18 +271,21 @@ class _LiveChatPanelState extends ConsumerState<LiveChatPanel> {
     showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Report Message'),
-        content: Text('Report "${msg.body.length > 40 ? "${msg.body.substring(0, 40)}…" : msg.body}" as inappropriate?'),
+        title: Text(AppLocalizations.of(context)!.reportMessage),
+        content: Text(
+            'Report "${msg.body.length > 40 ? "${msg.body.substring(0, 40)}…" : msg.body}" as inappropriate?',),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),),
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppLocalizations.of(context)!.cancel),
+          ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               _showSnack('Message reported. Thank you.');
             },
-            child: const Text('Report', style: TextStyle(color: AppColors.error)),
+            child:
+                const Text('Report', style: TextStyle(color: AppColors.error)),
           ),
         ],
       ),
@@ -310,8 +314,11 @@ class _ChatHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.chat_bubble_rounded,
-              size: 15, color: AppColors.navy,),
+          const Icon(
+            Icons.chat_bubble_rounded,
+            size: 15,
+            color: AppColors.navy,
+          ),
           const SizedBox(width: 6),
           Text(
             'Live Chat',
@@ -382,8 +389,11 @@ class _PinnedMessage extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.push_pin_rounded,
-              size: 12, color: AppColors.goldDark,),
+          const Icon(
+            Icons.push_pin_rounded,
+            size: 12,
+            color: AppColors.goldDark,
+          ),
           const SizedBox(width: 6),
           Expanded(
             child: RichText(
@@ -479,7 +489,8 @@ class _ChatMessageTile extends StatelessWidget {
                       ),
                       if (message.isLeader) ...[
                         const SizedBox(width: 4),
-                        const _Badge(label: '👑 Leader', color: AppColors.goldDark),
+                        const _Badge(
+                            label: '👑 Leader', color: AppColors.goldDark,),
                       ],
                       if (message.isModerator) ...[
                         const SizedBox(width: 4),
@@ -633,8 +644,12 @@ class _ChatMessageTile extends StatelessWidget {
 
   Color _avatarColor(String name) {
     const colors = [
-      Color(0xFF1E3A8A), Color(0xFF065F46), Color(0xFF92400E),
-      Color(0xFF7C3AED), Color(0xFF1D4ED8), Color(0xFF166534),
+      Color(0xFF1E3A8A),
+      Color(0xFF065F46),
+      Color(0xFF92400E),
+      Color(0xFF7C3AED),
+      Color(0xFF1D4ED8),
+      Color(0xFF166534),
     ];
     return colors[name.hashCode.abs() % colors.length];
   }
@@ -753,8 +768,11 @@ class _ReplyBanner extends StatelessWidget {
           ),
           GestureDetector(
             onTap: onDismiss,
-            child: const Icon(Icons.close_rounded,
-                size: 16, color: AppColors.textDisabled,),
+            child: const Icon(
+              Icons.close_rounded,
+              size: 16,
+              color: AppColors.textDisabled,
+            ),
           ),
         ],
       ),
@@ -839,8 +857,9 @@ class _ChatInputBar extends StatelessWidget {
               ),
               child: Icon(
                 Icons.send_rounded,
-                color:
-                    slowModeCountdown > 0 ? AppColors.textDisabled : AppColors.ink,
+                color: slowModeCountdown > 0
+                    ? AppColors.textDisabled
+                    : AppColors.ink,
                 size: 20,
               ),
             ),

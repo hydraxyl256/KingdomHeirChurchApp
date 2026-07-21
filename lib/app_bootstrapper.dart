@@ -23,15 +23,16 @@ class _AppBootstrapperState extends State<AppBootstrapper> {
 
   Future<void> _init() async {
     // 1. Minimum 2.4s splash duration
-    final splashTimer = Future<void>.delayed(const Duration(milliseconds: 2400));
-    
+    final splashTimer =
+        Future<void>.delayed(const Duration(milliseconds: 2400));
+
     // 2. Heavy initialization (Supabase, Firebase, SharedPreferences, etc.)
     final containerFuture = bootstrap();
 
     // Wait for both to complete concurrently
     await splashTimer;
     final container = await containerFuture;
-    
+
     if (mounted) {
       setState(() {
         _container = container;

@@ -15,16 +15,16 @@ class BibleVersion extends Equatable {
 
   factory BibleVersion.fromJson(Map<String, dynamic> json) {
     return BibleVersion(
-      id:           json['id'] as int,
-      title:        json['local_title'] as String? ??
-                    json['title'] as String? ?? '',
+      id: json['id'] as int,
+      title: json['local_title'] as String? ?? json['title'] as String? ?? '',
       abbreviation: json['local_abbreviation'] as String? ??
-                    json['abbreviation'] as String? ?? '',
-      language:     json['language'] as String? ?? 'eng',
+          json['abbreviation'] as String? ??
+          '',
+      language: json['language'] as String? ?? 'eng',
     );
   }
 
-  final int    id;
+  final int id;
   final String title;
   final String abbreviation;
   final String language;
@@ -51,16 +51,18 @@ class BibleBook extends Equatable {
     // YouVersion response uses 'usfm' as the book ID and 'human' or 'name' for the name
     final usfm = json['usfm'] as String? ?? json['id'] as String? ?? '';
     final name = json['human'] as String? ??
-                 json['name'] as String? ??
-                 json['local_abbreviation'] as String? ?? usfm;
+        json['name'] as String? ??
+        json['local_abbreviation'] as String? ??
+        usfm;
     return BibleBook(
-      id:           usfm,
-      bibleId:      (json['version_id'] ?? json['bibleId'] ?? '').toString(),
+      id: usfm,
+      bibleId: (json['version_id'] ?? json['bibleId'] ?? '').toString(),
       abbreviation: json['local_abbreviation'] as String? ??
-                    json['abbreviation'] as String? ?? usfm,
-      name:         name,
-      nameLong:     json['human_long'] as String? ??
-                    json['nameLong'] as String? ?? name,
+          json['abbreviation'] as String? ??
+          usfm,
+      name: name,
+      nameLong:
+          json['human_long'] as String? ?? json['nameLong'] as String? ?? name,
     );
   }
 
@@ -93,12 +95,12 @@ class BibleChapter extends Equatable {
     final parts = usfm.split('.');
     final number = parts.length >= 2 ? parts[1] : usfm;
     return BibleChapter(
-      id:        usfm,
-      bibleId:   (json['version_id'] ?? json['bibleId'] ?? '').toString(),
-      bookId:    parts.isNotEmpty ? parts[0] : usfm,
-      number:    number,
-      reference: json['human'] as String? ??
-                 json['reference'] as String? ?? usfm,
+      id: usfm,
+      bibleId: (json['version_id'] ?? json['bibleId'] ?? '').toString(),
+      bookId: parts.isNotEmpty ? parts[0] : usfm,
+      number: number,
+      reference:
+          json['human'] as String? ?? json['reference'] as String? ?? usfm,
     );
   }
 
@@ -134,7 +136,7 @@ class BibleChapterContent extends Equatable {
     //             "content": "<div>...</div>",
     //             "next":     {"usfm":"GEN.2","human":"Genesis 2"},
     //             "previous": {"usfm":"...","human":"..."} } }
-    final ref  = json['reference'] as Map<String, dynamic>? ?? json;
+    final ref = json['reference'] as Map<String, dynamic>? ?? json;
     final usfm = ref['usfm'] as String? ?? json['id'] as String? ?? '';
     final parts = usfm.split('.');
     final bookId = parts.isNotEmpty ? parts[0] : '';
@@ -144,31 +146,30 @@ class BibleChapterContent extends Equatable {
     final prevMap = json['previous'] as Map<String, dynamic>?;
 
     return BibleChapterContent(
-      id:                usfm,
-      bibleId:           (ref['version_id'] ?? json['bibleId'] ?? '').toString(),
-      number:            number,
-      bookId:            bookId,
-      reference:         ref['human'] as String? ??
-                         json['reference'] as String? ?? usfm,
-      content:           json['content'] as String? ?? '',
-      nextChapterId:     nextMap?['usfm'] as String?,
+      id: usfm,
+      bibleId: (ref['version_id'] ?? json['bibleId'] ?? '').toString(),
+      number: number,
+      bookId: bookId,
+      reference:
+          ref['human'] as String? ?? json['reference'] as String? ?? usfm,
+      content: json['content'] as String? ?? '',
+      nextChapterId: nextMap?['usfm'] as String?,
       previousChapterId: prevMap?['usfm'] as String?,
     );
   }
 
-  final String  id;
-  final String  bibleId;
-  final String  number;
-  final String  bookId;
-  final String  reference;
-  final String  content;
+  final String id;
+  final String bibleId;
+  final String number;
+  final String bookId;
+  final String reference;
+  final String content;
   // Navigation hints from YouVersion — used for Prev/Next chapter buttons
   final String? nextChapterId;
   final String? previousChapterId;
 
   @override
-  List<Object?> get props =>
-      [id, bibleId, number, bookId, reference, content];
+  List<Object?> get props => [id, bibleId, number, bookId, reference, content];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -208,30 +209,36 @@ class BibleBookmark extends Equatable {
 
   factory BibleBookmark.fromJson(Map<String, dynamic> json) {
     return BibleBookmark(
-      id:             json['id'] as String,
-      userId:         json['user_id'] as String,
+      id: json['id'] as String,
+      userId: json['user_id'] as String,
       bibleVersionId: json['bible_version_id'] as String,
-      bookId:         json['book_id'] as String,
-      chapterId:      json['chapter_id'] as String,
-      verseId:        json['verse_id'] as String,
-      referenceText:  json['reference_text'] as String,
-      createdAt:      DateTime.parse(json['created_at'] as String),
+      bookId: json['book_id'] as String,
+      chapterId: json['chapter_id'] as String,
+      verseId: json['verse_id'] as String,
+      referenceText: json['reference_text'] as String,
+      createdAt: DateTime.parse(json['created_at'] as String),
     );
   }
 
-  final String   id;
-  final String   userId;
-  final String   bibleVersionId;
-  final String   bookId;
-  final String   chapterId;
-  final String   verseId;
-  final String   referenceText;
+  final String id;
+  final String userId;
+  final String bibleVersionId;
+  final String bookId;
+  final String chapterId;
+  final String verseId;
+  final String referenceText;
   final DateTime createdAt;
 
   @override
   List<Object?> get props => [
-        id, userId, bibleVersionId, bookId,
-        chapterId, verseId, referenceText, createdAt,
+        id,
+        userId,
+        bibleVersionId,
+        bookId,
+        chapterId,
+        verseId,
+        referenceText,
+        createdAt,
       ];
 }
 
@@ -247,20 +254,20 @@ class BibleHighlight extends Equatable {
 
   factory BibleHighlight.fromJson(Map<String, dynamic> json) {
     return BibleHighlight(
-      id:             json['id'] as String,
-      userId:         json['user_id'] as String,
+      id: json['id'] as String,
+      userId: json['user_id'] as String,
       bibleVersionId: json['bible_version_id'] as String,
-      verseId:        json['verse_id'] as String,
-      colorHex:       json['color_hex'] as String,
-      createdAt:      DateTime.parse(json['created_at'] as String),
+      verseId: json['verse_id'] as String,
+      colorHex: json['color_hex'] as String,
+      createdAt: DateTime.parse(json['created_at'] as String),
     );
   }
 
-  final String   id;
-  final String   userId;
-  final String   bibleVersionId;
-  final String   verseId;
-  final String   colorHex;
+  final String id;
+  final String userId;
+  final String bibleVersionId;
+  final String verseId;
+  final String colorHex;
   final DateTime createdAt;
 
   @override

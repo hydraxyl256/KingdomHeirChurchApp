@@ -91,9 +91,7 @@ class SupabaseDevotionalSeriesRepository implements DevotionalSeriesRepository {
           .order('is_primary_challenge_series', ascending: false)
           .order('created_at', ascending: true);
 
-      final list = data
-          .map(DevotionalSeries.fromJson)
-          .toList();
+      final list = data.map(DevotionalSeries.fromJson).toList();
       return right(list);
     } catch (e) {
       return left('Failed to load devotional series: $e');
@@ -143,7 +141,8 @@ class SupabaseDevotionalSeriesRepository implements DevotionalSeriesRepository {
       // RLS ensures day_number <= highest_unlocked_day on the server
       final data = await _supabase
           .from('devotional_entries')
-          .select('id, series_id, day_number, title, status, created_at, updated_at, estimated_read_minutes')
+          .select(
+              'id, series_id, day_number, title, status, created_at, updated_at, estimated_read_minutes',)
           .eq('series_id', seriesId)
           .eq('status', 'published')
           .order('day_number', ascending: true);
@@ -211,8 +210,8 @@ class SupabaseDevotionalSeriesRepository implements DevotionalSeriesRepository {
   ) async {
     try {
       // Call the SECURITY DEFINER function — avoids direct RLS complexity
-      final data = await _supabase
-          .rpc<dynamic>('get_devotional_progress', params: {'p_series_id': seriesId});
+      final data = await _supabase.rpc<dynamic>('get_devotional_progress',
+          params: {'p_series_id': seriesId},);
 
       if (data == null) return right(null);
       return right(
@@ -249,7 +248,7 @@ class SupabaseDevotionalSeriesRepository implements DevotionalSeriesRepository {
       final data = await _supabase.rpc<dynamic>(
         'complete_devotional_day',
         params: {
-          'p_series_id':  seriesId,
+          'p_series_id': seriesId,
           'p_day_number': dayNumber,
         },
       );
@@ -278,11 +277,11 @@ class SupabaseDevotionalSeriesRepository implements DevotionalSeriesRepository {
 
       await _supabase.from('devotional_reflections').upsert(
         {
-          'user_id':              userId,
-          'devotional_entry_id':  entryId,
-          'reflection_text':      reflectionText,
-          'is_private':           isPrivate,
-          'updated_at':           DateTime.now().toIso8601String(),
+          'user_id': userId,
+          'devotional_entry_id': entryId,
+          'reflection_text': reflectionText,
+          'is_private': isPrivate,
+          'updated_at': DateTime.now().toIso8601String(),
         },
         onConflict: 'user_id,devotional_entry_id',
       );

@@ -16,6 +16,7 @@ import 'package:kingdom_heir/core/theme/motion.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/features/devotionals/presentation/providers/devotional_journey_provider.dart';
 import 'package:kingdom_heir/features/devotionals/presentation/providers/devotionals_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 import 'package:share_plus/share_plus.dart';
 
 class ScriptureReaderScreen extends ConsumerStatefulWidget {
@@ -102,8 +103,7 @@ class _ScriptureReaderScreenState extends ConsumerState<ScriptureReaderScreen>
             // Font size
             IconButton(
               icon: Icon(Icons.format_size_rounded, color: textColor),
-              onPressed: () =>
-                  setState(() => _showFontPanel = !_showFontPanel),
+              onPressed: () => setState(() => _showFontPanel = !_showFontPanel),
             ),
             // Dark mode
             IconButton(
@@ -121,7 +121,9 @@ class _ScriptureReaderScreenState extends ConsumerState<ScriptureReaderScreen>
           data: (devotional) {
             if (devotional == null || devotional.id != widget.devotionalId) {
               // Try to find in previous list (simplified — use daily for now)
-              return const Center(child: Text('Devotional not found.'));
+              return Center(
+                  child:
+                      Text(AppLocalizations.of(context)!.devotionalNotFound),);
             }
 
             return Column(
@@ -181,9 +183,7 @@ class _ScriptureReaderScreenState extends ConsumerState<ScriptureReaderScreen>
                               letterSpacing: 1,
                             ),
                           ),
-                        )
-                            .animate()
-                            .fadeIn(duration: AppMotion.standard),
+                        ).animate().fadeIn(duration: AppMotion.standard),
 
                         const SizedBox(height: AppSpacing.xl),
 
@@ -210,9 +210,7 @@ class _ScriptureReaderScreenState extends ConsumerState<ScriptureReaderScreen>
                             letterSpacing: 0.2,
                             fontFamily: 'Georgia',
                           ),
-                        )
-                            .animate()
-                            .fadeIn(
+                        ).animate().fadeIn(
                               delay: 200.ms,
                               duration: AppMotion.emphasized,
                             ),
@@ -229,9 +227,7 @@ class _ScriptureReaderScreenState extends ConsumerState<ScriptureReaderScreen>
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                        )
-                            .animate()
-                            .fadeIn(
+                        ).animate().fadeIn(
                               delay: 400.ms,
                               duration: AppMotion.standard,
                             ),
@@ -272,8 +268,7 @@ class _ScriptureReaderScreenState extends ConsumerState<ScriptureReaderScreen>
                   onContinue: () async {
                     await ref
                         .read(
-                          journeyProgressProvider(widget.devotionalId)
-                              .notifier,
+                          journeyProgressProvider(widget.devotionalId).notifier,
                         )
                         .markScriptureRead();
                     if (context.mounted) {
@@ -319,14 +314,14 @@ class _FontSizePanel extends StatelessWidget {
         horizontal: AppSpacing.xl,
         vertical: AppSpacing.md,
       ),
-      color: isDark
-          ? AppColors.navyMid
-          : AppColors.surfaceContainerLight,
+      color: isDark ? AppColors.navyMid : AppColors.surfaceContainerLight,
       child: Row(
         children: [
-          Icon(Icons.text_fields_rounded,
-              size: 16,
-              color: isDark ? Colors.white54 : AppColors.textSecondary,),
+          Icon(
+            Icons.text_fields_rounded,
+            size: 16,
+            color: isDark ? Colors.white54 : AppColors.textSecondary,
+          ),
           Expanded(
             child: Slider(
               value: fontSize,
@@ -337,9 +332,11 @@ class _FontSizePanel extends StatelessWidget {
               onChanged: onChanged,
             ),
           ),
-          Icon(Icons.text_fields_rounded,
-              size: 22,
-              color: isDark ? Colors.white54 : AppColors.textSecondary,),
+          Icon(
+            Icons.text_fields_rounded,
+            size: 22,
+            color: isDark ? Colors.white54 : AppColors.textSecondary,
+          ),
         ],
       ),
     );
@@ -362,9 +359,17 @@ class _ActionRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _ActionBtn(icon: Icons.copy_rounded, label: 'Copy', onTap: onCopy, color: color),
+        _ActionBtn(
+            icon: Icons.copy_rounded,
+            label: 'Copy',
+            onTap: onCopy,
+            color: color,),
         const SizedBox(width: AppSpacing.xl),
-        _ActionBtn(icon: Icons.share_rounded, label: 'Share', onTap: onShare, color: color),
+        _ActionBtn(
+            icon: Icons.share_rounded,
+            label: 'Share',
+            onTap: onShare,
+            color: color,),
       ],
     );
   }
@@ -459,8 +464,11 @@ class _ContinueBar extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),
-              const Icon(Icons.arrow_forward_rounded,
-                  color: AppColors.ink, size: 18,),
+              const Icon(
+                Icons.arrow_forward_rounded,
+                color: AppColors.ink,
+                size: 18,
+              ),
             ],
           ),
         ),

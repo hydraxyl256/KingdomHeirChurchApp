@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
@@ -18,6 +17,7 @@ import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/features/live_service/domain/entities/live_service_models.dart';
 import 'package:kingdom_heir/features/live_service/presentation/providers/live_service_provider.dart';
 import 'package:kingdom_heir/features/sermons/presentation/providers/sermons_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 // ─── Helper Classes ──────────────────────────────────────────────────────────────
 
@@ -87,8 +87,7 @@ class _AnnouncementCard extends StatelessWidget {
                           ),
                           child: Text(
                             announcement.badgeLabel!,
-                            style:
-                                AppTypography.textTheme.labelSmall?.copyWith(
+                            style: AppTypography.textTheme.labelSmall?.copyWith(
                               color: AppColors.goldDark,
                               fontWeight: FontWeight.w700,
                               fontSize: 9,
@@ -503,8 +502,7 @@ class AnnouncementsCarousel extends ConsumerStatefulWidget {
       _AnnouncementsCarouselState();
 }
 
-class _AnnouncementsCarouselState
-    extends ConsumerState<AnnouncementsCarousel> {
+class _AnnouncementsCarouselState extends ConsumerState<AnnouncementsCarousel> {
   final _pageCtrl = PageController();
   int _current = 0;
   Timer? _autoTimer;
@@ -514,7 +512,8 @@ class _AnnouncementsCarouselState
     super.initState();
     _autoTimer = Timer.periodic(const Duration(seconds: 8), (_) {
       if (!mounted) return;
-      final count = ref.read(liveAnnouncementsProvider).valueOrNull?.length ?? 0;
+      final count =
+          ref.read(liveAnnouncementsProvider).valueOrNull?.length ?? 0;
       if (count == 0) return;
       final next = (_current + 1) % count;
       _pageCtrl.animateToPage(
@@ -561,12 +560,10 @@ class _AnnouncementsCarouselState
             FilledButton(
               onPressed: () => ref.refresh(liveAnnouncementsProvider),
               style: ButtonStyle(
-                backgroundColor:
-                    WidgetStateProperty.all(AppColors.gold),
-                foregroundColor:
-                    WidgetStateProperty.all(AppColors.ink),
+                backgroundColor: WidgetStateProperty.all(AppColors.gold),
+                foregroundColor: WidgetStateProperty.all(AppColors.ink),
               ),
-              child: const Text('Try Again'),
+              child: Text(AppLocalizations.of(context)!.tryAgain_1),
             ),
           ],
         ),
@@ -668,330 +665,345 @@ class AfterLiveSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ref.watch(liveServiceStateProvider).when(
-      loading: () => const SizedBox.shrink(),
-      error: (error, stackTrace) => Padding(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.xl,
-          AppSpacing.xxl,
-          AppSpacing.xl,
-          AppSpacing.lg,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              Icons.cloud_off_rounded,
-              color: AppColors.error,
-              size: 28,
+          loading: SizedBox.shrink,
+          error: (error, stackTrace) => Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.xl,
+              AppSpacing.xxl,
+              AppSpacing.xl,
+              AppSpacing.lg,
             ),
-            const SizedBox(height: 12),
-            const Text(
-              'Unable to load live service status.',
-              style: TextStyle(
-                color: AppColors.error,
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: () => ref.refresh(liveServiceStateProvider),
-              style: ButtonStyle(
-                backgroundColor:
-                    WidgetStateProperty.all(AppColors.gold),
-                foregroundColor:
-                    WidgetStateProperty.all(AppColors.ink),
-              ),
-              child: const Text('Try Again'),
-            ),
-          ],
-        ),
-      ),
-      data: (state) {
-        if (state.isLive) return const SizedBox.shrink();
-
-        final latestAsync = ref.watch(latestSermonsProvider);
-        final upcomingAsync = ref.watch(upcomingServicesProvider);
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Section header
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.xl,
-                AppSpacing.xxl,
-                AppSpacing.xl,
-                AppSpacing.lg,
-              ),
-              child: Text(
-                'Continue Your Worship',
-                style: AppTypography.textTheme.titleMedium?.copyWith(
-                  color: AppColors.navy,
-                  fontWeight: FontWeight.w800,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.cloud_off_rounded,
+                  color: AppColors.error,
+                  size: 28,
                 ),
-              ).animate().fadeIn(duration: 400.ms),
+                const SizedBox(height: 12),
+                const Text(
+                  'Unable to load live service status.',
+                  style: TextStyle(
+                    color: AppColors.error,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                FilledButton(
+                  onPressed: () => ref.refresh(liveServiceStateProvider),
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.all(AppColors.gold),
+                    foregroundColor: WidgetStateProperty.all(AppColors.ink),
+                  ),
+                  child: Text(AppLocalizations.of(context)!.tryAgain_1),
+                ),
+              ],
             ),
+          ),
+          data: (state) {
+            if (state.isLive) return const SizedBox.shrink();
 
-            // ── Today's devotional card ───────────────────────────────────────
-            _AfterLiveCard(
-              icon: Icons.auto_stories_rounded,
-              iconColor: AppColors.goldDark,
-              title: "Today's Devotional",
-              subtitle: 'Continue your daily spiritual journey',
-              onTap: () => unawaited(context.push('/home/devotionals')),
-            ).animate().fadeIn(delay: 80.ms, duration: 350.ms)
-                .slideY(begin: 0.05, end: 0, delay: 80.ms),
+            final latestAsync = ref.watch(latestSermonsProvider);
+            final upcomingAsync = ref.watch(upcomingServicesProvider);
 
-            _AfterLiveCard(
-              icon: Icons.menu_book_rounded,
-              iconColor: AppColors.navy,
-              title: 'Bible Reading Plan',
-              subtitle: 'Continue where you left off',
-              onTap: () {},
-            ).animate().fadeIn(delay: 160.ms, duration: 350.ms)
-                .slideY(begin: 0.05, end: 0, delay: 160.ms),
-
-            _AfterLiveCard(
-              icon: Icons.groups_rounded,
-              iconColor: const Color(0xFF059669),
-              title: 'Community Groups',
-              subtitle: 'Connect with your group this week',
-              onTap: () => unawaited(context.push('/home/community')),
-            ).animate().fadeIn(delay: 240.ms, duration: 350.ms)
-                .slideY(begin: 0.05, end: 0, delay: 240.ms),
-
-            // ── Related sermons ───────────────────────────────────────────────
-            latestAsync.when(
-              loading: () => const Padding(
-                padding: EdgeInsets.all(16),
-                child: Center(
-                  child: CircularProgressIndicator(),
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Section header
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.xl,
+                    AppSpacing.xxl,
+                    AppSpacing.xl,
+                    AppSpacing.lg,
+                  ),
+                  child: Text(
+                    'Continue Your Worship',
+                    style: AppTypography.textTheme.titleMedium?.copyWith(
+                      color: AppColors.navy,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ).animate().fadeIn(duration: 400.ms),
                 ),
-              ),
-              error: (_, __) => Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.cloud_off_rounded,
-                      color: AppColors.error,
-                      size: 28,
+
+                // ── Today's devotional card ───────────────────────────────────────
+                _AfterLiveCard(
+                  icon: Icons.auto_stories_rounded,
+                  iconColor: AppColors.goldDark,
+                  title: "Today's Devotional",
+                  subtitle: 'Continue your daily spiritual journey',
+                  onTap: () => unawaited(context.push('/home/devotionals')),
+                )
+                    .animate()
+                    .fadeIn(delay: 80.ms, duration: 350.ms)
+                    .slideY(begin: 0.05, end: 0, delay: 80.ms),
+
+                _AfterLiveCard(
+                  icon: Icons.menu_book_rounded,
+                  iconColor: AppColors.navy,
+                  title: 'Bible Reading Plan',
+                  subtitle: 'Continue where you left off',
+                  onTap: () {},
+                )
+                    .animate()
+                    .fadeIn(delay: 160.ms, duration: 350.ms)
+                    .slideY(begin: 0.05, end: 0, delay: 160.ms),
+
+                _AfterLiveCard(
+                  icon: Icons.groups_rounded,
+                  iconColor: const Color(0xFF059669),
+                  title: 'Community Groups',
+                  subtitle: 'Connect with your group this week',
+                  onTap: () => unawaited(context.push('/home/community')),
+                )
+                    .animate()
+                    .fadeIn(delay: 240.ms, duration: 350.ms)
+                    .slideY(begin: 0.05, end: 0, delay: 240.ms),
+
+                // ── Related sermons ───────────────────────────────────────────────
+                latestAsync.when(
+                  loading: () => const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Center(
+                      child: CircularProgressIndicator(),
                     ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'Could not load recent messages.',
-                      style: TextStyle(
-                        color: AppColors.error,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    FilledButton(
-                      onPressed: () => ref.refresh(latestSermonsProvider),
-                      style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.all(AppColors.gold),
-                        foregroundColor: WidgetStateProperty.all(AppColors.ink),
-                      ),
-                      child: const Text('Try Again'),
-                    ),
-                  ],
-                ),
-              ),
-              data: (sermons) {
-                if (sermons.isEmpty) return const SizedBox.shrink();
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        AppSpacing.xl,
-                        AppSpacing.xl,
-                        AppSpacing.xl,
-                        AppSpacing.md,
-                      ),
-                      child: Text(
-                        'Recent Messages',
-                        style: AppTypography.textTheme.titleSmall?.copyWith(
-                          color: AppColors.navy,
-                          fontWeight: FontWeight.w800,
+                  ),
+                  error: (_, __) => Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.cloud_off_rounded,
+                          color: AppColors.error,
+                          size: 28,
                         ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 200,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.lg,
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Could not load recent messages.',
+                          style: TextStyle(
+                            color: AppColors.error,
+                            fontSize: 16,
+                          ),
                         ),
-                        itemCount: sermons.take(6).length,
-                        itemBuilder: (_, i) {
-                          final sermon = sermons[i];
-                          return GestureDetector(
-                            onTap: () => unawaited(
-                              context.push('/home/sermons/${sermon.id}'),
+                        const SizedBox(height: 16),
+                        FilledButton(
+                          onPressed: () => ref.refresh(latestSermonsProvider),
+                          style: ButtonStyle(
+                            backgroundColor:
+                                WidgetStateProperty.all(AppColors.gold),
+                            foregroundColor:
+                                WidgetStateProperty.all(AppColors.ink),
+                          ),
+                          child: Text(AppLocalizations.of(context)!.tryAgain_1),
+                        ),
+                      ],
+                    ),
+                  ),
+                  data: (sermons) {
+                    if (sermons.isEmpty) return const SizedBox.shrink();
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(
+                            AppSpacing.xl,
+                            AppSpacing.xl,
+                            AppSpacing.xl,
+                            AppSpacing.md,
+                          ),
+                          child: Text(
+                            'Recent Messages',
+                            style: AppTypography.textTheme.titleSmall?.copyWith(
+                              color: AppColors.navy,
+                              fontWeight: FontWeight.w800,
                             ),
-                            child: Container(
-                              width: 150,
-                              margin: const EdgeInsets.only(
-                                right: AppSpacing.md,
-                              ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(
-                                  AppSpacing.radiusXl,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 200,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            physics: const BouncingScrollPhysics(),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.lg,
+                            ),
+                            itemCount: sermons.take(6).length,
+                            itemBuilder: (_, i) {
+                              final sermon = sermons[i];
+                              return GestureDetector(
+                                onTap: () => unawaited(
+                                  context.push('/home/sermons/${sermon.id}'),
                                 ),
-                                color: Colors.white,
-                                border: Border.all(color: AppColors.dividerLight),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: const BorderRadius.vertical(
-                                      top: Radius.circular(
-                                        AppSpacing.radiusXl,
-                                      ),
-                                    ),
-                                    child: sermon.thumbnailUrl != null
-                                        ? Image.network(
-                                            sermon.thumbnailUrl!,
-                                            height: 90,
-                                            width: double.infinity,
-                                            fit: BoxFit.cover,
-                                            errorBuilder: (_, __, ___) =>
-                                                const _SermonThumbFallback(),
-                                          )
-                                        : const _SermonThumbFallback(),
+                                child: Container(
+                                  width: 150,
+                                  margin: const EdgeInsets.only(
+                                    right: AppSpacing.md,
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(AppSpacing.sm),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          sermon.title,
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: AppTypography.textTheme.labelSmall
-                                              ?.copyWith(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(
+                                      AppSpacing.radiusXl,
+                                    ),
+                                    color: Colors.white,
+                                    border: Border.all(
+                                        color: AppColors.dividerLight,),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius:
+                                            const BorderRadius.vertical(
+                                          top: Radius.circular(
+                                            AppSpacing.radiusXl,
+                                          ),
+                                        ),
+                                        child: sermon.thumbnailUrl != null
+                                            ? Image.network(
+                                                sermon.thumbnailUrl!,
+                                                height: 90,
+                                                width: double.infinity,
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (_, __, ___) =>
+                                                    const _SermonThumbFallback(),
+                                              )
+                                            : const _SermonThumbFallback(),
+                                      ),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.all(AppSpacing.sm),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              sermon.title,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: AppTypography
+                                                  .textTheme.labelSmall
+                                                  ?.copyWith(
                                                 color: AppColors.navy,
                                                 fontWeight: FontWeight.w700,
                                                 height: 1.3,
                                               ),
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          sermon.speakerName,
-                                          style:
-                                              AppTypography.textTheme.bodySmall
-                                              ?.copyWith(
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Text(
+                                              sermon.speakerName,
+                                              style: AppTypography
+                                                  .textTheme.bodySmall
+                                                  ?.copyWith(
                                                 color: AppColors.textDisabled,
                                                 fontSize: 10,
                                               ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            const SizedBox(height: 2),
+                                          ],
                                         ),
-                                        const SizedBox(height: 2),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            )
-                                .animate(
-                                  delay: Duration(milliseconds: i * 60),
                                 )
-                                .fadeIn(duration: 300.ms)
-                                .slideX(begin: 0.06, end: 0),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-
-            // ── Upcoming services ─────────────────────────────────────────────
-            upcomingAsync.when(
-              loading: () => const Padding(
-                padding: EdgeInsets.all(16),
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              ),
-              error: (_, __) => Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.cloud_off_rounded,
-                      color: AppColors.error,
-                      size: 28,
-                    ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'Could not load upcoming services.',
-                      style: TextStyle(
-                        color: AppColors.error,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    FilledButton(
-                      onPressed: () => ref.refresh(upcomingServicesProvider),
-                      style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.all(AppColors.gold),
-                        foregroundColor: WidgetStateProperty.all(AppColors.ink),
-                      ),
-                      child: const Text('Try Again'),
-                    ),
-                  ],
-                ),
-              ),
-              data: (services) {
-                if (services.isEmpty) return const SizedBox.shrink();
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        AppSpacing.xl,
-                        AppSpacing.xl,
-                        AppSpacing.xl,
-                        AppSpacing.md,
-                      ),
-                      child: Text(
-                        'Upcoming Services',
-                        style: AppTypography.textTheme.titleSmall?.copyWith(
-                          color: AppColors.navy,
-                          fontWeight: FontWeight.w800,
+                                    .animate(
+                                      delay: Duration(milliseconds: i * 60),
+                                    )
+                                    .fadeIn(duration: 300.ms)
+                                    .slideX(begin: 0.06, end: 0),
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                    ),
-                    ...services.take(3).map(
-                          (s) => _UpcomingServiceTile(service: s)
-                              .animate()
-                              .fadeIn(duration: 300.ms)
-                              .slideY(begin: 0.04, end: 0),
-                        ),
-                  ],
-                );
-              },
-            ),
+                      ],
+                    );
+                  },
+                ),
 
-            const SizedBox(height: AppSpacing.xxxl),
-          ],
+                // ── Upcoming services ─────────────────────────────────────────────
+                upcomingAsync.when(
+                  loading: () => const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+                  error: (_, __) => Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.cloud_off_rounded,
+                          color: AppColors.error,
+                          size: 28,
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Could not load upcoming services.',
+                          style: TextStyle(
+                            color: AppColors.error,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        FilledButton(
+                          onPressed: () =>
+                              ref.refresh(upcomingServicesProvider),
+                          style: ButtonStyle(
+                            backgroundColor:
+                                WidgetStateProperty.all(AppColors.gold),
+                            foregroundColor:
+                                WidgetStateProperty.all(AppColors.ink),
+                          ),
+                          child: Text(AppLocalizations.of(context)!.tryAgain_1),
+                        ),
+                      ],
+                    ),
+                  ),
+                  data: (services) {
+                    if (services.isEmpty) return const SizedBox.shrink();
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(
+                            AppSpacing.xl,
+                            AppSpacing.xl,
+                            AppSpacing.xl,
+                            AppSpacing.md,
+                          ),
+                          child: Text(
+                            'Upcoming Services',
+                            style: AppTypography.textTheme.titleSmall?.copyWith(
+                              color: AppColors.navy,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                        ...services.take(3).map(
+                              (s) => _UpcomingServiceTile(service: s)
+                                  .animate()
+                                  .fadeIn(duration: 300.ms)
+                                  .slideY(begin: 0.04, end: 0),
+                            ),
+                      ],
+                    );
+                  },
+                ),
+
+                const SizedBox(height: AppSpacing.xxxl),
+              ],
+            );
+          },
         );
-      },
-    );
   }
 }

@@ -13,25 +13,29 @@ class BibleLocalCache {
   final SharedPreferences _prefs;
 
   // ── Keys ─────────────────────────────────────────────────────────────────────
-  static const _booksPrefix        = 'bible_books_v2_';
-  static const _chaptersPrefix     = 'bible_chapters_v2_';
-  static const _contentPrefix      = 'bible_content_v2_';
-  static const _lastVersionKey     = 'bible_last_version_id';
-  static const _lastBookKey        = 'bible_last_book_id';
-  static const _lastChapterKey     = 'bible_last_chapter_id';
-  static const _recentSearchesKey  = 'bible_recent_searches_v1';
-  static const _maxRecentSearches  = 10;
+  static const _booksPrefix = 'bible_books_v2_';
+  static const _chaptersPrefix = 'bible_chapters_v2_';
+  static const _contentPrefix = 'bible_content_v2_';
+  static const _lastVersionKey = 'bible_last_version_id';
+  static const _lastBookKey = 'bible_last_book_id';
+  static const _lastChapterKey = 'bible_last_chapter_id';
+  static const _recentSearchesKey = 'bible_recent_searches_v1';
+  static const _maxRecentSearches = 10;
 
   // ── Books ─────────────────────────────────────────────────────────────────────
 
   Future<void> cacheBooks(int versionId, List<BibleBook> books) async {
-    final jsonList = books.map((b) => {
-          'id':           b.id,
-          'bibleId':      b.bibleId,
-          'abbreviation': b.abbreviation,
-          'name':         b.name,
-          'nameLong':     b.nameLong,
-        },).toList();
+    final jsonList = books
+        .map(
+          (b) => {
+            'id': b.id,
+            'bibleId': b.bibleId,
+            'abbreviation': b.abbreviation,
+            'name': b.name,
+            'nameLong': b.nameLong,
+          },
+        )
+        .toList();
     await _prefs.setString('$_booksPrefix$versionId', jsonEncode(jsonList));
   }
 
@@ -55,13 +59,17 @@ class BibleLocalCache {
     String bookId,
     List<BibleChapter> chapters,
   ) async {
-    final jsonList = chapters.map((c) => {
-          'id':        c.id,
-          'bibleId':   c.bibleId,
-          'bookId':    c.bookId,
-          'number':    c.number,
-          'reference': c.reference,
-        },).toList();
+    final jsonList = chapters
+        .map(
+          (c) => {
+            'id': c.id,
+            'bibleId': c.bibleId,
+            'bookId': c.bookId,
+            'number': c.number,
+            'reference': c.reference,
+          },
+        )
+        .toList();
     await _prefs.setString(
       '$_chaptersPrefix${versionId}_$bookId',
       jsonEncode(jsonList),
@@ -89,13 +97,13 @@ class BibleLocalCache {
     BibleChapterContent content,
   ) async {
     final map = {
-      'id':                content.id,
-      'bibleId':           content.bibleId,
-      'number':            content.number,
-      'bookId':            content.bookId,
-      'reference':         content.reference,
-      'content':           content.content,
-      'nextChapterId':     content.nextChapterId,
+      'id': content.id,
+      'bibleId': content.bibleId,
+      'number': content.number,
+      'bookId': content.bookId,
+      'reference': content.reference,
+      'content': content.content,
+      'nextChapterId': content.nextChapterId,
       'previousChapterId': content.previousChapterId,
     };
     await _prefs.setString(
@@ -105,8 +113,7 @@ class BibleLocalCache {
   }
 
   BibleChapterContent? getCachedContent(int versionId, String chapterId) {
-    final str =
-        _prefs.getString('$_contentPrefix${versionId}_$chapterId');
+    final str = _prefs.getString('$_contentPrefix${versionId}_$chapterId');
     if (str == null) return null;
     try {
       final map = jsonDecode(str) as Map<String, dynamic>;
@@ -135,7 +142,7 @@ class BibleLocalCache {
   }
 
   ({String bookId, String chapterId})? getLastPosition() {
-    final book    = _prefs.getString(_lastBookKey);
+    final book = _prefs.getString(_lastBookKey);
     final chapter = _prefs.getString(_lastChapterKey);
     if (book == null || chapter == null) return null;
     return (bookId: book, chapterId: chapter);

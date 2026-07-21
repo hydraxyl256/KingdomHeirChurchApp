@@ -17,8 +17,8 @@ final bibleLocalCacheProvider = Provider<BibleLocalCache>((ref) {
 
 final bibleRepositoryProvider = Provider<BibleRepository>((ref) {
   return BibleRepositoryImpl(
-    apiService:      BibleApiService(),
-    localCache:      ref.watch(bibleLocalCacheProvider),
+    apiService: BibleApiService(),
+    localCache: ref.watch(bibleLocalCacheProvider),
     supabaseService: BibleSupabaseService(Supabase.instance.client),
   );
 });
@@ -27,9 +27,8 @@ final bibleRepositoryProvider = Provider<BibleRepository>((ref) {
 // Bible Versions (YouVersion numeric IDs)
 // ─────────────────────────────────────────────────────────────────────────────
 
-final bibleVersionsProvider =
-    FutureProvider<List<BibleVersion>>((ref) async {
-  final repo   = ref.watch(bibleRepositoryProvider);
+final bibleVersionsProvider = FutureProvider<List<BibleVersion>>((ref) async {
+  final repo = ref.watch(bibleRepositoryProvider);
   final result = await repo.getVersions();
   return result.fold(
     (l) => throw Exception(l),
@@ -67,8 +66,8 @@ final bibleVersionProvider =
 
 final bibleBooksProvider = FutureProvider<List<BibleBook>>((ref) async {
   final versionId = ref.watch(bibleVersionProvider);
-  final repo      = ref.watch(bibleRepositoryProvider);
-  final result    = await repo.getBooks(versionId);
+  final repo = ref.watch(bibleRepositoryProvider);
+  final result = await repo.getBooks(versionId);
   return result.fold(
     (l) => throw Exception(l),
     (r) => r,
@@ -87,7 +86,7 @@ class BibleNavigationState {
 
   BibleNavigationState copyWith({String? bookId, String? chapterId}) {
     return BibleNavigationState(
-      bookId:    bookId    ?? this.bookId,
+      bookId: bookId ?? this.bookId,
       chapterId: chapterId ?? this.chapterId,
     );
   }
@@ -102,14 +101,15 @@ class BibleNavigationNotifier extends StateNotifier<BibleNavigationState> {
     final pos = cache.getLastPosition();
     if (pos != null) {
       return BibleNavigationState(
-        bookId:    pos.bookId,
+        bookId: pos.bookId,
         chapterId: pos.chapterId,
       );
     }
     return BibleNavigationState();
   }
 
-  Future<void> navigate({required String bookId, required String chapterId}) async {
+  Future<void> navigate(
+      {required String bookId, required String chapterId,}) async {
     state = BibleNavigationState(bookId: bookId, chapterId: chapterId);
     await _cache.saveLastPosition(bookId: bookId, chapterId: chapterId);
   }
@@ -132,8 +132,8 @@ final bibleNavigationProvider =
 final bibleChaptersProvider =
     FutureProvider.family<List<BibleChapter>, String>((ref, bookId) async {
   final versionId = ref.watch(bibleVersionProvider);
-  final repo      = ref.watch(bibleRepositoryProvider);
-  final result    = await repo.getChapters(versionId, bookId);
+  final repo = ref.watch(bibleRepositoryProvider);
+  final result = await repo.getChapters(versionId, bookId);
   return result.fold(
     (l) => throw Exception(l),
     (r) => r,
@@ -144,12 +144,11 @@ final bibleChaptersProvider =
 // Current chapter content
 // ─────────────────────────────────────────────────────────────────────────────
 
-final bibleContentProvider =
-    FutureProvider<BibleChapterContent>((ref) async {
+final bibleContentProvider = FutureProvider<BibleChapterContent>((ref) async {
   final versionId = ref.watch(bibleVersionProvider);
-  final nav       = ref.watch(bibleNavigationProvider);
-  final repo      = ref.watch(bibleRepositoryProvider);
-  final result    = await repo.getChapterContent(versionId, nav.chapterId);
+  final nav = ref.watch(bibleNavigationProvider);
+  final repo = ref.watch(bibleRepositoryProvider);
+  final result = await repo.getChapterContent(versionId, nav.chapterId);
   return result.fold(
     (l) => throw Exception(l),
     (r) => r,
@@ -161,12 +160,11 @@ final bibleContentProvider =
 // ─────────────────────────────────────────────────────────────────────────────
 
 final bibleSearchProvider =
-    FutureProvider.family<List<BibleSearchResult>, String>(
-        (ref, query) async {
+    FutureProvider.family<List<BibleSearchResult>, String>((ref, query) async {
   if (query.trim().isEmpty) return const [];
   final versionId = ref.watch(bibleVersionProvider);
-  final repo      = ref.watch(bibleRepositoryProvider);
-  final result    = await repo.search(versionId, query);
+  final repo = ref.watch(bibleRepositoryProvider);
+  final result = await repo.search(versionId, query);
   return result.fold(
     (l) => throw Exception(l),
     (r) => r,

@@ -257,10 +257,7 @@ class _WelcomePage extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                       height: 1.15,
                     ),
-                  )
-                      .animate()
-                      .fadeIn(delay: 300.ms, duration: 500.ms)
-                      .slideY(
+                  ).animate().fadeIn(delay: 300.ms, duration: 500.ms).slideY(
                         begin: 0.15,
                         end: 0,
                         delay: 300.ms,
@@ -279,10 +276,7 @@ class _WelcomePage extends StatelessWidget {
                       height: 1.6,
                       letterSpacing: 0.3,
                     ),
-                  )
-                      .animate()
-                      .fadeIn(delay: 480.ms, duration: 500.ms)
-                      .slideY(
+                  ).animate().fadeIn(delay: 480.ms, duration: 500.ms).slideY(
                         begin: 0.1,
                         end: 0,
                         delay: 480.ms,
@@ -302,10 +296,7 @@ class _WelcomePage extends StatelessWidget {
                       ),
                       borderRadius: AppRadius.brCircle,
                     ),
-                  )
-                      .animate()
-                      .fadeIn(delay: 600.ms, duration: 400.ms)
-                      .scaleX(
+                  ).animate().fadeIn(delay: 600.ms, duration: 400.ms).scaleX(
                         begin: 0,
                         end: 1,
                         delay: 600.ms,
@@ -409,35 +400,40 @@ class _DiscoverPage extends StatelessWidget {
       icon: Icons.visibility_rounded,
       color: Color(0xFF1E3A8A),
       title: 'Our Vision',
-      description: 'Raising Kingdom Heirs who carry the glory of God to every nation on earth.',
+      description:
+          'Raising Kingdom Heirs who carry the glory of God to every nation on earth.',
       route: RouteNames.startHereVision,
     ),
     _DiscoverCardData(
       icon: Icons.history_edu_rounded,
       color: Color(0xFFA88B1D),
       title: 'Our Story',
-      description: "From a small prayer meeting to a global movement — God's faithfulness on display.",
+      description:
+          "From a small prayer meeting to a global movement — God's faithfulness on display.",
       route: RouteNames.startHereStory,
     ),
     _DiscoverCardData(
       icon: Icons.auto_stories_rounded,
       color: Color(0xFF15803D),
       title: 'What We Believe',
-      description: 'Rooted in Scripture. Our statement of faith defines who we are and how we live.',
+      description:
+          'Rooted in Scripture. Our statement of faith defines who we are and how we live.',
       route: RouteNames.startHereStatementOfFaith,
     ),
     _DiscoverCardData(
       icon: Icons.person_rounded,
       color: Color(0xFF7C3AED),
       title: 'Meet Our Founder',
-      description: 'A personal letter from the spiritual father of Kingdom Heirs Church.',
+      description:
+          'A personal letter from the spiritual father of Kingdom Heirs Church.',
       route: RouteNames.startHereFounder,
     ),
     _DiscoverCardData(
       icon: Icons.church_rounded,
       color: Color(0xFFDC2626),
       title: 'Join Us This Sunday',
-      description: 'Sunday Worship at 9 AM · In-person & Online. Come experience church family.',
+      description:
+          'Sunday Worship at 9 AM · In-person & Online. Come experience church family.',
       route: RouteNames.startHerePlanVisit,
     ),
   ];
@@ -478,7 +474,8 @@ class _DiscoverPage extends StatelessWidget {
               ),
             ),
             // Next
-            _BottomNav(onNext: onNext, onBack: onBack, label: 'Experience Life'),
+            _BottomNav(
+                onNext: onNext, onBack: onBack, label: 'Experience Life',),
           ],
         ),
       ),
@@ -533,9 +530,7 @@ class _DiscoverCard extends StatelessWidget {
         color: cardColor,
         borderRadius: AppRadius.brLg,
         child: InkWell(
-          onTap: data.route != null
-              ? () => context.push(data.route!)
-              : null,
+          onTap: data.route != null ? () => context.push(data.route!) : null,
           borderRadius: AppRadius.brLg,
           child: Container(
             decoration: BoxDecoration(
@@ -652,7 +647,8 @@ class _ExperiencePage extends StatelessWidget {
       emoji: '📖',
       color: Color(0xFF1E3A8A),
       title: 'Daily Bible Reading',
-      benefit: 'Follow curated Bible plans and grow your knowledge of Scripture every day.',
+      benefit:
+          'Follow curated Bible plans and grow your knowledge of Scripture every day.',
     ),
     _FeatureData(
       emoji: '🎧',
@@ -664,25 +660,29 @@ class _ExperiencePage extends StatelessWidget {
       emoji: '🙏',
       color: Color(0xFF0EA5E9),
       title: 'Prayer Community',
-      benefit: 'Submit requests and stand in faith with thousands who pray together.',
+      benefit:
+          'Submit requests and stand in faith with thousands who pray together.',
     ),
     _FeatureData(
       emoji: '👥',
       color: Color(0xFF15803D),
       title: 'Community Groups',
-      benefit: 'Connect in small groups for deeper fellowship, growth, and accountability.',
+      benefit:
+          'Connect in small groups for deeper fellowship, growth, and accountability.',
     ),
     _FeatureData(
       emoji: '📅',
       color: Color(0xFFA88B1D),
       title: 'Church Events',
-      benefit: 'Never miss a service, conference, or special gathering near you.',
+      benefit:
+          'Never miss a service, conference, or special gathering near you.',
     ),
     _FeatureData(
       emoji: '❤️',
       color: Color(0xFFDC2626),
       title: 'Giving & Stewardship',
-      benefit: 'Give securely and track your faithfulness toward Kingdom purposes.',
+      benefit:
+          'Give securely and track your faithfulness toward Kingdom purposes.',
     ),
   ];
 
@@ -961,10 +961,7 @@ class _JoinFamilyPage extends StatelessWidget {
                       color: AppColors.ink,
                       size: 32,
                     ),
-                  )
-                      .animate()
-                      .fadeIn(duration: 500.ms)
-                      .scale(
+                  ).animate().fadeIn(duration: 500.ms).scale(
                         begin: const Offset(0.8, 0.8),
                         end: const Offset(1, 1),
                         duration: 500.ms,
@@ -982,10 +979,7 @@ class _JoinFamilyPage extends StatelessWidget {
                       fontWeight: FontWeight.w800,
                       height: 1.25,
                     ),
-                  )
-                      .animate()
-                      .fadeIn(delay: 150.ms, duration: 450.ms)
-                      .slideY(
+                  ).animate().fadeIn(delay: 150.ms, duration: 450.ms).slideY(
                         begin: 0.1,
                         end: 0,
                         delay: 150.ms,
@@ -1010,7 +1004,8 @@ class _JoinFamilyPage extends StatelessWidget {
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       crossAxisSpacing: AppSpacing.md,
                       mainAxisSpacing: AppSpacing.md,
@@ -1428,10 +1423,7 @@ class _PageTopBar extends StatelessWidget {
             ),
           ),
         ],
-      )
-          .animate()
-          .fadeIn(duration: AppMotion.emphasized)
-          .slideY(
+      ).animate().fadeIn(duration: AppMotion.emphasized).slideY(
             begin: -0.05,
             end: 0,
             duration: AppMotion.emphasized,
@@ -1456,7 +1448,8 @@ class _BottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
+    final bgColor =
+        isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
     final borderColor = isDark ? AppColors.dividerDark : AppColors.dividerLight;
     final signInColor = isDark
         ? AppColors.warmWhite.withValues(alpha: 0.7)

@@ -35,7 +35,8 @@ class SupabaseProfileRepository implements ProfileRepository {
 
   @override
   Future<Either<String, Profile>> updateProfile(
-      Map<String, dynamic> updates,) async {
+    Map<String, dynamic> updates,
+  ) async {
     try {
       final user = _client.auth.currentUser;
       if (user == null) return left('Not authenticated.');

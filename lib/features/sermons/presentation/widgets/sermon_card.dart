@@ -157,7 +157,8 @@ class SermonCard extends ConsumerWidget {
                             Flexible(
                               child: Text(
                                 sermon.scriptureReference!,
-                                style: AppTypography.textTheme.labelSmall?.copyWith(
+                                style: AppTypography.textTheme.labelSmall
+                                    ?.copyWith(
                                   color: AppColors.gold,
                                   fontWeight: FontWeight.w600,
                                 ),

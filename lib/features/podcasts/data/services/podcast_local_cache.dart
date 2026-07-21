@@ -24,7 +24,9 @@ class PodcastLocalCache {
   }
 
   Future<void> cacheEpisodes(
-      String seriesId, List<PodcastEpisode> episodes,) async {
+    String seriesId,
+    List<PodcastEpisode> episodes,
+  ) async {
     final list = episodes.map((e) => e.toJson()).toList();
     await _prefs.setString('$_episodesKeyPrefix$seriesId', jsonEncode(list));
   }

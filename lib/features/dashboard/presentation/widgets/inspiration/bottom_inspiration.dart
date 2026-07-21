@@ -8,12 +8,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/features/dashboard/domain/dashboard_models.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class BottomInspiration extends StatefulWidget {
   const BottomInspiration({
@@ -171,7 +171,7 @@ class _BottomInspirationState extends State<BottomInspiration> {
               TextButton.icon(
                 onPressed: _next,
                 icon: const Icon(Icons.refresh_rounded, size: 14),
-                label: const Text('New inspiration'),
+                label: Text(AppLocalizations.of(context)!.newInspiration),
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.goldDark,
                   minimumSize: const Size(0, 36),

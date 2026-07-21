@@ -98,8 +98,7 @@ void main() {
 
   group('SignOutUseCase', () {
     test('should return unit on successful sign out', () async {
-      when(() => mockRepo.signOut())
-          .thenAnswer((_) async => const Right(unit));
+      when(() => mockRepo.signOut()).thenAnswer((_) async => const Right(unit));
 
       final result = await signOutUseCase();
 

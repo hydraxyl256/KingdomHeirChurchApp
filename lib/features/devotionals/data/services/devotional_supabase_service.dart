@@ -8,53 +8,55 @@ class DevotionalSupabaseService {
 
   String get _userId => _client.auth.currentUser!.id;
 
-  Future<Either<String, Devotional?>> getDailyDevotional() async {
+  Future<Either<String, Devotional?>> getDailyDevotional(
+      {String languageCode = 'en',}) async {
     try {
       final now = DateTime.now();
       final todayStr =
           '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
-      final data = await _client
-          .from('devotionals')
-          .select()
-          .eq('status', 'published')
-          .eq('scheduled_for', todayStr)
-          .maybeSingle();
 
-      if (data == null) {
-        // Fallback to the latest published devotional if none scheduled for today
-        final latest = await _client
-            .from('devotionals')
-            .select()
-            .eq('status', 'published')
-            .order('scheduled_for', ascending: false)
-            .limit(1)
-            .maybeSingle();
-        if (latest == null) return right(null);
-        return right(Devotional.fromJson(latest));
+      final data = await _client.rpc<List<dynamic>>('get_devotionals_localized',
+          params: {'p_lang': languageCode},);
+
+      if (data.isNotEmpty) {
+        // Find the one for today
+        final todayDevotional = data.firstWhere(
+          (d) => (d as Map<String, dynamic>)['scheduled_for'] == todayStr,
+          orElse: () => null,
+        );
+
+        if (todayDevotional != null) {
+          return right(
+              Devotional.fromJson(todayDevotional as Map<String, dynamic>),);
+        }
+
+        // Fallback to latest published if none scheduled for today
+        final latest = data.first;
+        return right(Devotional.fromJson(latest as Map<String, dynamic>));
       }
-      return right(Devotional.fromJson(data));
+      return right(null);
     } catch (e) {
       return left(e.toString());
     }
   }
 
-  Future<Either<String, List<Devotional>>> getPreviousDevotionals() async {
+  Future<Either<String, List<Devotional>>> getPreviousDevotionals(
+      {String languageCode = 'en',}) async {
     try {
       final now = DateTime.now();
       final todayStr =
           '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
 
-      final data = await _client
-          .from('devotionals')
-          .select()
-          .eq('status', 'published')
-          .lt('scheduled_for', todayStr)
-          .order('scheduled_for', ascending: false)
-          .limit(20);
+      final data = await _client.rpc<List<dynamic>>('get_devotionals_localized',
+          params: {'p_lang': languageCode},);
 
-      return right((data as List<dynamic>)
+      final previous = data
           .map((e) => Devotional.fromJson(e as Map<String, dynamic>))
-          .toList(),);
+          .where((d) => d.scheduledFor.compareTo(DateTime.parse(todayStr)) < 0)
+          .take(20)
+          .toList();
+      return right(previous);
+
     } catch (e) {
       return left(e.toString());
     }
@@ -66,16 +68,21 @@ class DevotionalSupabaseService {
           .from('devotional_reflections')
           .select()
           .order('created_at', ascending: false);
-      return right((data as List<dynamic>)
-          .map((e) => DevotionalReflection.fromJson(e as Map<String, dynamic>))
-          .toList(),);
+      return right(
+        (data as List<dynamic>)
+            .map(
+                (e) => DevotionalReflection.fromJson(e as Map<String, dynamic>),)
+            .toList(),
+      );
     } catch (e) {
       return left(e.toString());
     }
   }
 
-  Future<Either<String, void>> addReflection(String body,
-      {String? devotionalId,}) async {
+  Future<Either<String, void>> addReflection(
+    String body, {
+    String? devotionalId,
+  }) async {
     try {
       await _client.from('devotional_reflections').insert({
         'user_id': _userId,

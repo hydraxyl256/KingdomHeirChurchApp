@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final _adminSeriesProvider =
@@ -29,12 +30,12 @@ class AdminDevotionalSeriesScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Devotional Series'),
+        title: Text(AppLocalizations.of(context)!.devotionalSeries),
         actions: [
           FilledButton.icon(
             onPressed: () => _showCreateDialog(context, ref),
             icon: const Icon(Icons.add, size: 18),
-            label: const Text('New Series'),
+            label: Text(AppLocalizations.of(context)!.newSeries),
           ),
           const SizedBox(width: 12),
         ],
@@ -48,11 +49,16 @@ class AdminDevotionalSeriesScreen extends ConsumerWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.menu_book_rounded,
-                      size: 56, color: AppColors.gold,),
+                  const Icon(
+                    Icons.menu_book_rounded,
+                    size: 56,
+                    color: AppColors.gold,
+                  ),
                   const SizedBox(height: AppSpacing.md),
-                  Text('No devotional series yet.',
-                      style: AppTypography.textTheme.bodyMedium,),
+                  Text(
+                    'No devotional series yet.',
+                    style: AppTypography.textTheme.bodyMedium,
+                  ),
                 ],
               ),
             );
@@ -61,8 +67,7 @@ class AdminDevotionalSeriesScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(AppSpacing.md),
             itemCount: series.length,
             separatorBuilder: (_, __) => const Divider(height: 1),
-            itemBuilder: (context, i) =>
-                _SeriesRow(item: series[i], ref: ref),
+            itemBuilder: (context, i) => _SeriesRow(item: series[i], ref: ref),
           );
         },
       ),
@@ -70,22 +75,22 @@ class AdminDevotionalSeriesScreen extends ConsumerWidget {
   }
 
   Future<void> _showCreateDialog(BuildContext context, WidgetRef ref) async {
-    final titleCtrl   = TextEditingController();
-    final authorCtrl  = TextEditingController();
-    final daysCtrl    = TextEditingController(text: '90');
-    final slugCtrl    = TextEditingController();
+    final titleCtrl = TextEditingController();
+    final authorCtrl = TextEditingController();
+    final daysCtrl = TextEditingController(text: '90');
+    final slugCtrl = TextEditingController();
 
     await showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('New Devotional Series'),
+        title: Text(AppLocalizations.of(context)!.newDevotionalSeries),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _DialogField(controller: titleCtrl,  label: 'Title'),
+              _DialogField(controller: titleCtrl, label: 'Title'),
               const SizedBox(height: 12),
-              _DialogField(controller: slugCtrl,   label: 'Slug (URL-safe)'),
+              _DialogField(controller: slugCtrl, label: 'Slug (URL-safe)'),
               const SizedBox(height: 12),
               _DialogField(controller: authorCtrl, label: 'Author Name'),
               const SizedBox(height: 12),
@@ -100,24 +105,26 @@ class AdminDevotionalSeriesScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           FilledButton(
             onPressed: () async {
-              if (titleCtrl.text.trim().isEmpty || slugCtrl.text.trim().isEmpty) return;
+              if (titleCtrl.text.trim().isEmpty || slugCtrl.text.trim().isEmpty) {
+                return;
+              }
               await Supabase.instance.client.from('devotional_series').insert({
-                'title':      titleCtrl.text.trim(),
-                'slug':       slugCtrl.text.trim(),
-                'author_name':authorCtrl.text.trim().isNotEmpty
+                'title': titleCtrl.text.trim(),
+                'slug': slugCtrl.text.trim(),
+                'author_name': authorCtrl.text.trim().isNotEmpty
                     ? authorCtrl.text.trim()
                     : null,
                 'total_days': int.tryParse(daysCtrl.text.trim()) ?? 90,
-                'status':     'draft',
+                'status': 'draft',
               });
               ref.invalidate(_adminSeriesProvider);
               if (ctx.mounted) Navigator.pop(ctx);
             },
-            child: const Text('Create'),
+            child: Text(AppLocalizations.of(context)!.create),
           ),
         ],
       ),
@@ -132,16 +139,16 @@ class _SeriesRow extends StatelessWidget {
   final Map<String, dynamic> item;
   final WidgetRef ref;
 
-  String get _id       => item['id'] as String;
-  String get _title    => item['title'] as String? ?? 'Untitled';
-  String get _status   => item['status'] as String? ?? 'draft';
-  int    get _days     => item['total_days'] as int? ?? 0;
-  bool   get _primary  => item['is_primary_challenge_series'] as bool? ?? false;
+  String get _id => item['id'] as String;
+  String get _title => item['title'] as String? ?? 'Untitled';
+  String get _status => item['status'] as String? ?? 'draft';
+  int get _days => item['total_days'] as int? ?? 0;
+  bool get _primary => item['is_primary_challenge_series'] as bool? ?? false;
 
   Color _statusColor() => switch (_status) {
         'published' => AppColors.success,
-        'archived'  => AppColors.error,
-        _           => AppColors.warning,
+        'archived' => AppColors.error,
+        _ => AppColors.warning,
       };
 
   @override
@@ -154,14 +161,20 @@ class _SeriesRow extends StatelessWidget {
           color: AppColors.navyMid,
           borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
         ),
-        child: const Icon(Icons.menu_book_rounded,
-            color: AppColors.gold, size: 24,),
+        child: const Icon(
+          Icons.menu_book_rounded,
+          color: AppColors.gold,
+          size: 24,
+        ),
       ),
       title: Row(
         children: [
-          Text(_title, style: AppTypography.textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.w700,
-          ),),
+          Text(
+            _title,
+            style: AppTypography.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
           if (_primary) ...[
             const SizedBox(width: 6),
             Container(
@@ -182,17 +195,19 @@ class _SeriesRow extends StatelessWidget {
           ],
         ],
       ),
-      subtitle: Text('$_days days · Status: ${_status.toUpperCase()}',
-          style: AppTypography.textTheme.bodySmall?.copyWith(
-            color: _statusColor(),
-            fontWeight: FontWeight.w600,
-          ),),
+      subtitle: Text(
+        '$_days days · Status: ${_status.toUpperCase()}',
+        style: AppTypography.textTheme.bodySmall?.copyWith(
+          color: _statusColor(),
+          fontWeight: FontWeight.w600,
+        ),
+      ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           // Open day editor
           IconButton(
-            tooltip: 'Edit Days',
+            tooltip: AppLocalizations.of(context)!.editDays,
             icon: const Icon(Icons.edit_calendar_rounded, size: 20),
             onPressed: () => context.push(
               '/admin/devotional-series/$_id/days/1',
@@ -201,25 +216,31 @@ class _SeriesRow extends StatelessWidget {
           // Status popup
           PopupMenuButton<String>(
             onSelected: (val) async {
-              if (val == 'publish')  await _updateStatus('published');
-              if (val == 'draft')    await _updateStatus('draft');
-              if (val == 'archive')  await _updateStatus('archived');
-              if (val == 'primary')  await _togglePrimary();
+              if (val == 'publish') await _updateStatus('published');
+              if (val == 'draft') await _updateStatus('draft');
+              if (val == 'archive') await _updateStatus('archived');
+              if (val == 'primary') await _togglePrimary();
               ref.invalidate(_adminSeriesProvider);
             },
             itemBuilder: (_) => [
               if (_status != 'published')
-                const PopupMenuItem(value: 'publish', child: Text('✅ Publish')),
+                PopupMenuItem(
+                    value: 'publish',
+                    child: Text(AppLocalizations.of(context)!.publish),),
               if (_status != 'draft')
-                const PopupMenuItem(value: 'draft', child: Text('📝 Set Draft')),
+                PopupMenuItem(
+                    value: 'draft',
+                    child: Text(AppLocalizations.of(context)!.setDraft),),
               if (_status != 'archived')
-                const PopupMenuItem(value: 'archive', child: Text('🗄 Archive')),
+                PopupMenuItem(
+                    value: 'archive',
+                    child: Text(AppLocalizations.of(context)!.archive),),
               const PopupMenuDivider(),
               PopupMenuItem(
                 value: 'primary',
-                child: Text(_primary
-                    ? '⭐ Remove Primary'
-                    : '⭐ Set as Primary Challenge',),
+                child: Text(
+                  _primary ? '⭐ Remove Primary' : '⭐ Set as Primary Challenge',
+                ),
               ),
             ],
           ),
@@ -231,15 +252,13 @@ class _SeriesRow extends StatelessWidget {
   Future<void> _updateStatus(String status) async {
     await Supabase.instance.client
         .from('devotional_series')
-        .update({'status': status})
-        .eq('id', _id);
+        .update({'status': status}).eq('id', _id);
   }
 
   Future<void> _togglePrimary() async {
     await Supabase.instance.client
         .from('devotional_series')
-        .update({'is_primary_challenge_series': !_primary})
-        .eq('id', _id);
+        .update({'is_primary_challenge_series': !_primary}).eq('id', _id);
   }
 }
 

@@ -11,7 +11,8 @@ final leadershipRepositoryProvider = Provider<LeadershipRepository>((ref) {
 
 abstract class LeadershipRepository {
   Future<Either<String, void>> submitLeaderApplication(
-      LeaderApplication application,);
+    LeaderApplication application,
+  );
 }
 
 class SupabaseLeadershipRepository implements LeadershipRepository {
@@ -20,7 +21,8 @@ class SupabaseLeadershipRepository implements LeadershipRepository {
 
   @override
   Future<Either<String, void>> submitLeaderApplication(
-      LeaderApplication application,) async {
+    LeaderApplication application,
+  ) async {
     try {
       final user = _client.auth.currentUser;
       if (user == null) {

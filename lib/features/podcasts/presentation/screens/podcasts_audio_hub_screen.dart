@@ -5,6 +5,7 @@ import 'package:just_audio/just_audio.dart' show ProcessingState;
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/features/podcasts/presentation/providers/podcasts_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class PodcastsAudioHubScreen extends ConsumerWidget {
   const PodcastsAudioHubScreen({super.key});
@@ -16,7 +17,8 @@ class PodcastsAudioHubScreen extends ConsumerWidget {
     final seriesAsync = ref.watch(podcastSeriesProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Podcasts & Audio Hub')),
+      appBar:
+          AppBar(title: Text(AppLocalizations.of(context)!.podcastsAudioHub)),
       body: CustomScrollView(
         slivers: [
           // Player Card
@@ -40,13 +42,17 @@ class PodcastsAudioHubScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(AppSpacing.md),
             sliver: episodesAsync.when(
               loading: () => const SliverToBoxAdapter(
-                  child: Center(child: CircularProgressIndicator()),),
+                child: Center(child: CircularProgressIndicator()),
+              ),
               error: (err, _) =>
                   SliverToBoxAdapter(child: Center(child: Text('Error: $err'))),
               data: (episodes) {
                 if (episodes.isEmpty) {
-                  return const SliverToBoxAdapter(
-                      child: Center(child: Text('No episodes available')),);
+                  return SliverToBoxAdapter(
+                    child: Center(
+                        child: Text(
+                            AppLocalizations.of(context)!.noEpisodesAvailable,),),
+                  );
                 }
                 return SliverList(
                   delegate: SliverChildBuilderDelegate(
@@ -80,15 +86,17 @@ class PodcastsAudioHubScreen extends ConsumerWidget {
                           maxLines: 2,
                         ),
                         subtitle: Text(
-                            '${e.durationSeconds != null ? '${e.durationSeconds! ~/ 60} min' : 'Unknown length'} · ${e.publishedAt.day}/${e.publishedAt.month}/${e.publishedAt.year}',),
+                          '${e.durationSeconds != null ? '${e.durationSeconds! ~/ 60} min' : 'Unknown length'} · ${e.publishedAt.day}/${e.publishedAt.month}/${e.publishedAt.year}',
+                        ),
                         trailing: IconButton(
                           icon: const Icon(Icons.play_circle_outline_rounded),
                           color: AppColors.primary,
                           onPressed: () {
                             if (seriesAsync.hasValue) {
                               final series = seriesAsync.value!.firstWhere(
-                                  (s) => s.id == e.seriesId,
-                                  orElse: () => seriesAsync.value!.first,);
+                                (s) => s.id == e.seriesId,
+                                orElse: () => seriesAsync.value!.first,
+                              );
                               ref.read(currentSeriesProvider.notifier).state =
                                   series;
                               ref.read(currentEpisodeProvider.notifier).state =
@@ -137,7 +145,9 @@ class _MiniPlayerState extends ConsumerState<_MiniPlayer> {
           color: Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         ),
-        child: const Center(child: Text('Select an episode to start playing')),
+        child: Center(
+            child: Text(
+                AppLocalizations.of(context)!.selectAnEpisodeToStartPlaying,),),
       );
     }
 
@@ -200,8 +210,11 @@ class _MiniPlayerState extends ConsumerState<_MiniPlayer> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               IconButton(
-                icon: const Icon(Icons.replay_10_rounded,
-                    color: Colors.white, size: 32,),
+                icon: const Icon(
+                  Icons.replay_10_rounded,
+                  color: Colors.white,
+                  size: 32,
+                ),
                 onPressed: () {
                   final pos = playerService.player.position;
                   playerService.seek(pos - const Duration(seconds: 10));
@@ -222,7 +235,8 @@ class _MiniPlayerState extends ConsumerState<_MiniPlayer> {
                       width: 56,
                       height: 56,
                       child: const CircularProgressIndicator(
-                          color: AppColors.secondary,),
+                        color: AppColors.secondary,
+                      ),
                     );
                   } else if (playing != true) {
                     return IconButton(
@@ -249,8 +263,11 @@ class _MiniPlayerState extends ConsumerState<_MiniPlayer> {
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.forward_30_rounded,
-                    color: Colors.white, size: 32,),
+                icon: const Icon(
+                  Icons.forward_30_rounded,
+                  color: Colors.white,
+                  size: 32,
+                ),
                 onPressed: () {
                   final pos = playerService.player.position;
                   playerService.seek(pos + const Duration(seconds: 30));

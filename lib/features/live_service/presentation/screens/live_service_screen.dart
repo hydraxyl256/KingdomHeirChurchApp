@@ -243,8 +243,11 @@ class _ChatSection extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.chat_rounded,
-                      size: 15, color: cs.primary,),
+                  Icon(
+                    Icons.chat_rounded,
+                    size: 15,
+                    color: cs.primary,
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     'Live Chat',
@@ -257,8 +260,11 @@ class _ChatSection extends StatelessWidget {
                   AnimatedRotation(
                     turns: expanded ? 0.5 : 0,
                     duration: const Duration(milliseconds: 250),
-                    child: Icon(Icons.keyboard_arrow_down_rounded,
-                        color: cs.onSurfaceVariant, size: 20,),
+                    child: Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: cs.onSurfaceVariant,
+                      size: 20,
+                    ),
                   ),
                 ],
               ),

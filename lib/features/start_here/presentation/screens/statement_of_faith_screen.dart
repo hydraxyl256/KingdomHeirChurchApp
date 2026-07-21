@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/features/start_here/presentation/providers/start_here_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class StatementOfFaithScreen extends ConsumerWidget {
   const StatementOfFaithScreen({super.key});
@@ -16,7 +17,7 @@ class StatementOfFaithScreen extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Statement of Faith'),
+        title: Text(AppLocalizations.of(context)!.statementOfFaith),
         backgroundColor: isDark ? AppColors.surfaceDark : AppColors.primary,
         foregroundColor: isDark ? AppColors.warmWhite : Colors.white,
       ),
@@ -56,7 +57,12 @@ class StatementOfFaithScreen extends ConsumerWidget {
                   child: Text(
                     '• $text',
                     style: TextStyle(
-                        fontSize: 16, height: 1.5, color: isDark ? AppColors.warmWhite.withValues(alpha: 0.85) : Colors.black87,),
+                      fontSize: 16,
+                      height: 1.5,
+                      color: isDark
+                          ? AppColors.warmWhite.withValues(alpha: 0.85)
+                          : Colors.black87,
+                    ),
                   ),
                 );
               }),
@@ -96,7 +102,9 @@ class StatementOfFaithScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 15,
               height: 1.6,
-              color: isDark ? AppColors.warmWhite.withValues(alpha: 0.85) : AppColors.textPrimary,
+              color: isDark
+                  ? AppColors.warmWhite.withValues(alpha: 0.85)
+                  : AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: AppSpacing.xs),

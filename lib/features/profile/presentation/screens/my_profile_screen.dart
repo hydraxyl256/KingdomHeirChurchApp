@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +9,7 @@ import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/widgets/app_button.dart';
 import 'package:kingdom_heir/core/widgets/app_text_field.dart';
 import 'package:kingdom_heir/features/profile/presentation/providers/profile_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class MyProfileScreen extends ConsumerStatefulWidget {
   const MyProfileScreen({super.key});
@@ -48,7 +50,10 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
             .showSnackBar(SnackBar(content: Text(error)));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Avatar updated successfully!')),);
+          SnackBar(
+              content: Text(
+                  AppLocalizations.of(context)!.avatarUpdatedSuccessfully,),),
+        );
       }
     }
   }
@@ -69,7 +74,10 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
             .showSnackBar(SnackBar(content: Text(error)));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Profile saved successfully!')),);
+          SnackBar(
+              content:
+                  Text(AppLocalizations.of(context)!.profileSavedSuccessfully),),
+        );
       }
     }
   }
@@ -80,11 +88,11 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Profile'),
+        title: Text(AppLocalizations.of(context)!.myProfile),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_rounded),
-            tooltip: 'Settings',
+            tooltip: AppLocalizations.of(context)!.settings,
             onPressed: () => context.push(RouteNames.settings),
           ),
         ],

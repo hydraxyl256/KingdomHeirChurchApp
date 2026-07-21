@@ -6,7 +6,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
@@ -14,6 +13,7 @@ import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/features/groups/presentation/providers/groups_filters_provider.dart';
 import 'package:kingdom_heir/features/groups/presentation/widgets/discovery/discovery_grid.dart';
 import 'package:kingdom_heir/features/groups/presentation/widgets/discovery/filter_chips_bar.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class GroupDiscoveryScreen extends ConsumerStatefulWidget {
   const GroupDiscoveryScreen({super.key});
@@ -40,7 +40,7 @@ class _GroupDiscoveryScreenState extends ConsumerState<GroupDiscoveryScreen> {
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
-        title: const Text('Discover communities'),
+        title: Text(AppLocalizations.of(context)!.discoverCommunities),
         elevation: 0,
         backgroundColor: theme.colorScheme.surface,
       ),
@@ -78,8 +78,9 @@ class _GroupDiscoveryScreenState extends ConsumerState<GroupDiscoveryScreen> {
                             .read(groupFiltersProvider.notifier)
                             .setSearch(v),
                         textInputAction: TextInputAction.search,
-                        decoration: const InputDecoration(
-                          hintText: 'Search by name, topic, or interest…',
+                        decoration: InputDecoration(
+                          hintText: AppLocalizations.of(context)!
+                              .searchByNameTopicOrInterest,
                           border: InputBorder.none,
                           isCollapsed: true,
                         ),

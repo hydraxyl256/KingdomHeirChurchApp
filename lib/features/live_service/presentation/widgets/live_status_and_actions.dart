@@ -33,18 +33,18 @@ class LiveStatusBar extends ConsumerWidget {
     return stateAsync.when(
       loading: () => const SizedBox(height: 52),
       error: (_, __) => Container(
-            height: 52,
-            color: AppColors.errorContainer,
-            child: const Center(
-              child: Text(
-                'Live service unavailable',
-                style: TextStyle(
-                  color: AppColors.error,
-                  fontSize: 14,
-                ),
-              ),
+        height: 52,
+        color: AppColors.errorContainer,
+        child: const Center(
+          child: Text(
+            'Live service unavailable',
+            style: TextStyle(
+              color: AppColors.error,
+              fontSize: 14,
             ),
           ),
+        ),
+      ),
       data: (state) => state.isLive
           ? _LiveStatusContent(state: state)
           : _CountdownContent(state: state),
@@ -75,8 +75,11 @@ class _LiveStatusContent extends ConsumerWidget {
         children: [
           // Duration
           if (state.durationLabel.isNotEmpty) ...[
-            const Icon(Icons.timer_outlined,
-                size: 14, color: AppColors.textSecondary,),
+            const Icon(
+              Icons.timer_outlined,
+              size: 14,
+              color: AppColors.textSecondary,
+            ),
             const SizedBox(width: 4),
             Text(
               state.durationLabel,
@@ -112,8 +115,7 @@ class _LiveStatusContent extends ConsumerWidget {
                     LivePanelTab.bible;
               },
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   color: AppColors.goldContainer,
                   borderRadius: BorderRadius.circular(20),
@@ -211,8 +213,11 @@ class _CountdownContentState extends State<_CountdownContent> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.church_rounded,
-              size: 16, color: AppColors.textSecondary,),
+          const Icon(
+            Icons.church_rounded,
+            size: 16,
+            color: AppColors.textSecondary,
+          ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Column(
@@ -434,8 +439,11 @@ class _BiblePanelStub extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.xl),
-            const Icon(Icons.menu_book_rounded,
-                size: 48, color: AppColors.gold,),
+            const Icon(
+              Icons.menu_book_rounded,
+              size: 48,
+              color: AppColors.gold,
+            ),
             const SizedBox(height: AppSpacing.md),
             Text(
               'Bible Reference',

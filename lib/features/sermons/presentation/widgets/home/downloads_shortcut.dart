@@ -6,12 +6,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/features/sermons/data/mock/mock_sermons_seed.dart';
 import 'package:kingdom_heir/features/sermons/domain/entities/sermon_download.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class DownloadsShortcut extends StatelessWidget {
   const DownloadsShortcut({
@@ -64,7 +64,7 @@ class DownloadsShortcut extends StatelessWidget {
                   style: TextButton.styleFrom(
                     foregroundColor: AppColors.gold,
                   ),
-                  child: const Text('See all'),
+                  child: Text(AppLocalizations.of(context)!.seeAll),
                 ),
               ],
             ),

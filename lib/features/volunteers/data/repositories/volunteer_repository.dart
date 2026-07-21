@@ -6,7 +6,8 @@ abstract class VolunteerRepository {
   Future<Either<String, List<VolunteerOpportunity>>> getOpportunities();
   Future<Either<String, List<VolunteerApplication>>> getMyApplications();
   Future<Either<String, VolunteerApplication>> applyForOpportunity(
-      String opportunityId,);
+    String opportunityId,
+  );
 }
 
 class VolunteerRepositoryImpl implements VolunteerRepository {
@@ -23,6 +24,7 @@ class VolunteerRepositoryImpl implements VolunteerRepository {
 
   @override
   Future<Either<String, VolunteerApplication>> applyForOpportunity(
-          String opportunityId,) =>
+    String opportunityId,
+  ) =>
       _service.applyForOpportunity(opportunityId);
 }

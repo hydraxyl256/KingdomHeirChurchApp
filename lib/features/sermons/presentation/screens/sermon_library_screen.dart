@@ -6,7 +6,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
@@ -17,6 +16,7 @@ import 'package:kingdom_heir/features/sermons/presentation/widgets/library/libra
 import 'package:kingdom_heir/features/sermons/presentation/widgets/library/library_sort_tabs.dart';
 import 'package:kingdom_heir/features/sermons/presentation/widgets/library/topic_chips_bar.dart';
 import 'package:kingdom_heir/features/sermons/presentation/widgets/shared/sermons_empty_state.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class SermonLibraryScreen extends ConsumerWidget {
   const SermonLibraryScreen({super.key});
@@ -28,12 +28,12 @@ class SermonLibraryScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title: const Text('Library'),
+        title: Text(AppLocalizations.of(context)!.library),
         backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         actions: [
           IconButton(
-            tooltip: 'Filter',
+            tooltip: AppLocalizations.of(context)!.filter,
             icon: const Icon(Icons.tune_rounded),
             onPressed: () => showLibraryFilterSheet(context),
           ),

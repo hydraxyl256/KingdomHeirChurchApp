@@ -162,7 +162,8 @@ class _ResourcesExpandableSectionState
                                 // the body during the expand animation.
                                 child: _TileFadeIn(
                                   delayMs: 40 * i,
-                                  child: FeatureTileWidget(feature: _features[i]),
+                                  child:
+                                      FeatureTileWidget(feature: _features[i]),
                                 ),
                               ),
                             ),

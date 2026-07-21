@@ -12,8 +12,7 @@ final notificationsProvider =
   NotificationsNotifier.new,
 );
 
-class NotificationsNotifier
-    extends AsyncNotifier<List<AppNotification>> {
+class NotificationsNotifier extends AsyncNotifier<List<AppNotification>> {
   @override
   Future<List<AppNotification>> build() async {
     final repo = ref.watch(notificationsRepositoryProvider);

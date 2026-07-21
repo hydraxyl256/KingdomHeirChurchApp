@@ -266,8 +266,6 @@ class _HomeDashboardBody extends ConsumerWidget {
     }
   }
 
-
-
   void _onQuickAction(BuildContext context, QuickActionItem action) {
     switch (action) {
       case QuickActionItem.bible:
@@ -319,7 +317,8 @@ class _HomeDashboardBody extends ConsumerWidget {
   ) async {
     // Trim quotes already in the text and wrap with attribution.
     final clean = text.replaceAll(RegExp(r'^"|"$'), '').trim();
-    final shareText = '"$clean"\n— $reference\n\nShared from the Kingdom Heirs Church App';
+    final shareText =
+        '"$clean"\n— $reference\n\nShared from the Kingdom Heirs Church App';
     try {
       await Share.share(shareText, subject: reference);
     } catch (e) {
@@ -369,7 +368,9 @@ class _HomeDashboardBody extends ConsumerWidget {
     // The journal screen accepts a devotionalId; pass the scripture
     // reference as the title so the user can write a reflection on
     // the verse they just read.
-    context.push('${RouteNames.devotionals}/scripture/reflection',
-        extra: reference,);
+    context.push(
+      '${RouteNames.devotionals}/scripture/reflection',
+      extra: reference,
+    );
   }
 }

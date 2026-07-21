@@ -13,6 +13,7 @@ import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/features/devotionals/domain/entities/devotional_series_models.dart';
 import 'package:kingdom_heir/features/devotionals/presentation/providers/devotional_series_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class DevotionalDayReaderScreen extends ConsumerStatefulWidget {
   const DevotionalDayReaderScreen({
@@ -95,7 +96,9 @@ class _DevotionalDayReaderScreenState
             ),
             const SizedBox(height: AppSpacing.md),
             Text(
-              isAllDone ? '🎉 All 90 Days Complete!' : 'Day ${widget.dayNumber} Complete!',
+              isAllDone
+                  ? '🎉 All 90 Days Complete!'
+                  : 'Day ${widget.dayNumber} Complete!',
               style: AppTypography.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w800,
               ),
@@ -136,9 +139,11 @@ class _DevotionalDayReaderScreenState
 
   @override
   Widget build(BuildContext context) {
-    final entryAsync = ref.watch(devotionalEntryProvider(
-      (seriesId: widget.seriesId, dayNumber: widget.dayNumber),
-    ),);
+    final entryAsync = ref.watch(
+      devotionalEntryProvider(
+        (seriesId: widget.seriesId, dayNumber: widget.dayNumber),
+      ),
+    );
     final progressAsync =
         ref.watch(devotionalProgressProvider(widget.seriesId));
     final theme = Theme.of(context);
@@ -150,7 +155,9 @@ class _DevotionalDayReaderScreenState
         error: (err, __) => _ErrorView(message: err.toString()),
         data: (entry) {
           if (entry == null) {
-            return const _ErrorView(message: 'This day is not yet available.');
+            return _ErrorView(
+                message:
+                    AppLocalizations.of(context)!.thisDayIsNotYetAvailable,);
           }
 
           final progress = progressAsync.valueOrNull;
@@ -163,8 +170,7 @@ class _DevotionalDayReaderScreenState
           ref
               .watch(devotionalReflectionProvider(entry.id))
               .whenData((reflection) {
-            if (reflection != null &&
-                _reflectionController.text.isEmpty) {
+            if (reflection != null && _reflectionController.text.isEmpty) {
               _reflectionController.text = reflection.reflectionText ?? '';
             }
           });
@@ -198,8 +204,11 @@ class _DevotionalDayReaderScreenState
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const SizedBox(height: 24),
-                          const Icon(Icons.menu_book_rounded,
-                              color: AppColors.gold, size: 40,),
+                          const Icon(
+                            Icons.menu_book_rounded,
+                            color: AppColors.gold,
+                            size: 40,
+                          ),
                           const SizedBox(height: AppSpacing.sm),
                           Padding(
                             padding: const EdgeInsets.symmetric(
@@ -207,8 +216,8 @@ class _DevotionalDayReaderScreenState
                             ),
                             child: Text(
                               entry.title,
-                              style: AppTypography.textTheme.titleMedium
-                                  ?.copyWith(
+                              style:
+                                  AppTypography.textTheme.titleMedium?.copyWith(
                                 color: AppColors.warmWhite,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -229,8 +238,7 @@ class _DevotionalDayReaderScreenState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // ── Fallback language banner ───────────────────
-                    if (entry.isFallback)
-                      _FallbackBanner(theme: theme),
+                    if (entry.isFallback) _FallbackBanner(theme: theme),
 
                     const SizedBox(height: AppSpacing.lg),
 
@@ -346,8 +354,11 @@ class _DevotionalDayReaderScreenState
                         children: [
                           Row(
                             children: [
-                              const Icon(Icons.edit_note_rounded,
-                                  color: AppColors.gold, size: 20,),
+                              const Icon(
+                                Icons.edit_note_rounded,
+                                color: AppColors.gold,
+                                size: 20,
+                              ),
                               const SizedBox(width: AppSpacing.xs),
                               Text(
                                 'Your Reflection',
@@ -366,8 +377,8 @@ class _DevotionalDayReaderScreenState
                             onChanged: (_) =>
                                 setState(() => _reflectionDirty = true),
                             decoration: InputDecoration(
-                              hintText:
-                                  'Write your thoughts, prayers, or insights…',
+                              hintText: AppLocalizations.of(context)!
+                                  .writeYourThoughtsPrayersOrInsights,
                               hintStyle: TextStyle(
                                 color: theme.colorScheme.onSurface
                                     .withValues(alpha: 0.4),
@@ -417,9 +428,10 @@ class _DevotionalDayReaderScreenState
                       child: SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
-                          onPressed: isAlreadyDone || _isCompleting || !isDayUnlocked
-                              ? null
-                              : () => _markComplete(entry),
+                          onPressed:
+                              isAlreadyDone || _isCompleting || !isDayUnlocked
+                                  ? null
+                                  : () => _markComplete(entry),
                           icon: _isCompleting
                               ? const SizedBox(
                                   width: 18,
@@ -544,7 +556,10 @@ class _FallbackBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.fromLTRB(
-        AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, 0,
+        AppSpacing.lg,
+        AppSpacing.lg,
+        AppSpacing.lg,
+        0,
       ),
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
@@ -557,8 +572,11 @@ class _FallbackBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.info_outline_rounded,
-              color: AppColors.warning, size: 18,),
+          const Icon(
+            Icons.info_outline_rounded,
+            color: AppColors.warning,
+            size: 18,
+          ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
@@ -589,8 +607,11 @@ class _ErrorView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.lock_outline_rounded,
-                size: 56, color: AppColors.warning,),
+            const Icon(
+              Icons.lock_outline_rounded,
+              size: 56,
+              color: AppColors.warning,
+            ),
             const SizedBox(height: AppSpacing.md),
             Text(
               message,

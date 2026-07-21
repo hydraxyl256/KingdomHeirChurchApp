@@ -107,7 +107,8 @@ class GroupActionBar extends ConsumerWidget {
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                      content: Text('Invite link copied for ${group.name}'),),
+                    content: Text('Invite link copied for ${group.name}'),
+                  ),
                 );
               },
               customBorder: const CircleBorder(),

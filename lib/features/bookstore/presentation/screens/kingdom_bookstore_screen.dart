@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/features/bookstore/presentation/providers/bookstore_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class KingdomBookstoreScreen extends ConsumerWidget {
@@ -16,7 +17,9 @@ class KingdomBookstoreScreen extends ConsumerWidget {
     } else {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not open store link.')),
+          SnackBar(
+              content:
+                  Text(AppLocalizations.of(context)!.couldNotOpenStoreLink),),
         );
       }
     }
@@ -31,18 +34,22 @@ class KingdomBookstoreScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kingdom Bookstore'),
+        title: Text(AppLocalizations.of(context)!.kingdomBookstore),
         actions: [
           IconButton(icon: const Icon(Icons.search_rounded), onPressed: () {}),
           IconButton(
-              icon: const Icon(Icons.shopping_cart_outlined), onPressed: () {},),
+            icon: const Icon(Icons.shopping_cart_outlined),
+            onPressed: () {},
+          ),
         ],
       ),
       body: Column(
         children: [
           categoriesAsync.when(
             loading: () => const SizedBox(
-                height: 44, child: Center(child: LinearProgressIndicator()),),
+              height: 44,
+              child: Center(child: LinearProgressIndicator()),
+            ),
             error: (e, _) =>
                 SizedBox(height: 44, child: Center(child: Text('Error: $e'))),
             data: (categories) {
@@ -85,7 +92,9 @@ class KingdomBookstoreScreen extends ConsumerWidget {
               error: (e, _) => Center(child: Text('Error: $e')),
               data: (products) {
                 if (products.isEmpty) {
-                  return const Center(child: Text('No products available.'));
+                  return Center(
+                      child: Text(
+                          AppLocalizations.of(context)!.noProductsAvailable,),);
                 }
                 return GridView.builder(
                   padding: const EdgeInsets.all(AppSpacing.md),
@@ -167,14 +176,19 @@ class KingdomBookstoreScreen extends ConsumerWidget {
                                       height: 28,
                                       child: ElevatedButton(
                                         onPressed: () => _launchBuyUrl(
-                                            p.externalBuyUrl, context,),
+                                          p.externalBuyUrl,
+                                          context,
+                                        ),
                                         style: ElevatedButton.styleFrom(
                                           minimumSize: const Size(0, 28),
                                           padding: const EdgeInsets.symmetric(
-                                              horizontal: 8,),
+                                            horizontal: 8,
+                                          ),
                                         ),
-                                        child: const Text('Buy',
-                                            style: TextStyle(fontSize: 12),),
+                                        child: const Text(
+                                          'Buy',
+                                          style: TextStyle(fontSize: 12),
+                                        ),
                                       ),
                                     ),
                                   ],

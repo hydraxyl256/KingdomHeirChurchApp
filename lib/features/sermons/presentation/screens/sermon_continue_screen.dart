@@ -6,13 +6,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/widgets/app_error_widget.dart';
 import 'package:kingdom_heir/features/sermons/presentation/providers/sermon_continue_provider.dart';
 import 'package:kingdom_heir/features/sermons/presentation/widgets/continue_watching/continue_card.dart';
 import 'package:kingdom_heir/features/sermons/presentation/widgets/shared/sermons_empty_state.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class SermonContinueScreen extends ConsumerWidget {
   const SermonContinueScreen({super.key});
@@ -23,7 +23,7 @@ class SermonContinueScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title: const Text('Continue watching'),
+        title: Text(AppLocalizations.of(context)!.continueWatching),
         backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
       ),

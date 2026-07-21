@@ -24,8 +24,10 @@ class ChatDraft {
 abstract class GroupsRepository {
   // ── Existing — signatures unchanged ───────────────────────────────
   Future<Either<String, List<CommunityGroup>>> getGroups();
-  Future<Either<String, void>> joinGroup(String groupId,
-      {bool isPrivate = false,});
+  Future<Either<String, void>> joinGroup(
+    String groupId, {
+    bool isPrivate = false,
+  });
   Future<Either<String, void>> leaveGroup(String groupId);
   Stream<List<GroupMessage>> streamMessages(String groupId);
   Future<Either<String, void>> sendMessage(
@@ -41,7 +43,8 @@ abstract class GroupsRepository {
   // ── New — per-section feeds ──────────────────────────────────────
   Future<Either<String, List<GroupEvent>>> getGroupEvents(String groupId);
   Future<Either<String, List<GroupPrayerRequest>>> getGroupPrayer(
-      String groupId,);
+    String groupId,
+  );
   Future<Either<String, List<GroupAnnouncement>>> getGroupAnnouncements(
     String groupId,
   );

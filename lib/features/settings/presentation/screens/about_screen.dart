@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -47,8 +48,7 @@ class _AboutScreenState extends State<AboutScreen> {
 
   Future<void> _launch(String url) async {
     final uri = Uri.parse(url);
-    final launched =
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!launched && mounted) {
       final scheme = Theme.of(context).colorScheme;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -90,7 +90,7 @@ class _AboutScreenState extends State<AboutScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_rounded),
           onPressed: () => Navigator.of(context).pop(),
-          tooltip: 'Back',
+          tooltip: AppLocalizations.of(context)!.back,
         ),
       ),
       body: SafeArea(

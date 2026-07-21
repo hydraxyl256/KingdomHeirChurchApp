@@ -74,15 +74,18 @@ class _EmptyPrayerRepository implements PrayerRepository {
 
   @override
   Future<Either<String, List<PrayerRequestModel>>>
-      getPendingPrayerRequestsForAdmin({int limit = 50}) async => const Right([]);
+      getPendingPrayerRequestsForAdmin({int limit = 50}) async =>
+          const Right([]);
 
   @override
   Future<Either<String, List<PrayerRequestModel>>>
-      getApprovedPrayerRequestsForAdmin({int limit = 50}) async => const Right([]);
+      getApprovedPrayerRequestsForAdmin({int limit = 50}) async =>
+          const Right([]);
 
   @override
   Future<Either<String, List<PrayerRequestModel>>>
-      getRejectedPrayerRequestsForAdmin({int limit = 50}) async => const Right([]);
+      getRejectedPrayerRequestsForAdmin({int limit = 50}) async =>
+          const Right([]);
 
   @override
   Future<Either<String, void>> approvePrayerRequest({

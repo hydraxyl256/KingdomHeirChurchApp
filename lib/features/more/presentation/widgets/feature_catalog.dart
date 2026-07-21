@@ -137,12 +137,6 @@ class FeatureCatalog {
       route: RouteNames.giving,
       opensDonationPage: true,
     ),
-    MoreFeature.givingHistory: FeatureSpec(
-      feature: MoreFeature.givingHistory,
-      icon: Icons.receipt_long_rounded,
-      accent: FeatureAccent.gold,
-      route: RouteNames.givingHistory,
-    ),
     MoreFeature.campaigns: FeatureSpec(
       feature: MoreFeature.campaigns,
       icon: Icons.flag_rounded,

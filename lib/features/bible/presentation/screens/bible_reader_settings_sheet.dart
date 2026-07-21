@@ -74,7 +74,9 @@ class BibleReaderSettingsSheet extends ConsumerWidget {
                   ),
                 ),
                 _Header(
-                    palette: palette, onClose: () => Navigator.pop(context),),
+                  palette: palette,
+                  onClose: () => Navigator.pop(context),
+                ),
                 const SizedBox(height: AppSpacing.sm),
                 _SectionTitle(palette: palette, text: 'Theme'),
                 _ThemePicker(

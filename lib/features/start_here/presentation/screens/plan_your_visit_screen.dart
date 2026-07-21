@@ -86,7 +86,8 @@ class PlanYourVisitScreen extends StatelessWidget {
   }
 
   Future<void> _openWhatsApp(BuildContext context) async {
-    final ok = await _launchExternal(Uri.parse('https://wa.me/$_kWhatsAppNumber'));
+    final ok =
+        await _launchExternal(Uri.parse('https://wa.me/$_kWhatsAppNumber'));
     if (!ok && context.mounted) {
       _snack(context, 'Could not open WhatsApp');
     }
@@ -433,7 +434,9 @@ class _ServiceTimeRow extends StatelessWidget {
               Text(
                 time.note,
                 style: AppTypography.textTheme.bodySmall?.copyWith(
-                  color: isDark ? AppColors.warmWhite.withValues(alpha: 0.7) : AppColors.textSecondary,
+                  color: isDark
+                      ? AppColors.warmWhite.withValues(alpha: 0.7)
+                      : AppColors.textSecondary,
                 ),
               ),
             ],
@@ -484,7 +487,9 @@ class _AddressCard extends StatelessWidget {
           Text(
             line2,
             style: AppTypography.textTheme.bodyMedium?.copyWith(
-              color: isDark ? AppColors.warmWhite.withValues(alpha: 0.7) : AppColors.textSecondary,
+              color: isDark
+                  ? AppColors.warmWhite.withValues(alpha: 0.7)
+                  : AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
@@ -554,7 +559,9 @@ class _LiveStreamCard extends StatelessWidget {
                 Text(
                   'Stream our services live on YouTube.',
                   style: AppTypography.textTheme.bodySmall?.copyWith(
-                    color: isDark ? AppColors.warmWhite.withValues(alpha: 0.7) : AppColors.textSecondary,
+                    color: isDark
+                        ? AppColors.warmWhite.withValues(alpha: 0.7)
+                        : AppColors.textSecondary,
                   ),
                 ),
               ],
@@ -668,7 +675,9 @@ class _ContactRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
         child: Row(
           children: [
-            Icon(icon, size: AppSpacing.iconMd, color: isDark ? AppColors.gold : AppColors.goldDark),
+            Icon(icon,
+                size: AppSpacing.iconMd,
+                color: isDark ? AppColors.gold : AppColors.goldDark,),
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
@@ -678,7 +687,9 @@ class _ContactRow extends StatelessWidget {
                   Text(
                     label,
                     style: AppTypography.textTheme.labelSmall?.copyWith(
-                      color: isDark ? AppColors.warmWhite.withValues(alpha: 0.7) : AppColors.textSecondary,
+                      color: isDark
+                          ? AppColors.warmWhite.withValues(alpha: 0.7)
+                          : AppColors.textSecondary,
                       letterSpacing: 0.6,
                     ),
                   ),
@@ -787,7 +798,8 @@ class _BackToDiscoverButton extends StatelessWidget {
         onPressed: onTap,
         style: OutlinedButton.styleFrom(
           foregroundColor: isDark ? AppColors.warmWhite : AppColors.navy,
-          side: BorderSide(color: isDark ? AppColors.dividerDark : AppColors.dividerLight),
+          side: BorderSide(
+              color: isDark ? AppColors.dividerDark : AppColors.dividerLight,),
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
@@ -795,7 +807,9 @@ class _BackToDiscoverButton extends StatelessWidget {
         ),
         child: Text(
           'Back to Discover',
-          style: TextStyle(fontWeight: FontWeight.w600, color: isDark ? AppColors.warmWhite : AppColors.navy),
+          style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: isDark ? AppColors.warmWhite : AppColors.navy,),
         ),
       ),
     );
@@ -817,7 +831,9 @@ class _SectionHeader extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       children: [
-        Icon(icon, size: AppSpacing.iconSm, color: isDark ? AppColors.gold : AppColors.goldDark),
+        Icon(icon,
+            size: AppSpacing.iconSm,
+            color: isDark ? AppColors.gold : AppColors.goldDark,),
         const SizedBox(width: AppSpacing.sm),
         Text(
           title,

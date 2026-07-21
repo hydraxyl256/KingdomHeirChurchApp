@@ -6,21 +6,22 @@ import 'package:kingdom_heir/features/sermons/domain/entities/sermon.dart';
 void main() {
   group('Sermon.fromMediaContent()', () {
     final baseRow = {
-      'id':               'abc-123',
+      'id': 'abc-123',
       'youtube_video_id': 'dQw4w9WgXcQ',
-      'youtube_url':      'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-      'content_type':     'sermon',
-      'title':            'Walking by Faith',
-      'description':      'A powerful message on faith.',
-      'thumbnail_url':    'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
-      'speaker_name':     'Pastor James',
-      'series_name':      'Faith Series',
+      'youtube_url': 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      'content_type': 'sermon',
+      'title': 'Walking by Faith',
+      'description': 'A powerful message on faith.',
+      'thumbnail_url':
+          'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+      'speaker_name': 'Pastor James',
+      'series_name': 'Faith Series',
       'duration_seconds': 3600,
-      'published_at':     '2026-06-01T10:00:00Z',
-      'tags':             ['faith', 'grace'],
-      'is_featured':      true,
-      'status':           'published',
-      'updated_at':       '2026-06-02T08:00:00Z',
+      'published_at': '2026-06-01T10:00:00Z',
+      'tags': ['faith', 'grace'],
+      'is_featured': true,
+      'status': 'published',
+      'updated_at': '2026-06-02T08:00:00Z',
     };
 
     test('maps id correctly', () {
@@ -60,8 +61,10 @@ void main() {
 
     test('maps thumbnail_url correctly', () {
       final sermon = Sermon.fromMediaContent(baseRow);
-      expect(sermon.thumbnailUrl,
-          'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',);
+      expect(
+        sermon.thumbnailUrl,
+        'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+      );
     });
 
     test('maps mediaType as video', () {

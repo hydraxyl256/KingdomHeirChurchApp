@@ -6,6 +6,7 @@ import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/widgets/app_button.dart';
 import 'package:kingdom_heir/features/devotionals/domain/entities/devotional_models.dart';
 import 'package:kingdom_heir/features/devotionals/presentation/providers/devotionals_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class ReflectionJournalScreen extends ConsumerStatefulWidget {
   const ReflectionJournalScreen({super.key});
@@ -30,7 +31,7 @@ class _ReflectionJournalScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reflection Journal'),
+        title: Text(AppLocalizations.of(context)!.reflectionJournal),
         actions: [
           IconButton(
             icon: Icon(_isEditing ? Icons.close_rounded : Icons.add_rounded),
@@ -60,8 +61,10 @@ class _ReflectionJournalScreenState
                   error: (e, st) => Center(child: Text('Error: $e')),
                   data: (entries) {
                     if (entries.isEmpty) {
-                      return const Center(
-                          child: Text('No journal entries yet.'),);
+                      return Center(
+                        child: Text(
+                            AppLocalizations.of(context)!.noJournalEntriesYet,),
+                      );
                     }
                     return ListView.builder(
                       padding: const EdgeInsets.all(AppSpacing.md),
@@ -111,9 +114,10 @@ class _NewEntryPanel extends StatelessWidget {
           TextField(
             controller: controller,
             maxLines: 4,
-            decoration: const InputDecoration(
-              hintText: 'Write your reflection for today...',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              hintText:
+                  AppLocalizations.of(context)!.writeYourReflectionForToday,
+              border: const OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: AppSpacing.md),

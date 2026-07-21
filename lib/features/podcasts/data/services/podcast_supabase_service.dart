@@ -15,16 +15,19 @@ class PodcastSupabaseService {
           .select()
           .eq('status', 'published')
           .order('created_at', ascending: false);
-      return right((data as List<dynamic>)
-          .map((e) => PodcastSeries.fromJson(e as Map<String, dynamic>))
-          .toList(),);
+      return right(
+        (data as List<dynamic>)
+            .map((e) => PodcastSeries.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
     } catch (e) {
       return left(e.toString());
     }
   }
 
   Future<Either<String, List<PodcastEpisode>>> getEpisodes(
-      String seriesId,) async {
+    String seriesId,
+  ) async {
     try {
       final data = await _client
           .from('podcast_episodes')
@@ -32,9 +35,11 @@ class PodcastSupabaseService {
           .eq('series_id', seriesId)
           .eq('status', 'published')
           .order('published_at', ascending: false);
-      return right((data as List<dynamic>)
-          .map((e) => PodcastEpisode.fromJson(e as Map<String, dynamic>))
-          .toList(),);
+      return right(
+        (data as List<dynamic>)
+            .map((e) => PodcastEpisode.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
     } catch (e) {
       return left(e.toString());
     }
@@ -47,9 +52,11 @@ class PodcastSupabaseService {
           .select()
           .eq('status', 'published')
           .order('published_at', ascending: false);
-      return right((data as List<dynamic>)
-          .map((e) => PodcastEpisode.fromJson(e as Map<String, dynamic>))
-          .toList(),);
+      return right(
+        (data as List<dynamic>)
+            .map((e) => PodcastEpisode.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
     } catch (e) {
       return left(e.toString());
     }
@@ -87,16 +94,20 @@ class PodcastSupabaseService {
           .from('podcast_subscriptions')
           .select()
           .eq('user_id', _userId);
-      return right((data as List<dynamic>)
-          .map((e) => PodcastSubscription.fromJson(e as Map<String, dynamic>))
-          .toList(),);
+      return right(
+        (data as List<dynamic>)
+            .map((e) => PodcastSubscription.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
     } catch (e) {
       return left(e.toString());
     }
   }
 
   Future<Either<String, void>> savePlaybackPosition(
-      String episodeId, int positionSeconds,) async {
+    String episodeId,
+    int positionSeconds,
+  ) async {
     try {
       await _client.from('podcast_playback_positions').upsert({
         'user_id': _userId,
@@ -111,7 +122,8 @@ class PodcastSupabaseService {
   }
 
   Future<Either<String, PlaybackPosition?>> getPlaybackPosition(
-      String episodeId,) async {
+    String episodeId,
+  ) async {
     try {
       final data = await _client
           .from('podcast_playback_positions')

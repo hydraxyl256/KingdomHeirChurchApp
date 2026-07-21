@@ -13,6 +13,7 @@ import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/features/live_service/presentation/providers/live_service_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 import 'package:share_plus/share_plus.dart';
 
 class SermonNotesPanel extends ConsumerStatefulWidget {
@@ -32,8 +33,7 @@ class _SermonNotesPanelState extends ConsumerState<SermonNotesPanel> {
   @override
   void initState() {
     super.initState();
-    final existingNote =
-        ref.read(sermonNotesProvider(widget.sermonId));
+    final existingNote = ref.read(sermonNotesProvider(widget.sermonId));
     _ctrl = TextEditingController(text: existingNote?.body ?? '')
       ..addListener(_onChanged);
     _attachedScripture = existingNote?.scriptureRef;
@@ -110,8 +110,7 @@ class _SermonNotesPanelState extends ConsumerState<SermonNotesPanel> {
               onSave: _save,
               attachedScripture: _attachedScripture,
               onAttachScripture: _showScriptureAttach,
-              onClearScripture: () =>
-                  setState(() => _attachedScripture = null),
+              onClearScripture: () => setState(() => _attachedScripture = null),
             ),
 
             // Attached scripture banner
@@ -144,7 +143,7 @@ class _SermonNotesPanelState extends ConsumerState<SermonNotesPanel> {
                   ),
                   decoration: InputDecoration(
                     hintText:
-                        'Take notes as you listen… key scriptures, insights, how to apply this message…',
+                        AppLocalizations.of(context)!.takeNotesAsYouListenKey,
                     hintStyle: AppTypography.textTheme.bodyLarge?.copyWith(
                       color: AppColors.textDisabled,
                       height: 1.75,
@@ -186,8 +185,11 @@ class _SermonNotesPanelState extends ConsumerState<SermonNotesPanel> {
                             key: const ValueKey('saved'),
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.cloud_done_rounded,
-                                  color: AppColors.success, size: 13,),
+                              const Icon(
+                                Icons.cloud_done_rounded,
+                                color: AppColors.success,
+                                size: 13,
+                              ),
                               const SizedBox(width: 4),
                               Text(
                                 'Saved',
@@ -221,11 +223,11 @@ class _SermonNotesPanelState extends ConsumerState<SermonNotesPanel> {
     final result = await showDialog<String>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Attach Scripture'),
+        title: Text(AppLocalizations.of(context)!.attachScripture_1),
         content: TextField(
           controller: ctrl,
-          decoration: const InputDecoration(
-            hintText: 'e.g. John 3:16',
+          decoration: InputDecoration(
+            hintText: AppLocalizations.of(context)!.egJohn316,
           ),
           textCapitalization: TextCapitalization.words,
           onSubmitted: (v) => Navigator.pop(context, v),
@@ -233,11 +235,11 @@ class _SermonNotesPanelState extends ConsumerState<SermonNotesPanel> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, ctrl.text),
-            child: const Text('Attach'),
+            child: Text(AppLocalizations.of(context)!.attach),
           ),
         ],
       ),
@@ -284,8 +286,11 @@ class _NotesToolbar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.edit_note_rounded,
-              size: 18, color: AppColors.navy,),
+          const Icon(
+            Icons.edit_note_rounded,
+            size: 18,
+            color: AppColors.navy,
+          ),
           const SizedBox(width: AppSpacing.sm),
           Text(
             'Sermon Notes',
@@ -388,8 +393,11 @@ class _ScriptureBanner extends StatelessWidget {
       color: AppColors.goldContainer,
       child: Row(
         children: [
-          const Icon(Icons.menu_book_rounded,
-              size: 14, color: AppColors.goldDark,),
+          const Icon(
+            Icons.menu_book_rounded,
+            size: 14,
+            color: AppColors.goldDark,
+          ),
           const SizedBox(width: 6),
           Expanded(
             child: Text(
@@ -404,8 +412,11 @@ class _ScriptureBanner extends StatelessWidget {
           ),
           GestureDetector(
             onTap: onRemove,
-            child: const Icon(Icons.close_rounded,
-                size: 14, color: AppColors.goldDark,),
+            child: const Icon(
+              Icons.close_rounded,
+              size: 14,
+              color: AppColors.goldDark,
+            ),
           ),
         ],
       ),

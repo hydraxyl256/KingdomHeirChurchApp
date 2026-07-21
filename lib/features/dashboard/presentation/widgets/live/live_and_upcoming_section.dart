@@ -18,7 +18,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-
 import 'package:kingdom_heir/core/responsive/breakpoints.dart';
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
@@ -28,6 +27,7 @@ import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/core/widgets/app_button.dart';
 import 'package:kingdom_heir/core/widgets/responsive_section_header.dart';
 import 'package:kingdom_heir/features/dashboard/domain/dashboard_models.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class LiveAndUpcomingSection extends StatelessWidget {
   const LiveAndUpcomingSection({
@@ -292,8 +292,11 @@ class _ViewerChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.visibility_rounded,
-              color: AppColors.warmWhite, size: 14,),
+          const Icon(
+            Icons.visibility_rounded,
+            color: AppColors.warmWhite,
+            size: 14,
+          ),
           SizedBox(width: insets.xxs),
           Text(
             _format(count),
@@ -402,7 +405,7 @@ class UpcomingServiceCard extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: onRsvp,
             icon: const Icon(Icons.notifications_active_outlined, size: 16),
-            label: const Text('Remind me'),
+            label: Text(AppLocalizations.of(context)!.remindMe),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.goldDark,
               side: const BorderSide(color: AppColors.goldDark, width: 1.4),

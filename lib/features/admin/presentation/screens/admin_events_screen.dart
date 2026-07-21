@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/features/admin/data/repositories/admin_content_repository.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 final adminEventsProvider =
     FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
@@ -19,7 +19,7 @@ class AdminEventsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Event Management'),
+        title: Text(AppLocalizations.of(context)!.eventManagement),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -28,11 +28,13 @@ class AdminEventsScreen extends ConsumerWidget {
           FilledButton.icon(
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Create Event coming soon')),
+                SnackBar(
+                    content: Text(
+                        AppLocalizations.of(context)!.createEventComingSoon,),),
               );
             },
             icon: const Icon(Icons.add),
-            label: const Text('New Event'),
+            label: Text(AppLocalizations.of(context)!.newEvent),
           ),
           const SizedBox(width: 16),
         ],
@@ -42,7 +44,8 @@ class AdminEventsScreen extends ConsumerWidget {
         error: (err, stack) => Center(child: Text('Error: $err')),
         data: (events) {
           if (events.isEmpty) {
-            return const Center(child: Text('No events found.'));
+            return Center(
+                child: Text(AppLocalizations.of(context)!.noEventsFound),);
           }
           return ListView.separated(
             padding: const EdgeInsets.all(16),
@@ -61,10 +64,13 @@ class AdminEventsScreen extends ConsumerWidget {
               final rsvpCount = event['rsvp_count'] as int? ?? 0;
 
               return ListTile(
-                title: Text(title,
-                    style: const TextStyle(fontWeight: FontWeight.bold),),
+                title: Text(
+                  title,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
                 subtitle: Text(
-                    '${startAt.toString().split('.')[0]} • RSVPs: $rsvpCount',),
+                  '${startAt.toString().split('.')[0]} • RSVPs: $rsvpCount',
+                ),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -74,9 +80,8 @@ class AdminEventsScreen extends ConsumerWidget {
                           ? AppColors.success.withValues(alpha: 0.2)
                           : AppColors.warning.withValues(alpha: 0.2),
                       labelStyle: TextStyle(
-                        color: isPublished
-                            ? AppColors.success
-                            : AppColors.warning,
+                        color:
+                            isPublished ? AppColors.success : AppColors.warning,
                         fontSize: 12,
                       ),
                     ),
@@ -98,14 +103,16 @@ class AdminEventsScreen extends ConsumerWidget {
                           value: 'toggle_status',
                           child: Text(isPublished ? 'Unpublish' : 'Publish'),
                         ),
-                        const PopupMenuItem(
+                        PopupMenuItem(
                           value: 'edit',
-                          child: Text('Edit'),
+                          child: Text(AppLocalizations.of(context)!.edit),
                         ),
                         const PopupMenuItem(
                           value: 'delete',
-                          child: Text('Delete',
-                              style: TextStyle(color: AppColors.error),),
+                          child: Text(
+                            'Delete',
+                            style: TextStyle(color: AppColors.error),
+                          ),
                         ),
                       ],
                     ),

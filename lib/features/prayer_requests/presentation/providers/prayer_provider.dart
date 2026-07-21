@@ -114,9 +114,11 @@ class PrayerFeedNotifier extends AsyncNotifier<List<PrayerRequest>> {
                 current.where((e) => e.hasPrayed).map((e) => e.id).toSet();
             state = AsyncData(
               models
-                  .map((m) => m.toEntity(
-                        hasPrayed: intercededIds.contains(m.id),
-                      ),)
+                  .map(
+                    (m) => m.toEntity(
+                      hasPrayed: intercededIds.contains(m.id),
+                    ),
+                  )
                   .toList(),
             );
           });

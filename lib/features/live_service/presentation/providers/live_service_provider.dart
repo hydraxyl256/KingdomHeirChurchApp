@@ -28,7 +28,7 @@ final liveServiceRepositoryProvider = Provider<LiveServiceRepository>((ref) {
 final liveServiceStateProvider =
     StreamProvider.autoDispose<LiveServiceState>((ref) async* {
   final repo = ref.watch(liveServiceRepositoryProvider);
-  
+
   Future<LiveServiceState> build() async {
     return repo.getActiveLiveService();
   }
@@ -51,11 +51,11 @@ final _chatMessagesProvider =
     StreamProvider.autoDispose<List<LiveChatMessage>>((ref) {
   final repo = ref.watch(liveServiceRepositoryProvider);
   final state = ref.watch(liveServiceStateProvider).valueOrNull;
-  
+
   if (state == null || !state.isLive || state.serviceId == null) {
     return Stream.value([]);
   }
-  
+
   return repo.streamChatMessages(state.serviceId!);
 });
 
@@ -98,9 +98,7 @@ class LiveChatNotifier extends AsyncNotifier<void> {
     );
 
     try {
-      await _db
-          .from('live_chat_messages')
-          .insert(msg.toInsertJson(serviceId));
+      await _db.from('live_chat_messages').insert(msg.toInsertJson(serviceId));
     } catch (_) {
       // Offline queue: store locally and retry on reconnect
       final prefs = await SharedPreferences.getInstance();
@@ -116,8 +114,7 @@ class LiveChatNotifier extends AsyncNotifier<void> {
     try {
       await _db
           .from('live_chat_messages')
-          .update({'is_pinned': pin})
-          .eq('id', messageId);
+          .update({'is_pinned': pin}).eq('id', messageId);
     } catch (_) {}
   }
 
@@ -125,8 +122,7 @@ class LiveChatNotifier extends AsyncNotifier<void> {
     try {
       await _db
           .from('live_chat_messages')
-          .update({'is_deleted': true})
-          .eq('id', messageId);
+          .update({'is_deleted': true}).eq('id', messageId);
     } catch (_) {}
   }
 }
@@ -163,7 +159,9 @@ final liveAnnouncementsProvider =
       .order('created_at', ascending: false)
       .limit(6);
   return rows
-      .map(LiveAnnouncement.fromJson,)
+      .map(
+        LiveAnnouncement.fromJson,
+      )
       .toList();
 });
 
@@ -180,7 +178,9 @@ final upcomingServicesProvider =
       .order('scheduled_at')
       .limit(5);
   return rows
-      .map(UpcomingService.fromJson,)
+      .map(
+        UpcomingService.fromJson,
+      )
       .toList();
 });
 
@@ -188,7 +188,8 @@ final upcomingServicesProvider =
 // 7. Sermon Notes  (local + Supabase sync)
 // ─────────────────────────────────────────────────────────────────────────────
 
-class SermonNotesNotifier extends AutoDisposeFamilyNotifier<SermonNote?, String> {
+class SermonNotesNotifier
+    extends AutoDisposeFamilyNotifier<SermonNote?, String> {
   static const _prefixKey = 'sermon_note_';
 
   @override
@@ -201,8 +202,7 @@ class SermonNotesNotifier extends AutoDisposeFamilyNotifier<SermonNote?, String>
   Future<void> _loadFromPrefs(String sermonId) async {
     final prefs = await SharedPreferences.getInstance();
     final body = prefs.getString('$_prefixKey$sermonId') ?? '';
-    final scriptureRef =
-        prefs.getString('${_prefixKey}scripture_$sermonId');
+    final scriptureRef = prefs.getString('${_prefixKey}scripture_$sermonId');
     if (body.isNotEmpty) {
       state = SermonNote(
         id: sermonId,
@@ -214,8 +214,11 @@ class SermonNotesNotifier extends AutoDisposeFamilyNotifier<SermonNote?, String>
     }
   }
 
-  Future<void> updateNote(String sermonId, String body,
-      {String? scriptureRef,}) async {
+  Future<void> updateNote(
+    String sermonId,
+    String body, {
+    String? scriptureRef,
+  }) async {
     final now = DateTime.now();
     final note = SermonNote(
       id: sermonId,
@@ -274,8 +277,8 @@ class SermonNotesNotifier extends AutoDisposeFamilyNotifier<SermonNote?, String>
   }
 }
 
-final sermonNotesProvider =
-    NotifierProvider.family.autoDispose<SermonNotesNotifier, SermonNote?, String>(
+final sermonNotesProvider = NotifierProvider.family
+    .autoDispose<SermonNotesNotifier, SermonNote?, String>(
   SermonNotesNotifier.new,
 );
 
@@ -283,7 +286,8 @@ final sermonNotesProvider =
 // 8. Prayer Requests
 // ─────────────────────────────────────────────────────────────────────────────
 
-class PrayerRequestNotifier extends AutoDisposeNotifier<List<LivePrayerRequest>> {
+class PrayerRequestNotifier
+    extends AutoDisposeNotifier<List<LivePrayerRequest>> {
   @override
   List<LivePrayerRequest> build() => [];
 
@@ -325,15 +329,16 @@ class PrayerRequestNotifier extends AutoDisposeNotifier<List<LivePrayerRequest>>
           .order('submitted_at', ascending: false)
           .limit(10);
       state = (rows as List)
-          .map((r) =>
-              LivePrayerRequest.fromJson(r as Map<String, dynamic>),)
+          .map(
+            (r) => LivePrayerRequest.fromJson(r as Map<String, dynamic>),
+          )
           .toList();
     } catch (_) {}
   }
 }
 
-final prayerRequestProvider =
-    NotifierProvider.autoDispose<PrayerRequestNotifier, List<LivePrayerRequest>>(
+final prayerRequestProvider = NotifierProvider.autoDispose<
+    PrayerRequestNotifier, List<LivePrayerRequest>>(
   PrayerRequestNotifier.new,
 );
 
@@ -359,8 +364,7 @@ final livePanelTabProvider =
 // 11. Viewer count (Supabase Presence)
 // ─────────────────────────────────────────────────────────────────────────────
 
-final liveViewerCountProvider =
-    StreamProvider.autoDispose<int>((ref) async* {
+final liveViewerCountProvider = StreamProvider.autoDispose<int>((ref) async* {
   final state = ref.watch(liveServiceStateProvider).valueOrNull;
   if (state == null || !state.isLive || state.serviceId == null) {
     yield 0;
@@ -371,20 +375,18 @@ final liveViewerCountProvider =
   final channel = _db.channel('viewers:$serviceId');
   final controller = StreamController<int>();
 
-  final sub = channel
-      .onPresenceSync(
-        (payload) {
-          final count = channel.presenceState().length;
-          if (!controller.isClosed) controller.add(count);
-        },
-      )
-      .subscribe((status, [error]) {
-        if (status == RealtimeSubscribeStatus.subscribed) {
-          unawaited(
-            channel.track({'user_id': _db.auth.currentUser?.id ?? 'guest'}),
-          );
-        }
-      });
+  final sub = channel.onPresenceSync(
+    (payload) {
+      final count = channel.presenceState().length;
+      if (!controller.isClosed) controller.add(count);
+    },
+  ).subscribe((status, [error]) {
+    if (status == RealtimeSubscribeStatus.subscribed) {
+      unawaited(
+        channel.track({'user_id': _db.auth.currentUser?.id ?? 'guest'}),
+      );
+    }
+  });
 
   ref.onDispose(() {
     unawaited(sub.unsubscribe());

@@ -28,6 +28,7 @@ import 'package:kingdom_heir/features/groups/presentation/widgets/chat/chat_inpu
 import 'package:kingdom_heir/features/groups/presentation/widgets/chat/pinned_message_banner.dart';
 import 'package:kingdom_heir/features/groups/presentation/widgets/chat/prayer_composer.dart';
 import 'package:kingdom_heir/features/groups/presentation/widgets/chat/scripture_chip.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class GroupChatScreen extends ConsumerStatefulWidget {
@@ -99,20 +100,20 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Attach scripture'),
+        title: Text(AppLocalizations.of(context)!.attachScripture),
         content: TextField(
           controller: controller,
           autofocus: true,
-          decoration: const InputDecoration(
-            hintText: 'e.g. John 3:16',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            hintText: AppLocalizations.of(context)!.egJohn316,
+            border: const OutlineInputBorder(),
           ),
           textCapitalization: TextCapitalization.words,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           FilledButton(
             onPressed: () {
@@ -121,7 +122,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
               setState(() => _attachedScripture = v);
               Navigator.of(ctx).pop();
             },
-            child: const Text('Attach'),
+            child: Text(AppLocalizations.of(context)!.attach),
           ),
         ],
       ),
@@ -161,7 +162,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
         ),
         actions: [
           IconButton(
-            tooltip: 'Group info',
+            tooltip: AppLocalizations.of(context)!.groupInfo,
             icon: const Icon(Icons.info_outline_rounded),
             onPressed: () => _showGroupInfo(context, group, pinnedList),
           ),
@@ -195,7 +196,8 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
             child: chatStream.when(
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (err, _) => AppErrorWidget(
-                message: 'Couldn’t load the conversation',
+                message:
+                    AppLocalizations.of(context)!.couldntLoadTheConversation,
                 onRetry: () =>
                     ref.invalidate(groupChatStreamProvider(widget.groupId)),
               ),
@@ -245,12 +247,12 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
           children: [
             ListTile(
               leading: const Icon(Icons.photo_library_outlined),
-              title: const Text('Share image'),
+              title: Text(AppLocalizations.of(context)!.shareImage),
               onTap: () => Navigator.of(ctx).pop(),
             ),
             ListTile(
               leading: const Icon(Icons.volunteer_activism_rounded),
-              title: const Text('Share prayer request'),
+              title: Text(AppLocalizations.of(context)!.sharePrayerRequest),
               onTap: () {
                 Navigator.of(ctx).pop();
                 _openPrayerComposer();
@@ -258,7 +260,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.menu_book_rounded),
-              title: const Text('Share scripture'),
+              title: Text(AppLocalizations.of(context)!.shareScripture),
               onTap: () {
                 Navigator.of(ctx).pop();
                 _showScripturePicker();
@@ -330,8 +332,11 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
                       Icons.push_pin_rounded,
                       color: AppColors.goldDark,
                     ),
-                    title: Text(a.body,
-                        maxLines: 2, overflow: TextOverflow.ellipsis,),
+                    title: Text(
+                      a.body,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     subtitle: Text(a.authorName),
                   ),
                 const SizedBox(height: 16),
@@ -339,13 +344,13 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen> {
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.share_outlined),
-                title: const Text('Share group'),
+                title: Text(AppLocalizations.of(context)!.shareGroup),
                 onTap: () => Navigator.of(ctx).pop(),
               ),
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.notifications_off_outlined),
-                title: const Text('Mute notifications'),
+                title: Text(AppLocalizations.of(context)!.muteNotifications),
                 onTap: () => Navigator.of(ctx).pop(),
               ),
             ],

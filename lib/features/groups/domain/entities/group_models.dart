@@ -98,8 +98,10 @@ class CommunityGroup extends Equatable {
     this.weeklyActiveMembers = 0,
   });
 
-  factory CommunityGroup.fromJson(Map<String, dynamic> json,
-      {String? currentUserId,}) {
+  factory CommunityGroup.fromJson(
+    Map<String, dynamic> json, {
+    String? currentUserId,
+  }) {
     String? role;
     String? status;
     final memberCount = json['member_count'];
@@ -129,7 +131,8 @@ class CommunityGroup extends Equatable {
       name: json['name'] as String,
       description: json['description'] as String? ?? '',
       categoryId: json['category_id'] as String?,
-      categoryName: (json['group_categories'] as Map<String, dynamic>?)?['name'] as String?,
+      categoryName: (json['group_categories'] as Map<String, dynamic>?)?['name']
+          as String?,
       meetingTime: json['meeting_time'] as String?,
       location: json['location'] as String?,
       isPrivate: isPrivate,
@@ -291,8 +294,11 @@ class GroupMessage extends Equatable {
       userId: json['user_id'] as String,
       content: json['content'] as String,
       createdAt: DateTime.parse(json['created_at'] as String),
-      senderName: (json['profiles'] as Map<String, dynamic>?)?['full_name'] as String? ?? 'User',
-      senderAvatarUrl: (json['profiles'] as Map<String, dynamic>?)?['avatar_url'] as String?,
+      senderName: (json['profiles'] as Map<String, dynamic>?)?['full_name']
+              as String? ??
+          'User',
+      senderAvatarUrl:
+          (json['profiles'] as Map<String, dynamic>?)?['avatar_url'] as String?,
       kind: kind,
       metadata: meta,
     );

@@ -401,8 +401,6 @@ class _LoginScrollable extends StatelessWidget {
   }
 }
 
-
-
 class _WelcomeBlock extends StatelessWidget {
   const _WelcomeBlock({required this.reduceMotion});
 
@@ -726,7 +724,6 @@ class _PrimarySignInButton extends StatelessWidget {
   }
 }
 
-
 class _GoogleLogo extends StatelessWidget {
   const _GoogleLogo();
 
@@ -760,7 +757,8 @@ class _GoogleButton extends StatelessWidget {
         child: Ink(
           height: AppSpacing.buttonHeight,
           decoration: BoxDecoration(
-            color: disabled ? Colors.white.withValues(alpha: 0.6) : Colors.white,
+            color:
+                disabled ? Colors.white.withValues(alpha: 0.6) : Colors.white,
             borderRadius: BorderRadius.circular(AppRadius.full),
             boxShadow: disabled
                 ? const []

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/widgets/app_button.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class LeaderCovenantSignatureScreen extends StatefulWidget {
   const LeaderCovenantSignatureScreen({super.key});
@@ -21,7 +22,7 @@ class _LeaderCovenantSignatureScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Leader Covenant'),
+        title: Text(AppLocalizations.of(context)!.leaderCovenant),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
       ),
@@ -44,7 +45,8 @@ class _LeaderCovenantSignatureScreenState
             const SizedBox(height: AppSpacing.xxl),
             CheckboxListTile(
               title: const Text(
-                  'I affirm my agreement with the Statement of Faith.',),
+                'I affirm my agreement with the Statement of Faith.',
+              ),
               value: _agreedToBeliefs,
               onChanged: (val) =>
                   setState(() => _agreedToBeliefs = val ?? false),
@@ -53,7 +55,8 @@ class _LeaderCovenantSignatureScreenState
             ),
             CheckboxListTile(
               title: const Text(
-                  'I voluntarily enter this covenant as a servant of Jesus Christ and a representative of Kingdom Heirs Foundation.',),
+                'I voluntarily enter this covenant as a servant of Jesus Christ and a representative of Kingdom Heirs Foundation.',
+              ),
               value: _agreedToCommitments,
               onChanged: (val) =>
                   setState(() => _agreedToCommitments = val ?? false),
@@ -90,9 +93,10 @@ class _LeaderCovenantSignatureScreenState
                 if (_formKey.currentState?.validate() ?? false) {
                   if (!_agreedToBeliefs || !_agreedToCommitments) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content:
-                              Text('You must check all affirmation boxes.'),),
+                      SnackBar(
+                        content: Text(AppLocalizations.of(context)!
+                            .youMustCheckAllAffirmationBoxes,),
+                      ),
                     );
                     return;
                   }

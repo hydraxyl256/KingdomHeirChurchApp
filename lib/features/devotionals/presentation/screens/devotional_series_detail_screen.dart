@@ -14,6 +14,7 @@ import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/features/devotionals/domain/entities/devotional_series_models.dart';
 import 'package:kingdom_heir/features/devotionals/presentation/providers/devotional_series_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DevotionalSeriesDetailScreen extends ConsumerWidget {
@@ -71,7 +72,8 @@ class DevotionalSeriesDetailScreen extends ConsumerWidget {
                           if (series.authorName != null)
                             Text(
                               'by ${series.authorName}',
-                              style: AppTypography.textTheme.bodySmall?.copyWith(
+                              style:
+                                  AppTypography.textTheme.bodySmall?.copyWith(
                                 color: AppColors.gold,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -102,15 +104,17 @@ class DevotionalSeriesDetailScreen extends ConsumerWidget {
                               child: ElevatedButton.icon(
                                 onPressed: () async {
                                   final result = await ref
-                                      .read(devotionalProgressProvider(
-                                        seriesId,
-                                      ).notifier,)
+                                      .read(
+                                        devotionalProgressProvider(
+                                          seriesId,
+                                        ).notifier,
+                                      )
                                       .joinChallenge();
                                   result.fold(
-                                    (err) =>
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(content: Text(err)),
-                                        ),
+                                    (err) => ScaffoldMessenger.of(context)
+                                        .showSnackBar(
+                                      SnackBar(content: Text(err)),
+                                    ),
                                     (_) => ref.invalidate(
                                       unlockedEntriesProvider(seriesId),
                                     ),
@@ -120,7 +124,8 @@ class DevotionalSeriesDetailScreen extends ConsumerWidget {
                                   Icons.rocket_launch_rounded,
                                   size: 18,
                                 ),
-                                label: const Text('Start this Journey'),
+                                label: Text(AppLocalizations.of(context)!
+                                    .startThisJourney,),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.gold,
                                   foregroundColor: AppColors.navy,
@@ -145,13 +150,15 @@ class DevotionalSeriesDetailScreen extends ConsumerWidget {
                               context,
                               series.amazonPurchaseUrl,
                             ),
-                            icon: const Icon(Icons.shopping_cart_outlined,
-                                size: 16,),
-                            label: const Text('Buy Physical Copy on Amazon'),
+                            icon: const Icon(
+                              Icons.shopping_cart_outlined,
+                              size: 16,
+                            ),
+                            label: Text(
+                                AppLocalizations.of(context)!.buyPhysicalCopy,),
                             style: OutlinedButton.styleFrom(
                               minimumSize: const Size(double.infinity, 44),
-                              foregroundColor:
-                                  theme.colorScheme.onSurface,
+                              foregroundColor: theme.colorScheme.onSurface,
                               side: BorderSide(
                                 color: theme.colorScheme.outline,
                               ),
@@ -209,11 +216,11 @@ class DevotionalSeriesDetailScreen extends ConsumerWidget {
     const fallback =
         'https://www.amazon.com/s?k=james+maddalone&crid=33XGMCSH8QWPF&sprefix=james+maddalone+%2Caps%2C194&ref=nb_sb_noss';
     final uri = Uri.parse(url ?? fallback);
-    final launched =
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!launched && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not open Amazon.')),
+        SnackBar(
+            content: Text(AppLocalizations.of(context)!.couldNotOpenAmazon),),
       );
     }
   }
@@ -264,7 +271,8 @@ class _GradientPlaceholder extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.menu_book_rounded, color: AppColors.gold, size: 52),
+            const Icon(Icons.menu_book_rounded,
+                color: AppColors.gold, size: 52,),
             const SizedBox(height: AppSpacing.sm),
             Text(
               '${series.totalDays} Days',
@@ -436,17 +444,17 @@ class _DayRow extends StatelessWidget {
     Color rowColor;
 
     if (isCompleted) {
-      iconData  = Icons.check_circle_rounded;
+      iconData = Icons.check_circle_rounded;
       iconColor = AppColors.success;
-      rowColor  = AppColors.success.withValues(alpha: 0.08);
+      rowColor = AppColors.success.withValues(alpha: 0.08);
     } else if (isAvailable) {
-      iconData  = Icons.play_circle_rounded;
+      iconData = Icons.play_circle_rounded;
       iconColor = AppColors.gold;
-      rowColor  = AppColors.gold.withValues(alpha: 0.08);
+      rowColor = AppColors.gold.withValues(alpha: 0.08);
     } else {
-      iconData  = Icons.lock_rounded;
+      iconData = Icons.lock_rounded;
       iconColor = theme.colorScheme.onSurface.withValues(alpha: 0.3);
-      rowColor  = Colors.transparent;
+      rowColor = Colors.transparent;
     }
 
     return InkWell(
@@ -493,8 +501,7 @@ class _DayRow extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                       color: isUnlocked || isCompleted
                           ? theme.colorScheme.onSurface
-                          : theme.colorScheme.onSurface
-                              .withValues(alpha: 0.4),
+                          : theme.colorScheme.onSurface.withValues(alpha: 0.4),
                     ),
                   ),
                   if (title != null)
@@ -511,8 +518,11 @@ class _DayRow extends StatelessWidget {
               ),
             ),
             if (isAvailable)
-              const Icon(Icons.chevron_right_rounded,
-                  color: AppColors.gold, size: 20,),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.gold,
+                size: 20,
+              ),
           ],
         ),
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class LeaderResourcesScreen extends StatelessWidget {
   const LeaderResourcesScreen({super.key});
@@ -6,8 +7,10 @@ class LeaderResourcesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Leader Resources')),
-      body: const Center(child: Text('Leader Toolkit & Resources')),
+      appBar:
+          AppBar(title: Text(AppLocalizations.of(context)!.leaderResources)),
+      body: Center(
+          child: Text(AppLocalizations.of(context)!.leaderToolkitResources),),
     );
   }
 }

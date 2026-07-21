@@ -10,6 +10,7 @@ import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/features/sermons/domain/entities/sermon.dart';
 import 'package:kingdom_heir/features/sermons/presentation/providers/sermons_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BookmarkPicker extends ConsumerWidget {
@@ -69,7 +70,7 @@ class BookmarkPicker extends ConsumerWidget {
                       );
                     },
                     icon: const Icon(Icons.add_rounded, size: 16),
-                    label: const Text('Mark current'),
+                    label: Text(AppLocalizations.of(context)!.markCurrent),
                   ),
                 ],
               ),

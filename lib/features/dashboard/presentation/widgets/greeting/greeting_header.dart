@@ -35,6 +35,7 @@ import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/features/dashboard/domain/home_dashboard_models.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -96,7 +97,7 @@ class DashboardTopBar extends StatelessWidget {
           alignment: Alignment.center,
           children: [
             IconButton(
-              tooltip: 'Notifications',
+              tooltip: AppLocalizations.of(context)!.notifications,
               icon: Icon(
                 PhosphorIconsRegular.bellRinging,
                 color: cs.onSurface,
@@ -172,8 +173,7 @@ class HeroHeader extends StatelessWidget {
   final DashboardGreeting greeting;
 
   @override
-  Widget build(BuildContext context) =>
-      _PremiumHeroBanner(greeting: greeting);
+  Widget build(BuildContext context) => _PremiumHeroBanner(greeting: greeting);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -185,14 +185,14 @@ class _PremiumHeroBanner extends StatelessWidget {
 
   final DashboardGreeting greeting;
 
-  static String _cleanTagline(String raw) =>
-      raw.replaceAll(RegExp(r'[\u{1F300}-\u{1F9FF}]', unicode: true), '').trim();
+  static String _cleanTagline(String raw) => raw
+      .replaceAll(RegExp(r'[\u{1F300}-\u{1F9FF}]', unicode: true), '')
+      .trim();
 
   @override
   Widget build(BuildContext context) {
-    final today = DateFormat('EEEE • MMMM d')
-        .format(DateTime.now())
-        .toUpperCase();
+    final today =
+        DateFormat('EEEE • MMMM d').format(DateTime.now()).toUpperCase();
     final displayName = greeting.firstName.isNotEmpty
         ? greeting.firstName
         : 'Kingdom Heirs Member';
@@ -412,9 +412,7 @@ class _HeroImage extends StatelessWidget {
       errorBuilder: (_, __, ___) => const ColoredBox(
         color: AppColors.navy,
       ),
-    )
-        .animate(onPlay: (c) => c.repeat(reverse: true))
-        .scale(
+    ).animate(onPlay: (c) => c.repeat(reverse: true)).scale(
           begin: const Offset(1, 1),
           end: const Offset(1.06, 1.06),
           duration: const Duration(seconds: 12),
@@ -538,6 +536,5 @@ class DashboardGreetingBanner extends StatelessWidget {
   final DashboardGreeting greeting;
 
   @override
-  Widget build(BuildContext context) =>
-      _PremiumHeroBanner(greeting: greeting);
+  Widget build(BuildContext context) => _PremiumHeroBanner(greeting: greeting);
 }

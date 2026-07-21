@@ -191,7 +191,9 @@ class _WatchCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            card.kind == WatchKind.sermon ? 'Sermon' : 'Podcast',
+                            card.kind == WatchKind.sermon
+                                ? 'Sermon'
+                                : 'Podcast',
                             style: AppTypography.textTheme.labelSmall?.copyWith(
                               color: AppColors.goldDark,
                               fontWeight: FontWeight.bold,
@@ -214,7 +216,8 @@ class _WatchCard extends StatelessWidget {
                                 ),
                                 child: Text(
                                   card.durationLabel!,
-                                  style: AppTypography.textTheme.labelSmall?.copyWith(
+                                  style: AppTypography.textTheme.labelSmall
+                                      ?.copyWith(
                                     color: cs.onSurface,
                                   ),
                                 ),
@@ -250,7 +253,8 @@ class _WatchCard extends StatelessWidget {
                             children: [
                               Text(
                                 card.title,
-                                style: AppTypography.textTheme.titleMedium?.copyWith(
+                                style: AppTypography.textTheme.titleMedium
+                                    ?.copyWith(
                                   color: cs.onSurface,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -261,7 +265,8 @@ class _WatchCard extends StatelessWidget {
                                 const SizedBox(height: 2),
                                 Text(
                                   card.durationLabel!,
-                                  style: AppTypography.textTheme.bodySmall?.copyWith(
+                                  style: AppTypography.textTheme.bodySmall
+                                      ?.copyWith(
                                     color: cs.onSurfaceVariant,
                                   ),
                                   maxLines: 1,

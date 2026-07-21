@@ -6,7 +6,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
@@ -14,6 +13,7 @@ import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/core/widgets/app_avatar.dart';
 import 'package:kingdom_heir/features/groups/domain/entities/group_member_models.dart';
 import 'package:kingdom_heir/features/groups/presentation/providers/group_detail_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class PendingRequestCard extends ConsumerStatefulWidget {
   const PendingRequestCard({
@@ -135,7 +135,7 @@ class _PendingRequestCardState extends ConsumerState<PendingRequestCard> {
                 child: FilledButton.icon(
                   onPressed: _busy ? null : _approve,
                   icon: const Icon(Icons.check_rounded, size: 16),
-                  label: const Text('Approve'),
+                  label: Text(AppLocalizations.of(context)!.approve),
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.gold,
                     foregroundColor: AppColors.ink,
@@ -154,7 +154,7 @@ class _PendingRequestCardState extends ConsumerState<PendingRequestCard> {
                 child: OutlinedButton.icon(
                   onPressed: _busy ? null : _deny,
                   icon: const Icon(Icons.close_rounded, size: 16),
-                  label: const Text('Deny'),
+                  label: Text(AppLocalizations.of(context)!.deny),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: theme.colorScheme.onSurfaceVariant,
                     side: BorderSide(

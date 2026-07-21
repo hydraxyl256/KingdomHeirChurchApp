@@ -60,8 +60,7 @@ class ChurchTodaySection extends StatelessWidget {
                 height: 36,
                 decoration: BoxDecoration(
                   color: AppColors.goldContainer,
-                  borderRadius:
-                      BorderRadius.circular(AppSpacing.radiusSm),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                 ),
                 child: const Icon(
                   Iconography.events,
@@ -161,9 +160,8 @@ class _EventRow extends StatelessWidget {
                 Text(
                   isToday ? 'TODAY' : 'TOMORROW',
                   style: AppTypography.scriptureRef.copyWith(
-                    color: isToday
-                        ? AppColors.goldDark
-                        : AppColors.textSecondary,
+                    color:
+                        isToday ? AppColors.goldDark : AppColors.textSecondary,
                     fontSize: 8,
                     letterSpacing: 1,
                     fontWeight: FontWeight.w800,
@@ -312,8 +310,7 @@ class _EventRow extends StatelessWidget {
                   color: event.isOnline
                       ? AppColors.navyAccent.withValues(alpha: 0.1)
                       : AppColors.goldContainer,
-                  borderRadius:
-                      BorderRadius.circular(AppSpacing.radiusFull),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
                   border: Border.all(
                     color: event.isOnline
                         ? AppColors.navyAccent.withValues(alpha: 0.2)

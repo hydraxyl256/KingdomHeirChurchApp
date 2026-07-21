@@ -29,8 +29,26 @@ class SermonsRepositoryImpl implements SermonsRepository {
   // ─── Primary source: media_content (YouTube catalog) ─────────────────
 
   @override
-  Future<Either<String, List<Sermon>>> getSermons() async {
-    // 1. Try the new YouTube media catalog first
+  Future<Either<String, List<Sermon>>> getSermons(
+      {String languageCode = 'en',}) async {
+    // 1. Try the new localized RPC
+    try {
+      final response = await _supabase.rpc<List<dynamic>>(
+          'get_sermons_localized',
+          params: {'p_lang': languageCode},);
+
+      if (response.isNotEmpty) {
+        return right(
+          response
+              .map((json) => Sermon.fromJson(json as Map<String, dynamic>))
+              .toList(),
+        );
+      }
+    } catch (_) {
+      // Fall through
+    }
+
+    // 2. Try the new YouTube media catalog first
     try {
       final response = await _supabase
           .from('media_content')
@@ -41,9 +59,7 @@ class SermonsRepositoryImpl implements SermonsRepository {
 
       if (response.isNotEmpty) {
         return right(
-          response
-              .map(Sermon.fromMediaContent)
-              .toList(),
+          response.map(Sermon.fromMediaContent).toList(),
         );
       }
     } catch (_) {
@@ -60,9 +76,7 @@ class SermonsRepositoryImpl implements SermonsRepository {
 
       if (response.isNotEmpty) {
         return right(
-          response
-              .map(Sermon.fromJson)
-              .toList(),
+          response.map(Sermon.fromJson).toList(),
         );
       }
     } catch (_) {
@@ -86,7 +100,8 @@ class SermonsRepositoryImpl implements SermonsRepository {
 
       return right(
         (response as List<dynamic>)
-            .map((json) => Sermon.fromMediaContent(json as Map<String, dynamic>))
+            .map(
+                (json) => Sermon.fromMediaContent(json as Map<String, dynamic>),)
             .toList(),
       );
     } catch (_) {
@@ -226,7 +241,8 @@ class SermonsRepositoryImpl implements SermonsRepository {
     final items = await getContinueWatching();
     final list = <SermonContinueItem>[
       ...items.getOrElse((_) => <SermonContinueItem>[]),
-    ]..removeWhere((i) => i.sermon.id == sermonId)
+    ]
+      ..removeWhere((i) => i.sermon.id == sermonId)
       ..insert(
         0,
         SermonContinueItem(
@@ -286,7 +302,8 @@ class SermonsRepositoryImpl implements SermonsRepository {
     final items = await getDownloads();
     final list = <SermonDownload>[
       ...items.getOrElse((_) => <SermonDownload>[]),
-    ]..removeWhere((d) => d.sermonId == sermonId)
+    ]
+      ..removeWhere((d) => d.sermonId == sermonId)
       ..insert(
         0,
         SermonDownload(
@@ -364,7 +381,8 @@ class SermonsRepositoryImpl implements SermonsRepository {
     final currentEither = await getNotes(note.sermonId);
     final list = <SermonNote>[
       ...currentEither.getOrElse((_) => <SermonNote>[]),
-    ]..removeWhere((n) => n.id == note.id)
+    ]
+      ..removeWhere((n) => n.id == note.id)
       ..insert(0, note)
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
     final encoded = list
@@ -431,11 +449,13 @@ class SermonsRepositoryImpl implements SermonsRepository {
 
   @override
   Future<Either<String, void>> saveReflection(
-      SermonReflection reflection,) async {
+    SermonReflection reflection,
+  ) async {
     final currentEither = await getReflections(reflection.sermonId);
     final list = <SermonReflection>[
       ...currentEither.getOrElse((_) => <SermonReflection>[]),
-    ]..removeWhere((r) => r.id == reflection.id)
+    ]
+      ..removeWhere((r) => r.id == reflection.id)
       ..insert(0, reflection)
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
     final encoded = list
@@ -549,7 +569,8 @@ class SermonsRepositoryImpl implements SermonsRepository {
     int limit = 10,
   }) async {
     return right(
-        MockSermonSeed.sermonsBySpeaker(speakerName).take(limit).toList(),);
+      MockSermonSeed.sermonsBySpeaker(speakerName).take(limit).toList(),
+    );
   }
 
   @override

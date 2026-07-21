@@ -257,8 +257,7 @@ class _NavBarItem extends StatelessWidget {
               duration: const Duration(milliseconds: 200),
               style: AppTypography.textTheme.labelSmall!.copyWith(
                 color: isSelected ? selectedColor : unselectedColor,
-                fontWeight:
-                    isSelected ? FontWeight.w700 : FontWeight.w400,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
                 fontSize: 10,
               ),
               child: Text(
@@ -345,8 +344,7 @@ class _RailShell extends StatelessWidget {
                           const SizedBox(width: AppSpacing.sm),
                           Text(
                             'Kingdom Heir',
-                            style:
-                                AppTypography.textTheme.titleSmall?.copyWith(
+                            style: AppTypography.textTheme.titleSmall?.copyWith(
                               color:
                                   isDark ? AppColors.warmWhite : AppColors.navy,
                               fontWeight: FontWeight.w700,

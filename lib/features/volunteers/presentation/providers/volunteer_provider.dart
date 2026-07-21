@@ -6,7 +6,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 final volunteerRepositoryProvider = Provider<VolunteerRepository>((ref) {
   return VolunteerRepositoryImpl(
-      VolunteerSupabaseService(Supabase.instance.client),);
+    VolunteerSupabaseService(Supabase.instance.client),
+  );
 });
 
 final volunteerOpportunitiesProvider =
@@ -47,5 +48,7 @@ final volunteerApplicationNotifierProvider =
     StateNotifierProvider<VolunteerApplicationNotifier, AsyncValue<void>>(
         (ref) {
   return VolunteerApplicationNotifier(
-      ref, ref.watch(volunteerRepositoryProvider),);
+    ref,
+    ref.watch(volunteerRepositoryProvider),
+  );
 });

@@ -283,8 +283,11 @@ class _EventCoverFallback extends StatelessWidget {
           Positioned(
             right: -10,
             bottom: -10,
-            child: Icon(icon,
-                size: 110, color: AppColors.gold.withValues(alpha: 0.15),),
+            child: Icon(
+              icon,
+              size: 110,
+              color: AppColors.gold.withValues(alpha: 0.15),
+            ),
           ),
           Positioned(
             left: 14,

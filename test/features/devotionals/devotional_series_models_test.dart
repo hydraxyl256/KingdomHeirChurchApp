@@ -13,17 +13,17 @@ DevotionalSeriesProgress _makeProgress({
   DateTime? completedAt,
 }) {
   return DevotionalSeriesProgress(
-    id:                 'progress-id',
-    userId:             'user-id',
-    seriesId:           'series-id',
-    currentDay:         currentDay,
+    id: 'progress-id',
+    userId: 'user-id',
+    seriesId: 'series-id',
+    currentDay: currentDay,
     highestUnlockedDay: highestUnlockedDay,
-    completedDays:      completedDays,
-    currentStreak:      currentStreak,
-    longestStreak:      longestStreak,
-    startedAt:          DateTime(2026),
-    lastCompletedAt:    lastCompletedAt,
-    completedAt:        completedAt,
+    completedDays: completedDays,
+    currentStreak: currentStreak,
+    longestStreak: longestStreak,
+    startedAt: DateTime(2026),
+    lastCompletedAt: lastCompletedAt,
+    completedAt: completedAt,
   );
 }
 
@@ -80,20 +80,20 @@ void main() {
 
   group('DevotionalEntry.fromJson', () {
     final baseJson = {
-      'id':                  'entry-001',
-      'series_id':           'series-id',
-      'day_number':          1,
-      'title':               'Day 1: Walking by Faith',
-      'devotional_body':     'Body text here',
+      'id': 'entry-001',
+      'series_id': 'series-id',
+      'day_number': 1,
+      'title': 'Day 1: Walking by Faith',
+      'devotional_body': 'Body text here',
       'scripture_reference': 'Hebrews 11:1',
-      'scripture_text':      'Faith is...',
+      'scripture_text': 'Faith is...',
       'reflection_question': 'What does faith mean to you?',
-      'action_step':         'Read Hebrews 11 today.',
-      'prayer_text':         'Lord, increase my faith.',
+      'action_step': 'Read Hebrews 11 today.',
+      'prayer_text': 'Lord, increase my faith.',
       'estimated_read_minutes': 8,
-      'status':              'published',
-      'created_at':          '2026-01-01T00:00:00Z',
-      'updated_at':          '2026-01-01T00:00:00Z',
+      'status': 'published',
+      'created_at': '2026-01-01T00:00:00Z',
+      'updated_at': '2026-01-01T00:00:00Z',
     };
 
     test('creates from base JSON with English defaults', () {
@@ -106,10 +106,10 @@ void main() {
 
     test('overlays translation when translationJson provided', () {
       final txJson = {
-        'language_code':       'ur',
-        'title':               'دن 1: ایمان سے چلنا',
-        'devotional_body':     'اردو متن یہاں ہے',
-        'translation_status':  'published',
+        'language_code': 'ur',
+        'title': 'دن 1: ایمان سے چلنا',
+        'devotional_body': 'اردو متن یہاں ہے',
+        'translation_status': 'published',
       };
       final entry = DevotionalEntry.fromJson(baseJson, translationJson: txJson);
       expect(entry.title, 'دن 1: ایمان سے چلنا');
@@ -121,10 +121,10 @@ void main() {
     test('falls back to English fields when translation field is null', () {
       // Translation exists but missing title — should keep base English title
       final txJson = {
-        'language_code':       'zu',
-        'title':               null,
-        'devotional_body':     'Zulu body text',
-        'translation_status':  'published',
+        'language_code': 'zu',
+        'title': null,
+        'devotional_body': 'Zulu body text',
+        'translation_status': 'published',
       };
       final entry = DevotionalEntry.fromJson(baseJson, translationJson: txJson);
       // title falls back to English when tx title is null

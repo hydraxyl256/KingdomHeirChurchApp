@@ -8,6 +8,7 @@ import 'package:kingdom_heir/core/router/route_names.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/widgets/app_avatar.dart';
 import 'package:kingdom_heir/features/auth/presentation/providers/auth_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsNotificationCenterScreen extends ConsumerStatefulWidget {
@@ -149,7 +150,7 @@ class _SettingsNotificationCenterScreenState
                     size: 20,
                   ),
                 ),
-                title: const Text('Theme'),
+                title: Text(AppLocalizations.of(context)!.theme),
                 subtitle: Text(themeMode.name.capitalize()),
                 trailing: const Icon(Icons.chevron_right_rounded),
                 onTap: () => _showThemeDialog(context, ref, themeMode),
@@ -175,7 +176,7 @@ class _SettingsNotificationCenterScreenState
                     size: 20,
                   ),
                 ),
-                title: const Text('Default Currency'),
+                title: Text(AppLocalizations.of(context)!.defaultCurrency),
                 subtitle: Text(kSupportedCurrencies[currency] ?? currency),
                 trailing: const Icon(Icons.chevron_right_rounded),
                 onTap: () => _showCurrencyDialog(context, ref, currency),
@@ -261,7 +262,7 @@ class _SettingsNotificationCenterScreenState
                   Icons.lock_outline_rounded,
                   theme.colorScheme.secondary,
                 ),
-                title: const Text('Change Password'),
+                title: Text(AppLocalizations.of(context)!.changePassword),
                 trailing: const Icon(Icons.chevron_right_rounded),
                 onTap: () => context.push(RouteNames.changePassword),
               ),
@@ -275,7 +276,7 @@ class _SettingsNotificationCenterScreenState
                   Icons.language_rounded,
                   theme.colorScheme.tertiary,
                 ),
-                title: const Text('Language'),
+                title: Text(AppLocalizations.of(context)!.settingsLanguage),
                 subtitle: Text(
                   _currentLanguageLabel(ref.watch(localeProvider).languageCode),
                 ),
@@ -292,7 +293,7 @@ class _SettingsNotificationCenterScreenState
                   Icons.privacy_tip_outlined,
                   theme.colorScheme.secondary,
                 ),
-                title: const Text('Privacy Policy'),
+                title: Text(AppLocalizations.of(context)!.privacyPolicy),
                 trailing: const Icon(Icons.chevron_right_rounded),
                 onTap: () => _launchPrivacyPolicy(context),
               ),
@@ -306,7 +307,7 @@ class _SettingsNotificationCenterScreenState
                   Icons.info_outline_rounded,
                   theme.colorScheme.tertiary,
                 ),
-                title: const Text('About Kingdom Heir'),
+                title: Text(AppLocalizations.of(context)!.aboutKingdomHeir),
                 trailing: const Icon(Icons.chevron_right_rounded),
                 onTap: () => context.push(RouteNames.settingsAbout),
               ),
@@ -344,75 +345,85 @@ class _SettingsNotificationCenterScreenState
                   _isLoggingOut ? 'Signing out...' : 'Sign Out',
                   style: TextStyle(color: theme.colorScheme.error),
                 ),
-                onTap: _isLoggingOut ? null : () async {
-                  final outerContext = context;
-                  final messenger = ScaffoldMessenger.of(outerContext);
+                onTap: _isLoggingOut
+                    ? null
+                    : () async {
+                        final outerContext = context;
+                        final messenger = ScaffoldMessenger.of(outerContext);
+                        final signedOutMsg = AppLocalizations.of(context)!.youHaveBeenSignedOut;
 
-                  final confirmed = await showDialog<bool>(
-                    context: outerContext,
-                    builder: (dialogContext) => AlertDialog(
-                      title: const Text('Sign Out'),
-                      content: const Text('Are you sure you want to sign out?'),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(dialogContext, false),
-                          child: const Text('Cancel'),
-                        ),
-                        TextButton(
-                          onPressed: () => Navigator.pop(dialogContext, true),
-                          child: Text(
-                            'Sign Out',
-                            style: TextStyle(
-                              color: Theme.of(dialogContext).colorScheme.error,
-                            ),
+                        final confirmed = await showDialog<bool>(
+                          context: outerContext,
+                          builder: (dialogContext) => AlertDialog(
+                            title: Text(AppLocalizations.of(context)!.signOut),
+                            content: Text(AppLocalizations.of(context)!
+                                .areYouSureYouWantTo,),
+                            actions: [
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.pop(dialogContext, false),
+                                child:
+                                    Text(AppLocalizations.of(context)!.cancel),
+                              ),
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.pop(dialogContext, true),
+                                child: Text(
+                                  'Sign Out',
+                                  style: TextStyle(
+                                    color: Theme.of(dialogContext)
+                                        .colorScheme
+                                        .error,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                  );
+                        );
 
+                        if (confirmed != true) return;
 
-                  if (confirmed != true) return;
+                        if (!context.mounted) return;
+                        setState(() => _isLoggingOut = true);
 
-                  if (!mounted) return;
-                  setState(() => _isLoggingOut = true);
+                        try {
+                          await ref
+                              .read(authNotifierProvider.notifier)
+                              .signOut();
 
-                  try {
-                    await ref.read(authNotifierProvider.notifier).signOut();
+                          final authState = ref.read(authNotifierProvider);
+                          if (authState.hasError) {
+                            throw Exception(authState.error);
+                          }
 
-                    final authState = ref.read(authNotifierProvider);
-                    if (authState.hasError) {
-                      throw Exception(authState.error);
-                    }
+                          // We don't call router.go() here. GoRouter's redirect logic
+                          // will automatically redirect to start-here because auth state changed.
 
-                    // We don't call router.go() here. GoRouter's redirect logic
-                    // will automatically redirect to start-here because auth state changed.
-
-                    if (mounted) {
-                      messenger.showSnackBar(
-                        const SnackBar(
-                          content: Text('You have been signed out.'),
-                          duration: Duration(seconds: 3),
-                        ),
-                      );
-                    }
-                  } catch (e) {
-                    if (mounted) {
-                      messenger.showSnackBar(
-                        SnackBar(
-                          content: const Text(
-                            'Sign out failed. Please try again.',
-                          ),
-                          backgroundColor: theme.colorScheme.error,
-                        ),
-                      );
-                    }
-                  } finally {
-                    if (mounted) {
-                      setState(() => _isLoggingOut = false);
-                    }
-                  }
-                },
+                          if (mounted) {
+                            messenger.showSnackBar(
+                              SnackBar(
+                                content: Text(signedOutMsg),
+                                duration: const Duration(seconds: 3),
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          if (mounted) {
+                            messenger.showSnackBar(
+                              SnackBar(
+                                content: const Text(
+                                  'Sign out failed. Please try again.',
+                                ),
+                                backgroundColor: theme.colorScheme.error,
+                              ),
+                            );
+                          }
+                        } finally {
+                          if (mounted) {
+                            setState(() => _isLoggingOut = false);
+                          }
+                        }
+                      },
               ),
             ],
           ).animate().fadeIn(delay: 240.ms),
@@ -434,7 +445,7 @@ class _SettingsNotificationCenterScreenState
     showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Choose Theme'),
+        title: Text(AppLocalizations.of(context)!.chooseTheme),
         content: RadioGroup<ThemeMode>(
           groupValue: current,
           onChanged: (v) {
@@ -469,7 +480,7 @@ class _SettingsNotificationCenterScreenState
     showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Select Currency'),
+        title: Text(AppLocalizations.of(context)!.selectCurrency),
         contentPadding: const EdgeInsets.symmetric(vertical: 8),
         content: SizedBox(
           width: double.maxFinite,
@@ -516,7 +527,7 @@ class _SettingsNotificationCenterScreenState
     showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Select Language'),
+        title: Text(AppLocalizations.of(context)!.selectLanguage),
         contentPadding: const EdgeInsets.symmetric(vertical: 8),
         content: SizedBox(
           width: double.maxFinite,
@@ -569,11 +580,9 @@ class _SettingsNotificationCenterScreenState
   }
 
   Future<void> _launchPrivacyPolicy(BuildContext ctx) async {
-    const url =
-        'https://sites.google.com/view/kingdom-heirs-ministry/home';
+    const url = 'https://sites.google.com/view/kingdom-heirs-ministry/home';
     final uri = Uri.parse(url);
-    final launched =
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!launched && ctx.mounted) {
       final scheme = Theme.of(ctx).colorScheme;
       ScaffoldMessenger.of(ctx).showSnackBar(
@@ -595,7 +604,6 @@ class _SettingsNotificationCenterScreenState
     }
   }
 }
-
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -729,7 +737,6 @@ class _PersistentSwitchTileState extends ConsumerState<_PersistentSwitchTile> {
       ),
     );
   }
-
 }
 
 extension on String {

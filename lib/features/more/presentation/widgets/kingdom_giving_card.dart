@@ -25,11 +25,9 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import 'package:kingdom_heir/core/responsive/insets.dart';
-import 'package:kingdom_heir/core/router/route_names.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/more_section_theme.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
@@ -78,215 +76,206 @@ class KingdomGivingCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
-          children: [
-            // ── Header ────────────────────────────────────────────────────
-            Row(
-              children: [
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: section.brandContainerSubtle,
-                    borderRadius: BorderRadius.circular(AppRadius.sm),
-                  ),
-                  child: Icon(
-                    Icons.volunteer_activism_rounded,
-                    color: section.heroAccent,
-                    size: 18,
-                  ),
-                ),
-                SizedBox(width: insets.sm),
-                Expanded(
-                  child: Text(
-                    'KINGDOM GIVING',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTypography.textTheme.labelMedium?.copyWith(
-                      color: section.heroAccent,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.6,
-                    ),
-                  ),
-                ),
-                Text(
-                  summary.monthLabel,
-                  style: AppTypography.textTheme.labelMedium?.copyWith(
-                    color: section.heroMutedOnSurface,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: insets.md),
-
-            // ── Month progress ────────────────────────────────────────────
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Flexible(
-                  child: Text(
-                    _currency(summary.amountGiven),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTypography.textTheme.headlineMedium?.copyWith(
-                      color: section.heroAccentOnSurface,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-                SizedBox(width: insets.xs),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Text(
-                    'of ${_currency(summary.goalAmount)}',
-                    style: AppTypography.textTheme.bodyMedium?.copyWith(
-                      color: section.heroMutedOnSurface,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: insets.xs),
-            _AnimatedGoldBar(
-              value: summary.monthProgress,
-              height: 8,
-              section: section,
-            ),
-            SizedBox(height: insets.xs),
-            Text(
-              '${(summary.monthProgress * 100).toStringAsFixed(0)}% of monthly goal',
-              style: AppTypography.textTheme.labelSmall?.copyWith(
-                color: section.heroAccentOnSurface.withValues(alpha: 0.8),
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            SizedBox(height: insets.md),
-
-            // ── Sparkline (last 6 months) ────────────────────────────────
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(
-                horizontal: insets.md,
-                vertical: insets.sm,
-              ),
-              decoration: BoxDecoration(
-                color: section.heroAccentOnSurface.withValues(alpha: 0.06),
-                borderRadius: BorderRadius.circular(AppRadius.lg),
-                border: Border.all(
-                  color: section.heroAccentOnSurface.withValues(alpha: 0.08),
-                  width: 0.6,
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
+            children: [
+              // ── Header ────────────────────────────────────────────────────
+              Row(
                 children: [
-                  Text(
-                    'LAST 6 MONTHS',
-                    style: AppTypography.textTheme.labelSmall?.copyWith(
-                      color: section.heroAccentOnSurface.withValues(alpha: 0.6),
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.4,
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: section.brandContainerSubtle,
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                    ),
+                    child: Icon(
+                      Icons.volunteer_activism_rounded,
+                      color: section.heroAccent,
+                      size: 18,
                     ),
                   ),
-                  SizedBox(height: insets.xs),
-                  SizedBox(
-                    height: 36,
-                    child: CustomPaint(
-                      painter: _SparklinePainter(
-                        values: summary.recentMonths,
-                        strokeColor: section.heroAccent,
-                        fillColor:
-                            section.heroAccent.withValues(alpha: 0.16),
-                        lastPointColor: section.heroAccentOnSurface,
+                  SizedBox(width: insets.sm),
+                  Expanded(
+                    child: Text(
+                      'KINGDOM GIVING',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.textTheme.labelMedium?.copyWith(
+                        color: section.heroAccent,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.6,
                       ),
-                      size: Size.infinite,
+                    ),
+                  ),
+                  Text(
+                    summary.monthLabel,
+                    style: AppTypography.textTheme.labelMedium?.copyWith(
+                      color: section.heroMutedOnSurface,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
               ),
-            ),
-            SizedBox(height: insets.md),
+              SizedBox(height: insets.md),
 
-            // ── Campaign progress ────────────────────────────────────────
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: section.brandChipBackground,
-                    borderRadius: BorderRadius.circular(AppRadius.full),
-                  ),
-                  child: Text(
-                    'CAMPAIGN',
-                    style: AppTypography.textTheme.labelSmall?.copyWith(
-                      color: section.heroBackgroundTop,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.2,
+              // ── Month progress ────────────────────────────────────────────
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Flexible(
+                    child: Text(
+                      _currency(summary.amountGiven),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.textTheme.headlineMedium?.copyWith(
+                        color: section.heroAccentOnSurface,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(width: insets.sm),
-                Expanded(
-                  child: Text(
-                    summary.campaignTitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTypography.textTheme.titleSmall?.copyWith(
-                      color: section.heroAccentOnSurface,
-                      fontWeight: FontWeight.w700,
+                  SizedBox(width: insets.xs),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text(
+                      'of ${_currency(summary.goalAmount)}',
+                      style: AppTypography.textTheme.bodyMedium?.copyWith(
+                        color: section.heroMutedOnSurface,
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: insets.xs),
-            _AnimatedGoldBar(
-              value: summary.campaignProgress,
-              section: section,
-            ),
-            SizedBox(height: insets.xxs),
-            Text(
-              '${_currency(summary.campaignRaised)} raised · ${_currency(summary.campaignGoal)} goal',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTypography.textTheme.labelSmall?.copyWith(
-                color: section.heroAccentOnSurface.withValues(alpha: 0.75),
-                fontWeight: FontWeight.w600,
+                ],
               ),
-            ),
-            SizedBox(height: insets.md),
+              SizedBox(height: insets.xs),
+              _AnimatedGoldBar(
+                value: summary.monthProgress,
+                height: 8,
+                section: section,
+              ),
+              SizedBox(height: insets.xs),
+              Text(
+                '${(summary.monthProgress * 100).toStringAsFixed(0)}% of monthly goal',
+                style: AppTypography.textTheme.labelSmall?.copyWith(
+                  color: section.heroAccentOnSurface.withValues(alpha: 0.8),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              SizedBox(height: insets.md),
 
-            // ── CTAs ─────────────────────────────────────────────────────
-            // The primary CTA opens the hosted donation page in the
-            // device's external browser (see `donation_launcher.dart`).
-            // The secondary "History" button stays in-app so the user
-            // can still review past giving records.
-            Row(
-              children: [
-                Expanded(
-                  child: AppButton(
-                    label: 'Donate Securely',
-                    icon: Icons.open_in_new_rounded,
-                    onPressed: () => openDonationPage(context),
+              // ── Sparkline (last 6 months) ────────────────────────────────
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(
+                  horizontal: insets.md,
+                  vertical: insets.sm,
+                ),
+                decoration: BoxDecoration(
+                  color: section.heroAccentOnSurface.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
+                  border: Border.all(
+                    color: section.heroAccentOnSurface.withValues(alpha: 0.08),
+                    width: 0.6,
                   ),
                 ),
-                SizedBox(width: insets.sm),
-                Expanded(
-                  child: AppButton(
-                    label: 'History',
-                    variant: AppButtonVariant.outlined,
-                    onPressed: () =>
-                        GoRouter.of(context).push(RouteNames.givingHistory),
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'LAST 6 MONTHS',
+                      style: AppTypography.textTheme.labelSmall?.copyWith(
+                        color:
+                            section.heroAccentOnSurface.withValues(alpha: 0.6),
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.4,
+                      ),
+                    ),
+                    SizedBox(height: insets.xs),
+                    SizedBox(
+                      height: 36,
+                      child: CustomPaint(
+                        painter: _SparklinePainter(
+                          values: summary.recentMonths,
+                          strokeColor: section.heroAccent,
+                          fillColor: section.heroAccent.withValues(alpha: 0.16),
+                          lastPointColor: section.heroAccentOnSurface,
+                        ),
+                        size: Size.infinite,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+              SizedBox(height: insets.md),
+
+              // ── Campaign progress ────────────────────────────────────────
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: section.brandChipBackground,
+                      borderRadius: BorderRadius.circular(AppRadius.full),
+                    ),
+                    child: Text(
+                      'CAMPAIGN',
+                      style: AppTypography.textTheme.labelSmall?.copyWith(
+                        color: section.heroBackgroundTop,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: insets.sm),
+                  Expanded(
+                    child: Text(
+                      summary.campaignTitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.textTheme.titleSmall?.copyWith(
+                        color: section.heroAccentOnSurface,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: insets.xs),
+              _AnimatedGoldBar(
+                value: summary.campaignProgress,
+                section: section,
+              ),
+              SizedBox(height: insets.xxs),
+              Text(
+                '${_currency(summary.campaignRaised)} raised · ${_currency(summary.campaignGoal)} goal',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTypography.textTheme.labelSmall?.copyWith(
+                  color: section.heroAccentOnSurface.withValues(alpha: 0.75),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              SizedBox(height: insets.md),
+
+              // ── CTAs ─────────────────────────────────────────────────────
+              // The primary CTA opens the hosted donation page in the
+              // device's external browser (see `donation_launcher.dart`).
+              // The secondary "History" button stays in-app so the user
+              // can still review past giving records.
+              Row(
+                children: [
+                  Expanded(
+                    child: AppButton(
+                      label: 'Donate Securely',
+                      icon: Icons.open_in_new_rounded,
+                      onPressed: () => openDonationPage(context),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -356,8 +345,7 @@ class _AnimatedGoldBar extends StatelessWidget {
                   height: height,
                   width: constraints.maxWidth,
                   decoration: BoxDecoration(
-                    color:
-                        section.heroAccentOnSurface.withValues(alpha: 0.18),
+                    color: section.heroAccentOnSurface.withValues(alpha: 0.18),
                     borderRadius: BorderRadius.circular(AppRadius.full),
                   ),
                 ),

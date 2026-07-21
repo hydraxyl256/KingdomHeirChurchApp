@@ -14,8 +14,8 @@ int parseIso8601Duration(String iso) {
     r'P(?:(\d+)D)?T?(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?',
   ).firstMatch(iso);
   if (match == null) return 0;
-  final days    = int.tryParse(match.group(1) ?? '') ?? 0;
-  final hours   = int.tryParse(match.group(2) ?? '') ?? 0;
+  final days = int.tryParse(match.group(1) ?? '') ?? 0;
+  final hours = int.tryParse(match.group(2) ?? '') ?? 0;
   final minutes = int.tryParse(match.group(3) ?? '') ?? 0;
   final seconds = int.tryParse(match.group(4) ?? '') ?? 0;
   return days * 86400 + hours * 3600 + minutes * 60 + seconds;

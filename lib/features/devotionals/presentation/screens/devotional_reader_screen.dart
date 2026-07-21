@@ -16,6 +16,7 @@ import 'package:kingdom_heir/core/theme/motion.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/features/devotionals/presentation/providers/devotional_journey_provider.dart';
 import 'package:kingdom_heir/features/devotionals/presentation/providers/devotionals_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class DevotionalReaderScreen extends ConsumerStatefulWidget {
   const DevotionalReaderScreen({required this.devotionalId, super.key});
@@ -26,7 +27,8 @@ class DevotionalReaderScreen extends ConsumerStatefulWidget {
       _DevotionalReaderScreenState();
 }
 
-class _DevotionalReaderScreenState extends ConsumerState<DevotionalReaderScreen> {
+class _DevotionalReaderScreenState
+    extends ConsumerState<DevotionalReaderScreen> {
   final _scrollController = ScrollController();
   double _scrollProgress = 0;
 
@@ -41,8 +43,7 @@ class _DevotionalReaderScreenState extends ConsumerState<DevotionalReaderScreen>
     final max = _scrollController.position.maxScrollExtent;
     if (max <= 0) return;
     setState(() {
-      _scrollProgress =
-          (_scrollController.offset / max).clamp(0.0, 1.0);
+      _scrollProgress = (_scrollController.offset / max).clamp(0.0, 1.0);
     });
   }
 
@@ -91,7 +92,8 @@ class _DevotionalReaderScreenState extends ConsumerState<DevotionalReaderScreen>
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (devotional) {
           if (devotional == null) {
-            return const Center(child: Text('Devotional not found.'));
+            return Center(
+                child: Text(AppLocalizations.of(context)!.devotionalNotFound),);
           }
 
           final estimatedMin = 3 + (devotional.body.length ~/ 700);
@@ -135,8 +137,7 @@ class _DevotionalReaderScreenState extends ConsumerState<DevotionalReaderScreen>
                       // Title
                       Text(
                         devotional.title,
-                        style:
-                            AppTypography.textTheme.headlineMedium?.copyWith(
+                        style: AppTypography.textTheme.headlineMedium?.copyWith(
                           color: AppColors.navy,
                           fontWeight: FontWeight.w800,
                           height: 1.2,
@@ -187,12 +188,13 @@ class _DevotionalReaderScreenState extends ConsumerState<DevotionalReaderScreen>
 
                       // Parsed body sections
                       ...sections.asMap().entries.map(
-                            (e) => _buildSection(e.value, e.key).animate().fadeIn(
-                                  delay: Duration(
-                                    milliseconds: 300 + e.key * 80,
-                                  ),
-                                  duration: AppMotion.standard,
-                                ),
+                            (e) =>
+                                _buildSection(e.value, e.key).animate().fadeIn(
+                                      delay: Duration(
+                                        milliseconds: 300 + e.key * 80,
+                                      ),
+                                      duration: AppMotion.standard,
+                                    ),
                           ),
 
                       const SizedBox(height: AppSpacing.xxl),
@@ -246,22 +248,28 @@ class _DevotionalReaderScreenState extends ConsumerState<DevotionalReaderScreen>
     for (final line in lines) {
       if (line.startsWith('# ')) {
         flush();
-        sections.add(_BodySection(
-          type: _SectionType.heading,
-          text: line.substring(2),
-        ),);
+        sections.add(
+          _BodySection(
+            type: _SectionType.heading,
+            text: line.substring(2),
+          ),
+        );
       } else if (line.startsWith('> ')) {
         flush();
-        sections.add(_BodySection(
-          type: _SectionType.blockquote,
-          text: line.substring(2),
-        ),);
+        sections.add(
+          _BodySection(
+            type: _SectionType.blockquote,
+            text: line.substring(2),
+          ),
+        );
       } else if (line.startsWith('🙏')) {
         flush();
-        sections.add(_BodySection(
-          type: _SectionType.prayerBox,
-          text: line,
-        ),);
+        sections.add(
+          _BodySection(
+            type: _SectionType.prayerBox,
+            text: line,
+          ),
+        );
       } else {
         if (buffer.isNotEmpty) buffer.writeln();
         buffer.write(line);
@@ -392,13 +400,17 @@ class _RelatedScriptureChip extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.goldContainer,
             borderRadius: AppRadius.brFull,
-            border: Border.all(color: AppColors.goldDark.withValues(alpha: 0.3)),
+            border:
+                Border.all(color: AppColors.goldDark.withValues(alpha: 0.3)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.menu_book_rounded,
-                  color: AppColors.goldDark, size: 14,),
+              const Icon(
+                Icons.menu_book_rounded,
+                color: AppColors.goldDark,
+                size: 14,
+              ),
               const SizedBox(width: 6),
               Text(
                 ref,
@@ -464,8 +476,11 @@ class _ContinueBar extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),
-              const Icon(Icons.arrow_forward_rounded,
-                  color: AppColors.ink, size: 18,),
+              const Icon(
+                Icons.arrow_forward_rounded,
+                color: AppColors.ink,
+                size: 18,
+              ),
             ],
           ),
         ),

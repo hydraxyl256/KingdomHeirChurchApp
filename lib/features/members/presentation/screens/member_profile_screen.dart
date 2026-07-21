@@ -79,18 +79,25 @@ class MemberProfileScreen extends StatelessWidget {
                     const Divider(),
                     const SizedBox(height: AppSpacing.md),
                     const _InfoTile(
-                        icon: Icons.email_outlined,
-                        label: 'david.steward@email.com',),
+                      icon: Icons.email_outlined,
+                      label: 'david.steward@email.com',
+                    ),
                     const _InfoTile(
-                        icon: Icons.phone_outlined, label: '+1 (555) 234-5678',),
+                      icon: Icons.phone_outlined,
+                      label: '+1 (555) 234-5678',
+                    ),
                     const _InfoTile(
-                        icon: Icons.location_on_outlined, label: 'Atlanta, GA',),
+                      icon: Icons.location_on_outlined,
+                      label: 'Atlanta, GA',
+                    ),
                     const _InfoTile(
-                        icon: Icons.groups_rounded,
-                        label: 'Young Professionals Group',),
+                      icon: Icons.groups_rounded,
+                      label: 'Young Professionals Group',
+                    ),
                     const _InfoTile(
-                        icon: Icons.volunteer_activism_rounded,
-                        label: 'Worship Team Volunteer',),
+                      icon: Icons.volunteer_activism_rounded,
+                      label: 'Worship Team Volunteer',
+                    ),
                     const SizedBox(height: AppSpacing.xl),
                     Text('About', style: theme.textTheme.titleMedium),
                     const SizedBox(height: AppSpacing.sm),
@@ -124,8 +131,8 @@ class _InfoTile extends StatelessWidget {
           Icon(icon, size: 20, color: AppColors.primary),
           const SizedBox(width: AppSpacing.md),
           Expanded(
-              child:
-                  Text(label, style: Theme.of(context).textTheme.bodyMedium),),
+            child: Text(label, style: Theme.of(context).textTheme.bodyMedium),
+          ),
         ],
       ),
     ).animate().fadeIn();

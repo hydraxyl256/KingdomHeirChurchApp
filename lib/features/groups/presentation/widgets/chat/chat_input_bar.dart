@@ -8,10 +8,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 typedef ChatSendCallback = Future<void> Function(String text);
 
@@ -94,7 +94,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             IconButton(
-              tooltip: 'Attach',
+              tooltip: AppLocalizations.of(context)!.attach,
               onPressed: widget.onAttachTap,
               icon: Icon(
                 Icons.attach_file_rounded,
@@ -102,7 +102,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
               ),
             ),
             IconButton(
-              tooltip: 'Share scripture',
+              tooltip: AppLocalizations.of(context)!.shareScripture,
               onPressed: widget.onScriptureTap,
               icon: const Icon(
                 Icons.menu_book_rounded,
@@ -123,7 +123,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
                   textInputAction: TextInputAction.send,
                   onSubmitted: (_) => _send(),
                   decoration: InputDecoration(
-                    hintText: 'Type a message…',
+                    hintText: AppLocalizations.of(context)!.typeAMessage,
                     filled: true,
                     fillColor: theme.colorScheme.surfaceContainerLow,
                     isDense: true,
@@ -156,7 +156,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
               width: _hasText ? 44 : 0,
               child: _hasText
                   ? IconButton(
-                      tooltip: 'Send as prayer',
+                      tooltip: AppLocalizations.of(context)!.sendAsPrayer,
                       onLongPress: widget.onLongPressSend,
                       onPressed: _send,
                       icon: widget.isSending
@@ -187,7 +187,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
               child: _hasText
                   ? IconButton(
                       key: const ValueKey('send'),
-                      tooltip: 'Send',
+                      tooltip: AppLocalizations.of(context)!.send,
                       onPressed: widget.isSending ? null : _send,
                       icon: widget.isSending
                           ? SizedBox(

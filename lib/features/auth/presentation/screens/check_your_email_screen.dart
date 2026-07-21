@@ -9,6 +9,7 @@ import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/features/auth/presentation/providers/auth_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import 'package:url_launcher/url_launcher.dart';
 
@@ -78,8 +79,6 @@ class _CheckYourEmailScreenState extends ConsumerState<CheckYourEmailScreen> {
       setState(() => _cooldownSeconds--);
     });
   }
-
-
 
   Future<void> _checkVerification() async {
     try {
@@ -326,7 +325,7 @@ class _CheckEmailView extends StatelessWidget {
                 size: 16,
                 color: AppColors.goldLight,
               ),
-              label: const Text('Use a different email'),
+              label: Text(AppLocalizations.of(context)!.useADifferentEmail),
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.goldLight,
               ),

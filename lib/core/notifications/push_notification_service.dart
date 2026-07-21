@@ -48,7 +48,8 @@ class PushNotificationService {
 
   Future<void> initialize() async {
     if (Firebase.apps.isEmpty) {
-      _logger.w('Firebase is not initialized. Skipping PushNotificationService.initialize()');
+      _logger.w(
+          'Firebase is not initialized. Skipping PushNotificationService.initialize()',);
       return;
     }
 
@@ -56,7 +57,8 @@ class PushNotificationService {
     final settings = await _fcm.requestPermission();
 
     _logger.d(
-        'User granted notification permission: ${settings.authorizationStatus}',);
+      'User granted notification permission: ${settings.authorizationStatus}',
+    );
 
     if (settings.authorizationStatus != AuthorizationStatus.authorized &&
         settings.authorizationStatus != AuthorizationStatus.provisional) {
@@ -133,7 +135,8 @@ class PushNotificationService {
     });
 
     // 5. Handle app opening from a background state (tapped notification)
-    _onOpenedSub = FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    _onOpenedSub =
+        FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       _logger.d('A new onMessageOpenedApp event was published!');
       NotificationRouter.handleNotificationTap(message.data);
     });

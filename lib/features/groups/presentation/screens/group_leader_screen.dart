@@ -22,7 +22,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
@@ -34,6 +33,7 @@ import 'package:kingdom_heir/features/groups/presentation/widgets/leader/engagem
 import 'package:kingdom_heir/features/groups/presentation/widgets/leader/member_row.dart';
 import 'package:kingdom_heir/features/groups/presentation/widgets/leader/pending_request_card.dart';
 import 'package:kingdom_heir/features/groups/presentation/widgets/leader/quick_stat_tile.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class GroupLeaderScreen extends ConsumerWidget {
   const GroupLeaderScreen({required this.groupId, super.key});
@@ -56,12 +56,12 @@ class GroupLeaderScreen extends ConsumerWidget {
       body: sections.detail.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, _) => AppErrorWidget(
-          message: 'Couldn’t load leader dashboard',
+          message: AppLocalizations.of(context)!.couldntLoadLeaderDashboard,
           onRetry: () => ref.invalidate(groupSectionsProvider(groupId)),
         ),
         data: (_) {
-          final pending = sections.pendingRequests.valueOrNull ?? const [];
-          final members = sections.members.valueOrNull ?? const [];
+          final pending = sections.pendingRequests.valueOrNull ?? [];
+          final members = sections.members.valueOrNull ?? [];
           final engagement = sections.weeklyEngagement.valueOrNull ?? 0;
           final avgAttend = sections.avgAttendance.valueOrNull ?? 0.0;
 
@@ -185,15 +185,17 @@ class GroupLeaderScreen extends ConsumerWidget {
                       member: members[i],
                       onPromote: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Promote — feature coming soon'),
+                          SnackBar(
+                            content: Text(AppLocalizations.of(context)!
+                                .promoteFeatureComingSoon,),
                           ),
                         );
                       },
                       onRemove: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Remove — feature coming soon'),
+                          SnackBar(
+                            content: Text(AppLocalizations.of(context)!
+                                .removeFeatureComingSoon,),
                           ),
                         );
                       },
@@ -271,7 +273,8 @@ class _AnnouncementComposerState extends ConsumerState<_AnnouncementComposer> {
         _controller.clear();
         setState(() => _sending = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Announcement posted')),
+          SnackBar(
+              content: Text(AppLocalizations.of(context)!.announcementPosted),),
         );
       }
     } catch (e) {
@@ -303,7 +306,7 @@ class _AnnouncementComposerState extends ConsumerState<_AnnouncementComposer> {
             minLines: 2,
             maxLines: 5,
             decoration: InputDecoration(
-              hintText: 'Share an update with the group…',
+              hintText: AppLocalizations.of(context)!.shareAnUpdateWithTheGroup,
               filled: true,
               fillColor: theme.colorScheme.surfaceContainerLow,
               border: OutlineInputBorder(
@@ -363,7 +366,7 @@ class _AnnouncementComposerState extends ConsumerState<_AnnouncementComposer> {
                         ),
                       )
                     : const Icon(Icons.send_rounded, size: 14),
-                label: const Text('Post'),
+                label: Text(AppLocalizations.of(context)!.post),
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.gold,
                   foregroundColor: AppColors.ink,

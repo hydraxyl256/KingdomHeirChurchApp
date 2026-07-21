@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final _entryEditorProvider = FutureProvider.autoDispose
@@ -23,8 +24,8 @@ final _entryEditorProvider = FutureProvider.autoDispose
   },
 );
 
-final _translationsProvider = FutureProvider.autoDispose
-    .family<List<Map<String, dynamic>>, String>(
+final _translationsProvider =
+    FutureProvider.autoDispose.family<List<Map<String, dynamic>>, String>(
   (ref, entryId) async {
     final data = await Supabase.instance.client
         .from('devotional_translations')
@@ -52,14 +53,14 @@ class AdminDevotionalDayEditorScreen extends ConsumerStatefulWidget {
 
 class _AdminDevotionalDayEditorScreenState
     extends ConsumerState<AdminDevotionalDayEditorScreen> {
-  final _titleCtrl          = TextEditingController();
-  final _scriptureRefCtrl   = TextEditingController();
-  final _scriptureTextCtrl  = TextEditingController();
-  final _bodyCtrl           = TextEditingController();
-  final _reflectionCtrl     = TextEditingController();
-  final _actionStepCtrl     = TextEditingController();
-  final _prayerCtrl         = TextEditingController();
-  final _readMinsCtrl       = TextEditingController();
+  final _titleCtrl = TextEditingController();
+  final _scriptureRefCtrl = TextEditingController();
+  final _scriptureTextCtrl = TextEditingController();
+  final _bodyCtrl = TextEditingController();
+  final _reflectionCtrl = TextEditingController();
+  final _actionStepCtrl = TextEditingController();
+  final _prayerCtrl = TextEditingController();
+  final _readMinsCtrl = TextEditingController();
 
   String _status = 'draft';
   String? _entryId;
@@ -82,39 +83,43 @@ class _AdminDevotionalDayEditorScreenState
   void _populate(Map<String, dynamic> entry) {
     if (_populated) return;
     _populated = true;
-    _entryId              = entry['id'] as String?;
-    _titleCtrl.text       = entry['title'] as String? ?? '';
-    _scriptureRefCtrl.text= entry['scripture_reference'] as String? ?? '';
-    _scriptureTextCtrl.text= entry['scripture_text'] as String? ?? '';
-    _bodyCtrl.text        = entry['devotional_body'] as String? ?? '';
-    _reflectionCtrl.text  = entry['reflection_question'] as String? ?? '';
-    _actionStepCtrl.text  = entry['action_step'] as String? ?? '';
-    _prayerCtrl.text      = entry['prayer_text'] as String? ?? '';
-    _readMinsCtrl.text    = (entry['estimated_read_minutes'] as int?)?.toString() ?? '';
-    _status               = entry['status'] as String? ?? 'draft';
+    _entryId = entry['id'] as String?;
+    _titleCtrl.text = entry['title'] as String? ?? '';
+    _scriptureRefCtrl.text = entry['scripture_reference'] as String? ?? '';
+    _scriptureTextCtrl.text = entry['scripture_text'] as String? ?? '';
+    _bodyCtrl.text = entry['devotional_body'] as String? ?? '';
+    _reflectionCtrl.text = entry['reflection_question'] as String? ?? '';
+    _actionStepCtrl.text = entry['action_step'] as String? ?? '';
+    _prayerCtrl.text = entry['prayer_text'] as String? ?? '';
+    _readMinsCtrl.text =
+        (entry['estimated_read_minutes'] as int?)?.toString() ?? '';
+    _status = entry['status'] as String? ?? 'draft';
   }
 
   Future<void> _save() async {
     setState(() => _saving = true);
     try {
       final payload = {
-        'series_id':            widget.seriesId,
-        'day_number':           widget.dayNumber,
-        'title':                _titleCtrl.text.trim(),
-        'scripture_reference':  _scriptureRefCtrl.text.trim().isEmpty
-            ? null : _scriptureRefCtrl.text.trim(),
-        'scripture_text':       _scriptureTextCtrl.text.trim().isEmpty
-            ? null : _scriptureTextCtrl.text.trim(),
-        'devotional_body':      _bodyCtrl.text.trim(),
-        'reflection_question':  _reflectionCtrl.text.trim().isEmpty
-            ? null : _reflectionCtrl.text.trim(),
-        'action_step':          _actionStepCtrl.text.trim().isEmpty
-            ? null : _actionStepCtrl.text.trim(),
-        'prayer_text':          _prayerCtrl.text.trim().isEmpty
-            ? null : _prayerCtrl.text.trim(),
-        'estimated_read_minutes':
-            int.tryParse(_readMinsCtrl.text.trim()),
-        'status':               _status,
+        'series_id': widget.seriesId,
+        'day_number': widget.dayNumber,
+        'title': _titleCtrl.text.trim(),
+        'scripture_reference': _scriptureRefCtrl.text.trim().isEmpty
+            ? null
+            : _scriptureRefCtrl.text.trim(),
+        'scripture_text': _scriptureTextCtrl.text.trim().isEmpty
+            ? null
+            : _scriptureTextCtrl.text.trim(),
+        'devotional_body': _bodyCtrl.text.trim(),
+        'reflection_question': _reflectionCtrl.text.trim().isEmpty
+            ? null
+            : _reflectionCtrl.text.trim(),
+        'action_step': _actionStepCtrl.text.trim().isEmpty
+            ? null
+            : _actionStepCtrl.text.trim(),
+        'prayer_text':
+            _prayerCtrl.text.trim().isEmpty ? null : _prayerCtrl.text.trim(),
+        'estimated_read_minutes': int.tryParse(_readMinsCtrl.text.trim()),
+        'status': _status,
       };
 
       if (_entryId != null) {
@@ -131,14 +136,16 @@ class _AdminDevotionalDayEditorScreenState
         _entryId = res['id'] as String;
       }
 
-      ref.invalidate(_entryEditorProvider(
-        (seriesId: widget.seriesId, dayNumber: widget.dayNumber),
-      ),);
+      ref.invalidate(
+        _entryEditorProvider(
+          (seriesId: widget.seriesId, dayNumber: widget.dayNumber),
+        ),
+      );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Day saved successfully!'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.daySavedSuccessfully),
             backgroundColor: AppColors.success,
             behavior: SnackBarBehavior.floating,
           ),
@@ -216,13 +223,23 @@ class _AdminDevotionalDayEditorScreenState
                 // ── Base content fields ─────────────────────────
                 _SectionHeader(label: 'DAY ${widget.dayNumber} CONTENT'),
                 const SizedBox(height: AppSpacing.md),
-                _Field(ctrl: _titleCtrl,        label: 'Title', required: true),
-                _Field(ctrl: _scriptureRefCtrl, label: 'Scripture Reference (e.g. John 3:16)'),
-                _Field(ctrl: _scriptureTextCtrl,label: 'Scripture Text', maxLines: 4),
-                _Field(ctrl: _bodyCtrl,         label: 'Devotional Body *', maxLines: 10),
-                _Field(ctrl: _reflectionCtrl,   label: 'Reflection Question', maxLines: 3),
-                _Field(ctrl: _actionStepCtrl,   label: 'Action Step', maxLines: 3),
-                _Field(ctrl: _prayerCtrl,       label: 'Prayer Text', maxLines: 5),
+                _Field(ctrl: _titleCtrl, label: 'Title', required: true),
+                _Field(
+                    ctrl: _scriptureRefCtrl,
+                    label: 'Scripture Reference (e.g. John 3:16)',),
+                _Field(
+                    ctrl: _scriptureTextCtrl,
+                    label: 'Scripture Text',
+                    maxLines: 4,),
+                _Field(
+                    ctrl: _bodyCtrl, label: 'Devotional Body *', maxLines: 10,),
+                _Field(
+                    ctrl: _reflectionCtrl,
+                    label: 'Reflection Question',
+                    maxLines: 3,),
+                _Field(
+                    ctrl: _actionStepCtrl, label: 'Action Step', maxLines: 3,),
+                _Field(ctrl: _prayerCtrl, label: 'Prayer Text', maxLines: 5),
                 _Field(
                   ctrl: _readMinsCtrl,
                   label: 'Estimated Read Minutes',
@@ -318,7 +335,8 @@ class _LanguageTile extends StatelessWidget {
       case 'review':
         chipColor = AppColors.warning;
       default:
-        chipColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3);
+        chipColor =
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3);
     }
 
     return ListTile(
@@ -343,7 +361,8 @@ class _LanguageTile extends StatelessWidget {
       title: Text(languageName),
       subtitle: Text(
         status == 'none' ? 'Not translated' : status.toUpperCase(),
-        style: TextStyle(color: chipColor, fontWeight: FontWeight.w600, fontSize: 11),
+        style: TextStyle(
+            color: chipColor, fontWeight: FontWeight.w600, fontSize: 11,),
       ),
       trailing: TextButton(
         child: Text(existing == null ? 'Add' : 'Edit'),
@@ -353,14 +372,21 @@ class _LanguageTile extends StatelessWidget {
   }
 
   void _openEditor(BuildContext context) {
-    final titleCtrl      = TextEditingController(text: existing?['title'] as String? ?? '');
-    final bodyCtrl       = TextEditingController(text: existing?['devotional_body'] as String? ?? '');
-    final scriptureRefCtrl= TextEditingController(text: existing?['scripture_reference'] as String? ?? '');
-    final scriptureTextCtrl=TextEditingController(text: existing?['scripture_text'] as String? ?? '');
-    final reflectionCtrl = TextEditingController(text: existing?['reflection_question'] as String? ?? '');
-    final actionCtrl     = TextEditingController(text: existing?['action_step'] as String? ?? '');
-    final prayerCtrl     = TextEditingController(text: existing?['prayer_text'] as String? ?? '');
-    var txStatus      = existing?['translation_status'] as String? ?? 'draft';
+    final titleCtrl =
+        TextEditingController(text: existing?['title'] as String? ?? '');
+    final bodyCtrl = TextEditingController(
+        text: existing?['devotional_body'] as String? ?? '',);
+    final scriptureRefCtrl = TextEditingController(
+        text: existing?['scripture_reference'] as String? ?? '',);
+    final scriptureTextCtrl = TextEditingController(
+        text: existing?['scripture_text'] as String? ?? '',);
+    final reflectionCtrl = TextEditingController(
+        text: existing?['reflection_question'] as String? ?? '',);
+    final actionCtrl =
+        TextEditingController(text: existing?['action_step'] as String? ?? '');
+    final prayerCtrl =
+        TextEditingController(text: existing?['prayer_text'] as String? ?? '');
+    var txStatus = existing?['translation_status'] as String? ?? 'draft';
 
     showModalBottomSheet<void>(
       context: context,
@@ -378,10 +404,12 @@ class _LanguageTile extends StatelessWidget {
             child: ListView(
               controller: scroll,
               children: [
-                Text('$languageName Translation',
-                    style: AppTypography.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),),
+                Text(
+                  '$languageName Translation',
+                  style: AppTypography.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
                 const SizedBox(height: AppSpacing.md),
                 DropdownButtonFormField<String>(
                   initialValue: txStatus,
@@ -396,13 +424,20 @@ class _LanguageTile extends StatelessWidget {
                   onChanged: (v) => setSt(() => txStatus = v!),
                 ),
                 const SizedBox(height: AppSpacing.md),
-                _Field(ctrl: titleCtrl,       label: 'Title *', required: true),
-                _Field(ctrl: scriptureRefCtrl,label: 'Scripture Reference'),
-                _Field(ctrl: scriptureTextCtrl,label: 'Scripture Text', maxLines: 4),
-                _Field(ctrl: bodyCtrl,        label: 'Devotional Body *', maxLines: 10),
-                _Field(ctrl: reflectionCtrl,  label: 'Reflection Question', maxLines: 3),
-                _Field(ctrl: actionCtrl,      label: 'Action Step', maxLines: 3),
-                _Field(ctrl: prayerCtrl,      label: 'Prayer Text', maxLines: 5),
+                _Field(ctrl: titleCtrl, label: 'Title *', required: true),
+                _Field(ctrl: scriptureRefCtrl, label: 'Scripture Reference'),
+                _Field(
+                    ctrl: scriptureTextCtrl,
+                    label: 'Scripture Text',
+                    maxLines: 4,),
+                _Field(
+                    ctrl: bodyCtrl, label: 'Devotional Body *', maxLines: 10,),
+                _Field(
+                    ctrl: reflectionCtrl,
+                    label: 'Reflection Question',
+                    maxLines: 3,),
+                _Field(ctrl: actionCtrl, label: 'Action Step', maxLines: 3),
+                _Field(ctrl: prayerCtrl, label: 'Prayer Text', maxLines: 5),
                 const SizedBox(height: AppSpacing.lg),
                 FilledButton(
                   onPressed: () async {
@@ -411,27 +446,34 @@ class _LanguageTile extends StatelessWidget {
                         .upsert(
                       {
                         'devotional_entry_id': entryId,
-                        'language_code':       languageCode,
-                        'title':               titleCtrl.text.trim(),
-                        'scripture_reference': scriptureRefCtrl.text.trim().isEmpty
-                            ? null : scriptureRefCtrl.text.trim(),
-                        'scripture_text':      scriptureTextCtrl.text.trim().isEmpty
-                            ? null : scriptureTextCtrl.text.trim(),
-                        'devotional_body':     bodyCtrl.text.trim(),
-                        'reflection_question': reflectionCtrl.text.trim().isEmpty
-                            ? null : reflectionCtrl.text.trim(),
-                        'action_step':         actionCtrl.text.trim().isEmpty
-                            ? null : actionCtrl.text.trim(),
-                        'prayer_text':         prayerCtrl.text.trim().isEmpty
-                            ? null : prayerCtrl.text.trim(),
-                        'translation_status':  txStatus,
+                        'language_code': languageCode,
+                        'title': titleCtrl.text.trim(),
+                        'scripture_reference':
+                            scriptureRefCtrl.text.trim().isEmpty
+                                ? null
+                                : scriptureRefCtrl.text.trim(),
+                        'scripture_text': scriptureTextCtrl.text.trim().isEmpty
+                            ? null
+                            : scriptureTextCtrl.text.trim(),
+                        'devotional_body': bodyCtrl.text.trim(),
+                        'reflection_question':
+                            reflectionCtrl.text.trim().isEmpty
+                                ? null
+                                : reflectionCtrl.text.trim(),
+                        'action_step': actionCtrl.text.trim().isEmpty
+                            ? null
+                            : actionCtrl.text.trim(),
+                        'prayer_text': prayerCtrl.text.trim().isEmpty
+                            ? null
+                            : prayerCtrl.text.trim(),
+                        'translation_status': txStatus,
                       },
                       onConflict: 'devotional_entry_id,language_code',
                     );
                     onSaved();
                     if (ctx.mounted) Navigator.pop(ctx);
                   },
-                  child: const Text('Save Translation'),
+                  child: Text(AppLocalizations.of(context)!.saveTranslation),
                 ),
               ],
             ),

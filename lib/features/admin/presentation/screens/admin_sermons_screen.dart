@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/features/admin/data/repositories/admin_content_repository.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 final adminSermonsProvider =
     FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
@@ -19,7 +19,7 @@ class AdminSermonsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sermon Management'),
+        title: Text(AppLocalizations.of(context)!.sermonManagement),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -29,11 +29,13 @@ class AdminSermonsScreen extends ConsumerWidget {
             onPressed: () {
               // TODO(kingdom-heir): Navigate to create sermon form
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Create Sermon coming soon')),
+                SnackBar(
+                    content: Text(
+                        AppLocalizations.of(context)!.createSermonComingSoon,),),
               );
             },
             icon: const Icon(Icons.add),
-            label: const Text('Add Sermon'),
+            label: Text(AppLocalizations.of(context)!.addSermon),
           ),
           const SizedBox(width: 16),
         ],
@@ -43,7 +45,8 @@ class AdminSermonsScreen extends ConsumerWidget {
         error: (err, stack) => Center(child: Text('Error: $err')),
         data: (sermons) {
           if (sermons.isEmpty) {
-            return const Center(child: Text('No sermons found.'));
+            return Center(
+                child: Text(AppLocalizations.of(context)!.noSermonsFound),);
           }
           return ListView.separated(
             padding: const EdgeInsets.all(16),
@@ -80,8 +83,10 @@ class AdminSermonsScreen extends ConsumerWidget {
                       ? const Icon(Icons.video_library)
                       : null,
                 ),
-                title: Text(title,
-                    style: const TextStyle(fontWeight: FontWeight.bold),),
+                title: Text(
+                  title,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
                 subtitle: Text('$speakerName • Preached: $preachedOn'),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -92,9 +97,8 @@ class AdminSermonsScreen extends ConsumerWidget {
                           ? AppColors.success.withValues(alpha: 0.2)
                           : AppColors.warning.withValues(alpha: 0.2),
                       labelStyle: TextStyle(
-                        color: isPublished
-                            ? AppColors.success
-                            : AppColors.warning,
+                        color:
+                            isPublished ? AppColors.success : AppColors.warning,
                         fontSize: 12,
                       ),
                     ),
@@ -117,14 +121,16 @@ class AdminSermonsScreen extends ConsumerWidget {
                           value: 'toggle_status',
                           child: Text(isPublished ? 'Unpublish' : 'Publish'),
                         ),
-                        const PopupMenuItem(
+                        PopupMenuItem(
                           value: 'edit',
-                          child: Text('Edit'),
+                          child: Text(AppLocalizations.of(context)!.edit),
                         ),
                         const PopupMenuItem(
                           value: 'delete',
-                          child: Text('Delete',
-                              style: TextStyle(color: AppColors.error),),
+                          child: Text(
+                            'Delete',
+                            style: TextStyle(color: AppColors.error),
+                          ),
                         ),
                       ],
                     ),

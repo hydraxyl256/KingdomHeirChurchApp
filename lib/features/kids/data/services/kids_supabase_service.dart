@@ -13,9 +13,11 @@ class KidsSupabaseService {
       final user = _client.auth.currentUser;
       if (user == null) return left('Not authenticated.');
       final data = await _client.from('kids').select().order('first_name');
-      return right((data as List<dynamic>)
-          .map((e) => Kid.fromJson(e as Map<String, dynamic>))
-          .toList(),);
+      return right(
+        (data as List<dynamic>)
+            .map((e) => Kid.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
     } catch (e) {
       return left(e.toString());
     }
@@ -37,22 +39,27 @@ class KidsSupabaseService {
   }
 
   Future<Either<String, List<KidsCheckin>>> getMyCheckins(
-      String sessionId,) async {
+    String sessionId,
+  ) async {
     try {
       final data = await _client
           .from('kids_checkins')
           .select()
           .eq('session_id', sessionId);
-      return right((data as List<dynamic>)
-          .map((e) => KidsCheckin.fromJson(e as Map<String, dynamic>))
-          .toList(),);
+      return right(
+        (data as List<dynamic>)
+            .map((e) => KidsCheckin.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
     } catch (e) {
       return left(e.toString());
     }
   }
 
   Future<Either<String, KidsCheckin>> checkInKid(
-      String kidId, String sessionId,) async {
+    String kidId,
+    String sessionId,
+  ) async {
     try {
       final user = _client.auth.currentUser;
       if (user == null) return left('Not authenticated.');

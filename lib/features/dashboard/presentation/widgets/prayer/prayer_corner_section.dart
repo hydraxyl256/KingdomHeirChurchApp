@@ -48,8 +48,7 @@ class PrayerCornerSection extends StatelessWidget {
                 height: 36,
                 decoration: BoxDecoration(
                   color: AppColors.goldContainer,
-                  borderRadius:
-                      BorderRadius.circular(AppSpacing.radiusSm),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                 ),
                 child: const Icon(
                   Iconography.prayer,
@@ -65,16 +64,14 @@ class PrayerCornerSection extends StatelessWidget {
                   children: [
                     Text(
                       'Prayer Corner',
-                      style:
-                          AppTypography.textTheme.titleMedium?.copyWith(
+                      style: AppTypography.textTheme.titleMedium?.copyWith(
                         color: AppColors.navy,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
                     Text(
                       '${corner.usersPrayedToday} people prayed today',
-                      style:
-                          AppTypography.textTheme.bodySmall?.copyWith(
+                      style: AppTypography.textTheme.bodySmall?.copyWith(
                         color: AppColors.textSecondary,
                         fontSize: 12,
                       ),
@@ -122,12 +119,10 @@ class PrayerCornerSection extends StatelessWidget {
               label: 'Submit a prayer request',
               child: Material(
                 color: AppColors.goldContainer,
-                borderRadius:
-                    BorderRadius.circular(AppSpacing.radiusFull),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
                 child: InkWell(
                   onTap: onSubmit,
-                  borderRadius:
-                      BorderRadius.circular(AppSpacing.radiusFull),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
                   child: Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(
@@ -151,8 +146,7 @@ class PrayerCornerSection extends StatelessWidget {
                         const SizedBox(width: AppSpacing.xs),
                         Text(
                           'Submit a Prayer Request',
-                          style:
-                              AppTypography.textTheme.labelMedium?.copyWith(
+                          style: AppTypography.textTheme.labelMedium?.copyWith(
                             color: AppColors.goldDark,
                             fontWeight: FontWeight.w800,
                           ),

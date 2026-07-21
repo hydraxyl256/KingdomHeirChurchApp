@@ -7,8 +7,11 @@ class AppProviderObserver extends ProviderObserver {
   final Logger _logger = Logger(printer: PrettyPrinter(methodCount: 0));
 
   @override
-  void didAddProvider(ProviderBase<dynamic> provider, Object? value,
-      ProviderContainer container,) {
+  void didAddProvider(
+    ProviderBase<dynamic> provider,
+    Object? value,
+    ProviderContainer container,
+  ) {
     // _logger.d('ProviderAdded: ${provider.name ?? provider.runtimeType}');
   }
 
@@ -28,7 +31,9 @@ class AppProviderObserver extends ProviderObserver {
 
   @override
   void didDisposeProvider(
-      ProviderBase<dynamic> provider, ProviderContainer container,) {
+    ProviderBase<dynamic> provider,
+    ProviderContainer container,
+  ) {
     // _logger.d('ProviderDisposed: ${provider.name ?? provider.runtimeType}');
   }
 

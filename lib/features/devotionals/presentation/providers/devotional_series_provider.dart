@@ -31,8 +31,8 @@ final publishedSeriesProvider =
 // Single series
 // ─────────────────────────────────────────────────────────────────────────────
 
-final devotionalSeriesByIdProvider =
-    FutureProvider.autoDispose.family<DevotionalSeries, String>((ref, id) async {
+final devotionalSeriesByIdProvider = FutureProvider.autoDispose
+    .family<DevotionalSeries, String>((ref, id) async {
   final repo = ref.watch(devotionalSeriesRepositoryProvider);
   final result = await repo.getSeriesById(id);
   return result.fold((err) => throw Exception(err), (s) => s);
@@ -144,7 +144,7 @@ final primaryChallengeCardStateProvider =
 
   if (progressAsync == null) {
     return DashboardDevotionalState(
-      status:   DashboardDevotionalStatus.notJoined,
+      status: DashboardDevotionalStatus.notJoined,
       seriesId: series.id,
       totalDays: series.totalDays,
     );
@@ -154,29 +154,29 @@ final primaryChallengeCardStateProvider =
 
   if (progress.isAllComplete) {
     return DashboardDevotionalState(
-      status:        DashboardDevotionalStatus.allComplete,
-      seriesId:      series.id,
-      currentDay:    series.totalDays,
-      totalDays:     series.totalDays,
+      status: DashboardDevotionalStatus.allComplete,
+      seriesId: series.id,
+      currentDay: series.totalDays,
+      totalDays: series.totalDays,
       currentStreak: progress.longestStreak,
     );
   }
 
   if (progress.completedToday) {
     return DashboardDevotionalState(
-      status:        DashboardDevotionalStatus.completedToday,
-      seriesId:      series.id,
-      currentDay:    progress.currentDay,
-      totalDays:     series.totalDays,
+      status: DashboardDevotionalStatus.completedToday,
+      seriesId: series.id,
+      currentDay: progress.currentDay,
+      totalDays: series.totalDays,
       currentStreak: progress.currentStreak,
     );
   }
 
   return DashboardDevotionalState(
-    status:        DashboardDevotionalStatus.continueDay,
-    seriesId:      series.id,
-    currentDay:    progress.currentDay,
-    totalDays:     series.totalDays,
+    status: DashboardDevotionalStatus.continueDay,
+    seriesId: series.id,
+    currentDay: progress.currentDay,
+    totalDays: series.totalDays,
     currentStreak: progress.currentStreak,
   );
 });
@@ -206,7 +206,8 @@ class ReflectionSaveNotifier extends AutoDisposeAsyncNotifier<void> {
   }) async {
     state = const AsyncLoading();
     final repo = ref.read(devotionalSeriesRepositoryProvider);
-    final result = await repo.saveReflection(entryId, text, isPrivate: isPrivate);
+    final result =
+        await repo.saveReflection(entryId, text, isPrivate: isPrivate);
     state = const AsyncData(null);
     if (result.isRight()) {
       ref.invalidate(devotionalReflectionProvider(entryId));

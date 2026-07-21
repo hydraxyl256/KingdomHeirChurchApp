@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/features/challenge/domain/models/group_reporting_packet.dart';
 import 'package:kingdom_heir/features/challenge/presentation/providers/challenge_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 class GroupReportingScreen extends ConsumerStatefulWidget {
@@ -26,7 +27,9 @@ class _GroupReportingScreenState extends ConsumerState<GroupReportingScreen> {
 
         // Section 2: Participant Summary
         'participantsRegistered': FormControl<int>(
-            value: 0, validators: [Validators.required, Validators.min(0)],),
+          value: 0,
+          validators: [Validators.required, Validators.min(0)],
+        ),
         'participantsActive': FormControl<int>(value: 0),
         'participantsCompleted': FormControl<int>(value: 0),
         'participantsAttendedFourPlus': FormControl<int>(value: 0),
@@ -52,7 +55,8 @@ class _GroupReportingScreenState extends ConsumerState<GroupReportingScreen> {
         // Section 5: Leadership Development
         'leadershipPotentialCount': FormControl<int>(value: 0),
         'potentialFutureLeaders': FormControl<String>(
-            value: '',), // Comma separated for simplicity in UI
+          value: '',
+        ), // Comma separated for simplicity in UI
         'interestLeadingFutureGroupCount': FormControl<int>(value: 0),
         'interestVesselSchoolCount': FormControl<int>(value: 0),
 
@@ -87,7 +91,7 @@ class _GroupReportingScreenState extends ConsumerState<GroupReportingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Group Reporting Packet'),
+        title: Text(AppLocalizations.of(context)!.groupReportingPacket),
       ),
       body: ReactiveFormBuilder(
         form: buildForm,
@@ -188,8 +192,9 @@ class _GroupReportingScreenState extends ConsumerState<GroupReportingScreen> {
                   } else {
                     Navigator.of(context).pop();
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Report submitted successfully!'),
+                      SnackBar(
+                        content: Text(AppLocalizations.of(context)!
+                            .reportSubmittedSuccessfully,),
                       ),
                     );
                   }
@@ -220,7 +225,7 @@ class _GroupReportingScreenState extends ConsumerState<GroupReportingScreen> {
   }
 
   Step _buildStep1() => Step(
-        title: const Text('Group Information'),
+        title: Text(AppLocalizations.of(context)!.groupInformation),
         isActive: _currentStep >= 0,
         content: Column(
           children: [
@@ -242,13 +247,25 @@ class _GroupReportingScreenState extends ConsumerState<GroupReportingScreen> {
             ReactiveDropdownField<String>(
               formControlName: 'meetingType',
               decoration: const InputDecoration(labelText: 'Meeting Type'),
-              items: const [
-                DropdownMenuItem(value: 'Home', child: Text('Home')),
-                DropdownMenuItem(value: 'Church', child: Text('Church')),
-                DropdownMenuItem(value: 'Business', child: Text('Business')),
-                DropdownMenuItem(value: 'Workplace', child: Text('Workplace')),
-                DropdownMenuItem(value: 'Online', child: Text('Online')),
-                DropdownMenuItem(value: 'Community', child: Text('Community')),
+              items: [
+                DropdownMenuItem(
+                    value: 'Home',
+                    child: Text(AppLocalizations.of(context)!.home),),
+                DropdownMenuItem(
+                    value: 'Church',
+                    child: Text(AppLocalizations.of(context)!.church),),
+                DropdownMenuItem(
+                    value: 'Business',
+                    child: Text(AppLocalizations.of(context)!.business),),
+                DropdownMenuItem(
+                    value: 'Workplace',
+                    child: Text(AppLocalizations.of(context)!.workplace),),
+                DropdownMenuItem(
+                    value: 'Online',
+                    child: Text(AppLocalizations.of(context)!.online),),
+                DropdownMenuItem(
+                    value: 'Community',
+                    child: Text(AppLocalizations.of(context)!.community),),
               ],
             ),
           ],
@@ -256,163 +273,211 @@ class _GroupReportingScreenState extends ConsumerState<GroupReportingScreen> {
       );
 
   Step _buildStep2() => Step(
-        title: const Text('Participant Summary'),
+        title: Text(AppLocalizations.of(context)!.participantSummary),
         isActive: _currentStep >= 1,
         content: Column(
           children: [
-            _buildIntField('participantsRegistered',
-                'Participants originally registered?',),
             _buildIntField(
-                'participantsActive', 'Participants currently active?',),
+              'participantsRegistered',
+              'Participants originally registered?',
+            ),
             _buildIntField(
-                'participantsCompleted', 'Participants completed all 90 days?',),
-            _buildIntField('participantsAttendedFourPlus',
-                'Participants attended at least 4 gatherings?',),
-            _buildIntField('participantsQualifiedCertificate',
-                'Participants qualified for Certificate?',),
+              'participantsActive',
+              'Participants currently active?',
+            ),
+            _buildIntField(
+              'participantsCompleted',
+              'Participants completed all 90 days?',
+            ),
+            _buildIntField(
+              'participantsAttendedFourPlus',
+              'Participants attended at least 4 gatherings?',
+            ),
+            _buildIntField(
+              'participantsQualifiedCertificate',
+              'Participants qualified for Certificate?',
+            ),
           ],
         ),
       );
 
   Step _buildStep3() => Step(
-        title: const Text('Discipleship Impact'),
+        title: Text(AppLocalizations.of(context)!.discipleshipImpact),
         isActive: _currentStep >= 2,
         content: Column(
           children: [
             _buildIntField(
-                'spiritualGrowthCount', 'Reported spiritual growth?',),
+              'spiritualGrowthCount',
+              'Reported spiritual growth?',
+            ),
             _buildIntField(
-                'consistentPrayerCount', 'Established consistent prayer life?',),
+              'consistentPrayerCount',
+              'Established consistent prayer life?',
+            ),
             _buildIntField(
-                'dailyBibleCount', 'Established daily Bible reading?',),
-            _buildIntField('reconciledRelationshipsCount',
-                'Reconciled broken relationships?',),
+              'dailyBibleCount',
+              'Established daily Bible reading?',
+            ),
             _buildIntField(
-                'activeLocalChurchCount', 'Became active in local church?',),
+              'reconciledRelationshipsCount',
+              'Reconciled broken relationships?',
+            ),
+            _buildIntField(
+              'activeLocalChurchCount',
+              'Became active in local church?',
+            ),
             _buildIntField('servingOthersCount', 'Began serving others?'),
           ],
         ),
       );
 
   Step _buildStep4() => Step(
-        title: const Text('Evangelism Impact'),
+        title: Text(AppLocalizations.of(context)!.evangelismImpact),
         isActive: _currentStep >= 3,
         content: Column(
           children: [
             _buildIntField('sharedTestimonyCount', 'Shared their testimony?'),
             _buildIntField('sharedGospelCount', 'Shared the Gospel?'),
             _buildIntField(
-                'prayedOutsideGroupCount', 'Prayed for someone outside?',),
+              'prayedOutsideGroupCount',
+              'Prayed for someone outside?',
+            ),
             _buildIntField(
-                'outreachParticipationCount', 'Participated in outreach?',),
+              'outreachParticipationCount',
+              'Participated in outreach?',
+            ),
             _buildIntField(
-                'professionsOfFaithCount', 'Professions of faith reported?',),
+              'professionsOfFaithCount',
+              'Professions of faith reported?',
+            ),
             _buildIntField('baptismsCount', 'Baptisms occurred?'),
           ],
         ),
       );
 
   Step _buildStep5() => Step(
-        title: const Text('Leadership Development'),
+        title: Text(AppLocalizations.of(context)!.leadershipDevelopment),
         isActive: _currentStep >= 4,
         content: Column(
           children: [
-            _buildIntField('leadershipPotentialCount',
-                'Demonstrated leadership potential?',),
+            _buildIntField(
+              'leadershipPotentialCount',
+              'Demonstrated leadership potential?',
+            ),
             ReactiveTextField<String>(
               formControlName: 'potentialFutureLeaders',
               decoration: const InputDecoration(
-                  labelText: 'List future leaders (comma separated)',),
+                labelText: 'List future leaders (comma separated)',
+              ),
               maxLines: 3,
             ),
             const SizedBox(height: AppSpacing.md),
-            _buildIntField('interestLeadingFutureGroupCount',
-                'Interest in leading future group?',),
-            _buildIntField('interestVesselSchoolCount',
-                'Interest in Vessel School of Ministry?',),
+            _buildIntField(
+              'interestLeadingFutureGroupCount',
+              'Interest in leading future group?',
+            ),
+            _buildIntField(
+              'interestVesselSchoolCount',
+              'Interest in Vessel School of Ministry?',
+            ),
           ],
         ),
       );
 
   Step _buildStep6() => Step(
-        title: const Text('Testimonies'),
+        title: Text(AppLocalizations.of(context)!.testimonies),
         isActive: _currentStep >= 5,
         content: Column(
           children: [
             ReactiveTextField<String>(
               formControlName: 'significantTestimony',
               decoration: const InputDecoration(
-                  labelText: 'Most significant testimony',),
+                labelText: 'Most significant testimony',
+              ),
               maxLines: 5,
             ),
             ReactiveCheckboxListTile(
               formControlName: 'contactForFeature',
-              title: const Text('May we contact this individual?'),
+              title: Text(
+                  AppLocalizations.of(context)!.mayWeContactThisIndividual,),
             ),
             ReactiveCheckboxListTile(
               formControlName: 'photoPermission',
-              title: const Text('Photo permission granted?'),
+              title: Text(AppLocalizations.of(context)!.photoPermissionGranted),
             ),
             ReactiveCheckboxListTile(
               formControlName: 'videoPermission',
-              title: const Text('Video permission granted?'),
+              title: Text(AppLocalizations.of(context)!.videoPermissionGranted),
             ),
           ],
         ),
       );
 
   Step _buildStep7() => Step(
-        title: const Text('Multiplication Report'),
+        title: Text(AppLocalizations.of(context)!.multiplicationReport),
         isActive: _currentStep >= 6,
         content: Column(
           children: [
             _buildIntField(
-                'futureGroupsExpected', 'Future groups expected to launch?',),
+              'futureGroupsExpected',
+              'Future groups expected to launch?',
+            ),
             _buildIntField(
-                'futureLeadersExpected', 'Future leaders expected to lead?',),
-            _buildIntField('projectedFutureParticipants',
-                'Projected future participants?',),
+              'futureLeadersExpected',
+              'Future leaders expected to lead?',
+            ),
+            _buildIntField(
+              'projectedFutureParticipants',
+              'Projected future participants?',
+            ),
           ],
         ),
       );
 
   Step _buildStep8(bool isLoading) => Step(
-        title: const Text('Leader Self-Evaluation'),
+        title: Text(AppLocalizations.of(context)!.leaderSelfevaluation),
         isActive: _currentStep >= 7,
         content: Column(
           children: [
             ReactiveCheckboxListTile(
               formControlName: 'completedReportingRequirements',
-              title: const Text('Completed reporting requirements?'),
+              title: Text(
+                  AppLocalizations.of(context)!.completedReportingRequirements,),
             ),
             ReactiveCheckboxListTile(
               formControlName: 'faithfullyFacilitated',
-              title: const Text('Faithfully facilitated your group?'),
+              title: Text(
+                  AppLocalizations.of(context)!.faithfullyFacilitatedYourGroup,),
             ),
             ReactiveCheckboxListTile(
               formControlName: 'identifiedFutureLeaders',
-              title: const Text('Identified future leaders?'),
+              title:
+                  Text(AppLocalizations.of(context)!.identifiedFutureLeaders),
             ),
             ReactiveCheckboxListTile(
               formControlName: 'wouldLikeToLeadAnotherGroup',
-              title: const Text('Would like to lead another group?'),
+              title: Text(
+                  AppLocalizations.of(context)!.wouldLikeToLeadAnotherGroup,),
             ),
             ReactiveCheckboxListTile(
               formControlName: 'wouldLikeAdditionalCoaching',
-              title: const Text('Would like additional coaching?'),
+              title: Text(
+                  AppLocalizations.of(context)!.wouldLikeAdditionalCoaching,),
             ),
             const SizedBox(height: AppSpacing.md),
             ReactiveTextField<String>(
               formControlName: 'supportAreas',
               decoration: const InputDecoration(
-                  labelText: 'Areas where you need support',),
+                labelText: 'Areas where you need support',
+              ),
               maxLines: 3,
             ),
             const SizedBox(height: AppSpacing.lg),
             ReactiveCheckboxListTile(
               formControlName: 'finalAffirmation',
               title: const Text(
-                  'I affirm that the information submitted is accurate to the best of my knowledge.',),
+                'I affirm that the information submitted is accurate to the best of my knowledge.',
+              ),
             ),
             if (isLoading)
               const Padding(

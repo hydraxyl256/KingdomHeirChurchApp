@@ -10,6 +10,7 @@ import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/widgets/app_empty_state.dart';
 import 'package:kingdom_heir/features/events/domain/entities/event.dart';
 import 'package:kingdom_heir/features/events/presentation/providers/events_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class EventsCalendarScreen extends ConsumerStatefulWidget {
@@ -47,7 +48,7 @@ class _EventsCalendarScreenState extends ConsumerState<EventsCalendarScreen> {
       backgroundColor:
           isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
       appBar: AppBar(
-        title: const Text('Events Calendar'),
+        title: Text(AppLocalizations.of(context)!.eventsCalendar),
         backgroundColor: AppColors.navy,
         foregroundColor: Colors.white,
       ),
@@ -125,7 +126,9 @@ class _EventsCalendarScreenState extends ConsumerState<EventsCalendarScreen> {
                   isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
               child: selectedDay != null
                   ? _EventsForDayList(
-                      day: selectedDay, events: getEventsForDay(selectedDay),)
+                      day: selectedDay,
+                      events: getEventsForDay(selectedDay),
+                    )
                   : const _AllUpcomingEventsList(),
             ),
           ),
@@ -135,7 +138,7 @@ class _EventsCalendarScreenState extends ConsumerState<EventsCalendarScreen> {
         onPressed: () =>
             context.go(RouteNames.events), // Navigate to listing screen
         icon: const Icon(Icons.list_rounded),
-        label: const Text('List View'),
+        label: Text(AppLocalizations.of(context)!.listView),
         backgroundColor: AppColors.navyAccent,
         foregroundColor: Colors.white,
       ),
@@ -305,8 +308,11 @@ class _EventCard extends StatelessWidget {
                     const SizedBox(height: AppSpacing.xxxs),
                     Row(
                       children: [
-                        const Icon(Icons.access_time_rounded,
-                            size: 12, color: Colors.grey,),
+                        const Icon(
+                          Icons.access_time_rounded,
+                          size: 12,
+                          color: Colors.grey,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           DateFormat('h:mm a').format(event.startsAt),

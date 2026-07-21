@@ -20,11 +20,30 @@ import 'package:share_plus/share_plus.dart';
 // ─── Encouraging verses ───────────────────────────────────────────────────────
 
 const _encouragingVerses = [
-  (ref: 'Psalm 1:2', text: 'His delight is in the law of the Lord, and on His law he meditates day and night.'),
-  (ref: 'Joshua 1:8', text: 'Keep this Book of the Law always on your lips; meditate on it day and night.'),
-  (ref: 'Colossians 3:16', text: 'Let the word of Christ dwell in you richly as you teach and admonish one another.'),
-  (ref: 'Psalm 119:105', text: 'Your word is a lamp for my feet, a light on my path.'),
-  (ref: 'Romans 10:17', text: 'Faith comes from hearing the message, and the message is heard through the word of Christ.'),
+  (
+    ref: 'Psalm 1:2',
+    text:
+        'His delight is in the law of the Lord, and on His law he meditates day and night.'
+  ),
+  (
+    ref: 'Joshua 1:8',
+    text:
+        'Keep this Book of the Law always on your lips; meditate on it day and night.'
+  ),
+  (
+    ref: 'Colossians 3:16',
+    text:
+        'Let the word of Christ dwell in you richly as you teach and admonish one another.'
+  ),
+  (
+    ref: 'Psalm 119:105',
+    text: 'Your word is a lamp for my feet, a light on my path.'
+  ),
+  (
+    ref: 'Romans 10:17',
+    text:
+        'Faith comes from hearing the message, and the message is heard through the word of Christ.'
+  ),
 ];
 
 class JourneyCompleteScreen extends ConsumerWidget {
@@ -36,8 +55,7 @@ class JourneyCompleteScreen extends ConsumerWidget {
     final streak = ref.watch(devotionalStreakProvider);
     final progress = ref.watch(journeyProgressProvider(devotionalId));
     // Pick an encouraging verse based on day of year
-    final verseIndex =
-        DateTime.now().dayOfYear % _encouragingVerses.length;
+    final verseIndex = DateTime.now().dayOfYear % _encouragingVerses.length;
     final verse = _encouragingVerses[verseIndex];
 
     // Haptic feedback on mount
@@ -132,10 +150,7 @@ class JourneyCompleteScreen extends ConsumerWidget {
                         fontWeight: FontWeight.w800,
                         height: 1.2,
                       ),
-                    )
-                        .animate()
-                        .fadeIn(delay: 400.ms, duration: 500.ms)
-                        .slideY(
+                    ).animate().fadeIn(delay: 400.ms, duration: 500.ms).slideY(
                           begin: 0.1,
                           end: 0,
                           delay: 400.ms,
@@ -383,8 +398,11 @@ class _WeeklyProgressRow extends StatelessWidget {
                     ),
                     child: Center(
                       child: done
-                          ? const Icon(Icons.check_rounded,
-                              color: Colors.white, size: 16,)
+                          ? const Icon(
+                              Icons.check_rounded,
+                              color: Colors.white,
+                              size: 16,
+                            )
                           : Text(
                               labels[i],
                               style: TextStyle(
@@ -421,11 +439,31 @@ class _StepsCompleted extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final steps = [
-      (icon: Icons.menu_book_rounded, label: 'Scripture', done: progress.scriptureRead),
-      (icon: Icons.auto_stories_rounded, label: 'Devotional', done: progress.contentRead),
-      (icon: Icons.lightbulb_rounded, label: 'Reflection', done: progress.reflectionDone),
-      (icon: Icons.self_improvement_rounded, label: 'Prayer', done: progress.prayerDone),
-      (icon: Icons.edit_note_rounded, label: 'Journal', done: progress.journalDone),
+      (
+        icon: Icons.menu_book_rounded,
+        label: 'Scripture',
+        done: progress.scriptureRead
+      ),
+      (
+        icon: Icons.auto_stories_rounded,
+        label: 'Devotional',
+        done: progress.contentRead
+      ),
+      (
+        icon: Icons.lightbulb_rounded,
+        label: 'Reflection',
+        done: progress.reflectionDone
+      ),
+      (
+        icon: Icons.self_improvement_rounded,
+        label: 'Prayer',
+        done: progress.prayerDone
+      ),
+      (
+        icon: Icons.edit_note_rounded,
+        label: 'Journal',
+        done: progress.journalDone
+      ),
     ];
 
     return Column(

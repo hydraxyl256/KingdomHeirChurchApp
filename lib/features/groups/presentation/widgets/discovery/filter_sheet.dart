@@ -5,13 +5,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/features/groups/domain/entities/group_models.dart';
 import 'package:kingdom_heir/features/groups/presentation/providers/groups_filters_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 void showFilterSheet(BuildContext context) {
   showModalBottomSheet<void>(
@@ -74,7 +74,7 @@ class _FilterSheetBody extends ConsumerWidget {
                     style: TextButton.styleFrom(
                       foregroundColor: AppColors.goldDark,
                     ),
-                    child: const Text('Clear all'),
+                    child: Text(AppLocalizations.of(context)!.clearAll),
                   ),
               ],
             ),

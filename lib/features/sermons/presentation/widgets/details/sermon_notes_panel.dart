@@ -6,12 +6,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/features/sermons/domain/entities/sermon_note.dart';
 import 'package:kingdom_heir/features/sermons/presentation/providers/sermon_engagement_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class SermonNotesPanel extends ConsumerStatefulWidget {
   const SermonNotesPanel({required this.sermonId, super.key});
@@ -72,8 +72,11 @@ class _SermonNotesPanelState extends ConsumerState<SermonNotesPanel> {
                 onTap: () => setState(() => _expanded = !_expanded),
                 child: Row(
                   children: [
-                    const Icon(Icons.sticky_note_2_outlined,
-                        color: AppColors.gold, size: 18,),
+                    const Icon(
+                      Icons.sticky_note_2_outlined,
+                      color: AppColors.gold,
+                      size: 18,
+                    ),
                     const SizedBox(width: AppSpacing.xs),
                     Expanded(
                       child: Text(
@@ -101,9 +104,9 @@ class _SermonNotesPanelState extends ConsumerState<SermonNotesPanel> {
                         controller: _controller,
                         minLines: 1,
                         maxLines: 3,
-                        decoration: const InputDecoration(
-                          hintText: 'Write a note…',
-                          border: OutlineInputBorder(),
+                        decoration: InputDecoration(
+                          hintText: AppLocalizations.of(context)!.writeANote,
+                          border: const OutlineInputBorder(),
                         ),
                       ),
                     ),
@@ -155,8 +158,11 @@ class _SermonNotesPanelState extends ConsumerState<SermonNotesPanel> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.cloud_off_rounded,
-                            color: AppColors.error, size: 24,),
+                        const Icon(
+                          Icons.cloud_off_rounded,
+                          color: AppColors.error,
+                          size: 24,
+                        ),
                         const SizedBox(height: AppSpacing.xs),
                         const Text(
                           'Could not load notes.',
@@ -175,7 +181,7 @@ class _SermonNotesPanelState extends ConsumerState<SermonNotesPanel> {
                             foregroundColor:
                                 WidgetStateProperty.all(AppColors.ink),
                           ),
-                          child: const Text('Try Again'),
+                          child: Text(AppLocalizations.of(context)!.tryAgain_1),
                         ),
                       ],
                     ),

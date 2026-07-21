@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:kingdom_heir/core/di/providers.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 final globalImpactDashboardProvider =
     FutureProvider.autoDispose<Map<String, dynamic>>((ref) async {
@@ -61,7 +61,7 @@ class AdminGlobalImpactDashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Global Impact Dashboard'),
+        title: Text(AppLocalizations.of(context)!.globalImpactDashboard),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -82,55 +82,81 @@ class AdminGlobalImpactDashboardScreen extends ConsumerWidget {
                 const SizedBox(height: 16),
                 _buildKpiGrid(context, [
                   _Kpi(
-                      'Participants Registered',
-                      data['participantsRegistered'].toString(),
-                      Icons.people_outline,
-                      AppColors.info,),
+                    'Participants Registered',
+                    data['participantsRegistered'].toString(),
+                    Icons.people_outline,
+                    AppColors.info,
+                  ),
                   _Kpi(
-                      'Participants Active',
-                      data['participantsActive'].toString(),
-                      Icons.people,
-                      AppColors.success,),
+                    'Participants Active',
+                    data['participantsActive'].toString(),
+                    Icons.people,
+                    AppColors.success,
+                  ),
                   _Kpi(
-                      'Participants Completed',
-                      data['participantsCompleted'].toString(),
-                      Icons.check_circle,
-                      AppColors.goldDark,),
-                  _Kpi('Groups Active', data['groupsActive'].toString(),
-                      Icons.group_work, AppColors.warning,),
-                  _Kpi('Groups Completed', data['groupsCompleted'].toString(),
-                      Icons.done_all, AppColors.error,),
-                  _Kpi('Countries Active', data['countriesActive'].toString(),
-                      Icons.public, AppColors.navyAccent,),
+                    'Participants Completed',
+                    data['participantsCompleted'].toString(),
+                    Icons.check_circle,
+                    AppColors.goldDark,
+                  ),
+                  _Kpi(
+                    'Groups Active',
+                    data['groupsActive'].toString(),
+                    Icons.group_work,
+                    AppColors.warning,
+                  ),
+                  _Kpi(
+                    'Groups Completed',
+                    data['groupsCompleted'].toString(),
+                    Icons.done_all,
+                    AppColors.error,
+                  ),
+                  _Kpi(
+                    'Countries Active',
+                    data['countriesActive'].toString(),
+                    Icons.public,
+                    AppColors.navyAccent,
+                  ),
                 ]),
                 const SizedBox(height: 32),
                 _buildSectionTitle(context, 'Kingdom Impact'),
                 const SizedBox(height: 16),
                 _buildKpiGrid(context, [
-                  _Kpi('Salvations', data['salvations'].toString(),
-                      Icons.favorite, AppColors.error,),
-                  _Kpi('Baptisms', data['baptisms'].toString(),
-                      Icons.water_drop, AppColors.info,),
+                  _Kpi(
+                    'Salvations',
+                    data['salvations'].toString(),
+                    Icons.favorite,
+                    AppColors.error,
+                  ),
+                  _Kpi(
+                    'Baptisms',
+                    data['baptisms'].toString(),
+                    Icons.water_drop,
+                    AppColors.info,
+                  ),
                 ]),
                 const SizedBox(height: 32),
                 _buildSectionTitle(context, 'Multiplication & Future'),
                 const SizedBox(height: 16),
                 _buildKpiGrid(context, [
                   _Kpi(
-                      'Future Leaders',
-                      data['futureLeadersIdentified'].toString(),
-                      Icons.star,
-                      AppColors.gold,),
+                    'Future Leaders',
+                    data['futureLeadersIdentified'].toString(),
+                    Icons.star,
+                    AppColors.gold,
+                  ),
                   _Kpi(
-                      'Future Groups Planned',
-                      data['futureGroupsPlanned'].toString(),
-                      Icons.next_plan,
-                      AppColors.tertiary,),
+                    'Future Groups Planned',
+                    data['futureGroupsPlanned'].toString(),
+                    Icons.next_plan,
+                    AppColors.tertiary,
+                  ),
                   _Kpi(
-                      'Vessel School Prospects',
-                      data['vesselProspects'].toString(),
-                      Icons.school,
-                      AppColors.navyMid,),
+                    'Vessel School Prospects',
+                    data['vesselProspects'].toString(),
+                    Icons.school,
+                    AppColors.navyMid,
+                  ),
                 ]),
               ],
             ),
@@ -189,9 +215,10 @@ class AdminGlobalImpactDashboardScreen extends ConsumerWidget {
                           child: Text(
                             kpi.title,
                             style: TextStyle(
-                                color: kpi.color,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13,),
+                              color: kpi.color,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -201,9 +228,10 @@ class AdminGlobalImpactDashboardScreen extends ConsumerWidget {
                     Text(
                       kpi.value,
                       style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: kpi.color.withValues(alpha: 0.9),),
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: kpi.color.withValues(alpha: 0.9),
+                      ),
                     ),
                   ],
                 ),

@@ -16,7 +16,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/widgets/app_empty_state.dart';
 import 'package:kingdom_heir/features/auth/presentation/providers/auth_provider.dart';
@@ -29,6 +28,7 @@ import 'package:kingdom_heir/features/groups/presentation/widgets/home/quick_act
 import 'package:kingdom_heir/features/groups/presentation/widgets/home/recently_active_section.dart';
 import 'package:kingdom_heir/features/groups/presentation/widgets/home/suggested_groups_section.dart';
 import 'package:kingdom_heir/features/groups/presentation/widgets/home/upcoming_meetings_section.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class CommunityHomeScreen extends ConsumerWidget {
   const CommunityHomeScreen({super.key});
@@ -60,7 +60,8 @@ class CommunityHomeScreen extends ConsumerWidget {
               error: (err, _) => SliverFillRemaining(
                 hasScrollBody: false,
                 child: AppErrorWidget(
-                  message: 'Couldn’t load your community',
+                  message:
+                      AppLocalizations.of(context)!.couldntLoadYourCommunity,
                   onRetry: () => ref.invalidate(communityHomeProvider),
                 ),
               ),

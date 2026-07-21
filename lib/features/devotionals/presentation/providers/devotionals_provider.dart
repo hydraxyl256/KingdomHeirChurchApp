@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kingdom_heir/core/di/providers.dart';
+import 'package:kingdom_heir/core/localization/locale_provider.dart';
 import 'package:kingdom_heir/features/devotionals/data/repositories/devotional_repository.dart';
 import 'package:kingdom_heir/features/devotionals/data/services/devotional_local_cache.dart';
 import 'package:kingdom_heir/features/devotionals/data/services/devotional_supabase_service.dart';
@@ -17,7 +18,9 @@ final devotionalRepositoryProvider = Provider<DevotionalRepository>((ref) {
 
 final dailyDevotionalProvider = FutureProvider<Devotional?>((ref) async {
   final repo = ref.watch(devotionalRepositoryProvider);
-  final result = await repo.getDailyDevotional();
+  final locale = ref.watch(localeProvider);
+  final result =
+      await repo.getDailyDevotional(languageCode: locale.languageCode);
   return result.fold(
     (l) => throw Exception(l),
     (r) => r,
@@ -27,7 +30,9 @@ final dailyDevotionalProvider = FutureProvider<Devotional?>((ref) async {
 final previousDevotionalsProvider =
     FutureProvider<List<Devotional>>((ref) async {
   final repo = ref.watch(devotionalRepositoryProvider);
-  final result = await repo.getPreviousDevotionals();
+  final locale = ref.watch(localeProvider);
+  final result =
+      await repo.getPreviousDevotionals(languageCode: locale.languageCode);
   return result.fold(
     (l) => throw Exception(l),
     (r) => r,

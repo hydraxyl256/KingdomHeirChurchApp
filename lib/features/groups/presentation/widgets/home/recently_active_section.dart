@@ -9,7 +9,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/motion.dart';
@@ -20,6 +19,7 @@ import 'package:kingdom_heir/features/groups/domain/entities/group_models.dart';
 import 'package:kingdom_heir/features/groups/presentation/providers/groups_provider.dart';
 import 'package:kingdom_heir/features/groups/presentation/widgets/shared/activity_dot.dart';
 import 'package:kingdom_heir/features/groups/presentation/widgets/shared/group_avatar.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class RecentlyActiveSection extends ConsumerWidget {
   const RecentlyActiveSection({super.key});
@@ -45,7 +45,7 @@ class RecentlyActiveSection extends ConsumerWidget {
           error: (err, _) => Padding(
             padding: EdgeInsets.symmetric(horizontal: insets.lg),
             child: AppErrorWidget(
-              message: 'Couldn’t load active groups',
+              message: AppLocalizations.of(context)!.couldntLoadActiveGroups,
               onRetry: () => ref.invalidate(recentlyActiveGroupsProvider),
             ),
           ),

@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
@@ -21,6 +20,7 @@ import 'package:kingdom_heir/features/groups/domain/entities/group_prayer_models
 import 'package:kingdom_heir/features/groups/presentation/providers/group_detail_provider.dart';
 import 'package:kingdom_heir/features/groups/presentation/providers/groups_provider.dart';
 import 'package:kingdom_heir/features/groups/presentation/widgets/shared/group_avatar.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class PrayerRequestsSection extends ConsumerWidget {
   const PrayerRequestsSection({super.key});
@@ -46,7 +46,7 @@ class PrayerRequestsSection extends ConsumerWidget {
           error: (err, _) => Padding(
             padding: EdgeInsets.symmetric(horizontal: insets.lg),
             child: AppErrorWidget(
-              message: 'Couldn’t load prayer requests',
+              message: AppLocalizations.of(context)!.couldntLoadPrayerRequests,
               onRetry: () => ref.invalidate(prayerFeedForUserProvider),
             ),
           ),
@@ -312,8 +312,12 @@ class _PrayedButtonState extends State<_PrayedButton> {
           duration: AppMotion.quick,
           curve: AppMotion.overshoot,
           transform: Matrix4.identity()
-            ..scaleByDouble(_pressed ? 1.18 : 1.0, _pressed ? 1.18 : 1.0,
-                _pressed ? 1.18 : 1.0, 1,),
+            ..scaleByDouble(
+              _pressed ? 1.18 : 1.0,
+              _pressed ? 1.18 : 1.0,
+              _pressed ? 1.18 : 1.0,
+              1,
+            ),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             color: AppColors.gold,
@@ -331,8 +335,11 @@ class _PrayedButtonState extends State<_PrayedButton> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.favorite_rounded,
-                  size: 14, color: AppColors.ink,),
+              const Icon(
+                Icons.favorite_rounded,
+                size: 14,
+                color: AppColors.ink,
+              ),
               const SizedBox(width: 4),
               Text(
                 'I prayed',

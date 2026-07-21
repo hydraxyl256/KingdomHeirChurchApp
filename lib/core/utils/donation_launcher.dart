@@ -71,8 +71,7 @@ Future<void> openDonationPage(BuildContext context) async {
       return;
     }
 
-    final launched =
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!launched) {
       _showErrorSnackbar(messenger, scheme);
     }

@@ -425,8 +425,11 @@ class _AnnouncementBubble extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.push_pin_rounded,
-              size: 16, color: AppColors.goldDark,),
+          const Icon(
+            Icons.push_pin_rounded,
+            size: 16,
+            color: AppColors.goldDark,
+          ),
           const SizedBox(width: 6),
           Flexible(
             child: Text(

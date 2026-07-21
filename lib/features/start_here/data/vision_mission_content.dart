@@ -64,46 +64,40 @@ class VisionMissionContent {
     visionStatement:
         'To see a global generation of Christ-shaped leaders who carry '
         'the presence of God into every sphere of society.',
-    visionSupporting:
-        'A movement, not a moment. A kingdom, not a programme.',
+    visionSupporting: 'A movement, not a moment. A kingdom, not a programme.',
     missionPillars: [
       MissionPillar(
         index: '01',
         title: 'Spiritual Growth',
-        body:
-            'Cultivating intimacy with God through prayer, the Word, and '
+        body: 'Cultivating intimacy with God through prayer, the Word, and '
             'the Holy Spirit.',
         icon: Icons.auto_awesome_rounded,
       ),
       MissionPillar(
         index: '02',
         title: 'Discipleship',
-        body:
-            'Walking alongside new believers until they become mature, '
+        body: 'Walking alongside new believers until they become mature, '
             'reproducing disciples of Christ.',
         icon: Icons.school_rounded,
       ),
       MissionPillar(
         index: '03',
         title: 'Leadership Development',
-        body:
-            'Equipping leaders with biblical wisdom, character, and skill '
+        body: 'Equipping leaders with biblical wisdom, character, and skill '
             'to serve the Church and the world.',
         icon: Icons.workspace_premium_rounded,
       ),
       MissionPillar(
         index: '04',
         title: 'Community Transformation',
-        body:
-            'Serving our cities through mercy, justice, and tangible acts '
+        body: 'Serving our cities through mercy, justice, and tangible acts '
             'of love that restore dignity.',
         icon: Icons.diversity_3_rounded,
       ),
       MissionPillar(
         index: '05',
         title: 'Global Impact',
-        body:
-            'Carrying the gospel across borders, planting churches, and '
+        body: 'Carrying the gospel across borders, planting churches, and '
             'reaching the unreached.',
         icon: Icons.public_rounded,
       ),
@@ -176,29 +170,25 @@ class VisionMissionContent {
       FuturePhase(
         phase: 'TODAY',
         title: 'Deepening the Core',
-        body:
-            'Strengthening prayer, discipleship, and leadership pipelines '
+        body: 'Strengthening prayer, discipleship, and leadership pipelines '
             'within our local church.',
       ),
       FuturePhase(
         phase: 'NEXT',
         title: 'The Next Generation',
-        body:
-            'Launching a dedicated youth and family ministry across every '
+        body: 'Launching a dedicated youth and family ministry across every '
             'Kingdom Heirs expression.',
       ),
       FuturePhase(
         phase: 'EXPAND',
         title: 'Future Expansion',
-        body:
-            'Planting churches across new cities and training centres for '
+        body: 'Planting churches across new cities and training centres for '
             'pastoral leadership.',
       ),
       FuturePhase(
         phase: 'GLOBAL',
         title: 'Global Influence',
-        body:
-            'Carrying our message and our missionaries to every continent, '
+        body: 'Carrying our message and our missionaries to every continent, '
             'every tongue, every nation.',
       ),
     ],

@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/widgets/app_avatar.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class MemberDirectoryScreen extends StatefulWidget {
   const MemberDirectoryScreen({super.key});
@@ -52,7 +53,7 @@ class _MemberDirectoryScreenState extends State<MemberDirectoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Member Directory'),
+        title: Text(AppLocalizations.of(context)!.memberDirectory),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(56),
           child: Padding(
@@ -63,7 +64,7 @@ class _MemberDirectoryScreenState extends State<MemberDirectoryScreen> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Search members…',
+                hintText: AppLocalizations.of(context)!.searchMembers,
                 prefixIcon: const Icon(Icons.search_rounded),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),

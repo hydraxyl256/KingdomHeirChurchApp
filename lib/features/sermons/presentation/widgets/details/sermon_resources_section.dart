@@ -6,11 +6,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/features/sermons/domain/entities/sermon_resource.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class SermonResourcesSection extends StatelessWidget {
   const SermonResourcesSection({required this.resources, super.key});
@@ -107,7 +107,7 @@ class _ResourceRow extends StatelessWidget {
             ),
           ),
           IconButton(
-            tooltip: 'Copy link',
+            tooltip: AppLocalizations.of(context)!.copyLink,
             onPressed: () {
               Clipboard.setData(ClipboardData(text: resource.url));
               ScaffoldMessenger.of(context).showSnackBar(

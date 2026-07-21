@@ -36,11 +36,11 @@ class PodcastRepositoryImpl implements PodcastRepository {
       if (cached != null && cached.isNotEmpty) {
         unawaited(
           supabaseService.getSeries().then(
-            (res) => res.fold(
-              (l) => null,
-              localCache.cacheSeries,
-            ),
-          ),
+                (res) => res.fold(
+                  (l) => null,
+                  localCache.cacheSeries,
+                ),
+              ),
         );
         return right(cached);
       }
@@ -67,11 +67,11 @@ class PodcastRepositoryImpl implements PodcastRepository {
       if (cached != null && cached.isNotEmpty) {
         unawaited(
           supabaseService.getEpisodes(seriesId).then(
-            (res) => res.fold(
-              (l) => null,
-              (list) => localCache.cacheEpisodes(seriesId, list),
-            ),
-          ),
+                (res) => res.fold(
+                  (l) => null,
+                  (list) => localCache.cacheEpisodes(seriesId, list),
+                ),
+              ),
         );
         return right(cached);
       }

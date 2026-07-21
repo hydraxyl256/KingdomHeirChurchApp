@@ -7,7 +7,9 @@ abstract class KidsRepository {
   Future<Either<String, KidsSession?>> getActiveSession();
   Future<Either<String, List<KidsCheckin>>> getMyCheckins(String sessionId);
   Future<Either<String, KidsCheckin>> checkInKid(
-      String kidId, String sessionId,);
+    String kidId,
+    String sessionId,
+  );
   Future<Either<String, KidsCheckin>> checkOutKid(String checkinId);
 }
 
@@ -28,7 +30,9 @@ class KidsRepositoryImpl implements KidsRepository {
 
   @override
   Future<Either<String, KidsCheckin>> checkInKid(
-          String kidId, String sessionId,) =>
+    String kidId,
+    String sessionId,
+  ) =>
       _service.checkInKid(kidId, sessionId);
 
   @override

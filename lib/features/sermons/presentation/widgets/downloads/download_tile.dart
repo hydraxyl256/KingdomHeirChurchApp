@@ -31,7 +31,9 @@ class DownloadTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg, vertical: AppSpacing.xs,),
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
@@ -103,7 +105,8 @@ class DownloadTile extends StatelessWidget {
                               const SizedBox(width: 4),
                               Text(
                                 download.humanSize,
-                                style: AppTypography.textTheme.labelSmall?.copyWith(
+                                style: AppTypography.textTheme.labelSmall
+                                    ?.copyWith(
                                   color: AppColors.gold,
                                   fontWeight: FontWeight.w700,
                                 ),
@@ -117,13 +120,15 @@ class DownloadTile extends StatelessWidget {
                               Icon(
                                 Icons.calendar_today_rounded,
                                 size: 12,
-                                color:
-                                    Theme.of(context).colorScheme.onSurfaceVariant,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
                               ),
                               const SizedBox(width: 4),
                               Text(
                                 DateFormat.MMMd().format(download.downloadedAt),
-                                style: AppTypography.textTheme.labelSmall?.copyWith(
+                                style: AppTypography.textTheme.labelSmall
+                                    ?.copyWith(
                                   color: Theme.of(context)
                                       .colorScheme
                                       .onSurfaceVariant,

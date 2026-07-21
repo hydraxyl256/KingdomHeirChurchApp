@@ -70,8 +70,8 @@ abstract final class RouteNames {
   // ── More / Secondary Navigation ───────────────────────────────────────────
   static const live = '/home/live';
   static const giving = '/home/giving';
-  static const givingHistory = '/home/giving/history';
-  static const checkout = '/home/giving/checkout';
+  // static const givingHistory = '/home/giving/history';
+  // static const checkout = '/home/giving/checkout';
   static const groups = '/home/groups';
   static const groupDiscover = '/home/groups/discover';
   static const groupDetail = '/home/groups/:id';
@@ -104,7 +104,6 @@ abstract final class RouteNames {
   static const changePassword = '/home/settings/change-password';
   static const settingsAbout = '/home/settings/about';
 
-
   // ── Prayer Requests ───────────────────────────────────────────────────────
   static const prayerFeed = '/home/prayer';
   static const submitPrayer = '/home/prayer/submit';
@@ -122,12 +121,17 @@ abstract final class RouteNames {
   static const leaderResources = '/home/leadership/resources';
 
   // ── Devotional Series (90-Day Journey) ───────────────────────────────────
-  static const devotionalSeriesList   = '/home/devotionals/series';
+  static const devotionalSeriesList = '/home/devotionals/series';
   static const devotionalSeriesDetail = '/home/devotionals/series/:seriesId';
-  static const devotionalDayReader    = '/home/devotionals/series/:seriesId/day/:dayNumber';
+  static const devotionalDayReader =
+      '/home/devotionals/series/:seriesId/day/:dayNumber';
 
   // ── Admin CMS Extended ────────────────────────────────────────────────────
-  static const adminMediaReview        = '/admin/media-review';
-  static const adminDevotionalSeries   = '/admin/devotional-series';
-  static const adminDevotionalDayEditor= '/admin/devotional-series/:seriesId/days/:dayNumber';
+  static const adminMediaReview = '/admin/media-review';
+  static const adminDevotionalSeries = '/admin/devotional-series';
+  static const adminDevotionalDayEditor =
+      '/admin/devotional-series/:seriesId/days/:dayNumber';
+
+  // ── Admin Utility Tools (temporary, pre-CMS) ──────────────────────────────
+  static const adminTools = '/admin/tools';
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class AdminShell extends StatelessWidget {
   const AdminShell({required this.child, super.key});
@@ -12,45 +13,50 @@ class AdminShell extends StatelessWidget {
     final isDesktop = MediaQuery.of(context).size.width >= 800;
 
     final navigationDestinations = [
-      const NavigationRailDestination(
-        icon: Icon(Icons.dashboard_outlined),
-        selectedIcon: Icon(Icons.dashboard),
-        label: Text('Dashboard'),
+      NavigationRailDestination(
+        icon: const Icon(Icons.dashboard_outlined),
+        selectedIcon: const Icon(Icons.dashboard),
+        label: Text(AppLocalizations.of(context)!.dashboard),
       ),
-      const NavigationRailDestination(
-        icon: Icon(Icons.people_outline),
-        selectedIcon: Icon(Icons.people),
-        label: Text('Members'),
+      NavigationRailDestination(
+        icon: const Icon(Icons.people_outline),
+        selectedIcon: const Icon(Icons.people),
+        label: Text(AppLocalizations.of(context)!.members),
       ),
-      const NavigationRailDestination(
-        icon: Icon(Icons.article_outlined),
-        selectedIcon: Icon(Icons.article),
-        label: Text('Sermons'),
+      NavigationRailDestination(
+        icon: const Icon(Icons.article_outlined),
+        selectedIcon: const Icon(Icons.article),
+        label: Text(AppLocalizations.of(context)!.sermonsTab),
       ),
-      const NavigationRailDestination(
-        icon: Icon(Icons.event_outlined),
-        selectedIcon: Icon(Icons.event),
-        label: Text('Events'),
+      NavigationRailDestination(
+        icon: const Icon(Icons.event_outlined),
+        selectedIcon: const Icon(Icons.event),
+        label: Text(AppLocalizations.of(context)!.eventsTab),
       ),
-      const NavigationRailDestination(
-        icon: Icon(Icons.gavel_outlined),
-        selectedIcon: Icon(Icons.gavel),
-        label: Text('Moderation'),
+      NavigationRailDestination(
+        icon: const Icon(Icons.gavel_outlined),
+        selectedIcon: const Icon(Icons.gavel),
+        label: Text(AppLocalizations.of(context)!.moderation),
       ),
-      const NavigationRailDestination(
-        icon: Icon(Icons.self_improvement_outlined),
-        selectedIcon: Icon(Icons.self_improvement),
-        label: Text('Prayer Mod'),
+      NavigationRailDestination(
+        icon: const Icon(Icons.self_improvement_outlined),
+        selectedIcon: const Icon(Icons.self_improvement),
+        label: Text(AppLocalizations.of(context)!.prayerMod),
       ),
-      const NavigationRailDestination(
-        icon: Icon(Icons.video_library_outlined),
-        selectedIcon: Icon(Icons.video_library),
-        label: Text('Media'),
+      NavigationRailDestination(
+        icon: const Icon(Icons.video_library_outlined),
+        selectedIcon: const Icon(Icons.video_library),
+        label: Text(AppLocalizations.of(context)!.media),
       ),
-      const NavigationRailDestination(
-        icon: Icon(Icons.menu_book_outlined),
-        selectedIcon: Icon(Icons.menu_book),
-        label: Text('Devotions'),
+      NavigationRailDestination(
+        icon: const Icon(Icons.menu_book_outlined),
+        selectedIcon: const Icon(Icons.menu_book),
+        label: Text(AppLocalizations.of(context)!.devotions),
+      ),
+      NavigationRailDestination(
+        icon: const Icon(Icons.build_circle_outlined),
+        selectedIcon: const Icon(Icons.build_circle),
+        label: Text(AppLocalizations.of(context)!.tools),
       ),
     ];
 
@@ -63,6 +69,7 @@ class AdminShell extends StatelessWidget {
       if (location.startsWith('/admin/prayer-moderation')) return 5;
       if (location.startsWith('/admin/media-review')) return 6;
       if (location.startsWith('/admin/devotional-series')) return 7;
+      if (location.startsWith('/admin/tools')) return 8;
       return 0; // default to dashboard
     }
 
@@ -84,17 +91,19 @@ class AdminShell extends StatelessWidget {
           context.go('/admin/media-review');
         case 7:
           context.go('/admin/devotional-series');
+        case 8:
+          context.go('/admin/tools');
       }
     }
 
     if (isDesktop) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Kingdom Heir CMS'),
+          title: Text(AppLocalizations.of(context)!.kingdomHeirCms),
           actions: [
             IconButton(
               icon: const Icon(Icons.exit_to_app),
-              tooltip: 'Exit Admin',
+              tooltip: AppLocalizations.of(context)!.exitAdmin,
               onPressed: () => context.go('/dashboard'),
             ),
           ],
@@ -149,7 +158,7 @@ class AdminShell extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kingdom Heir CMS'),
+        title: Text(AppLocalizations.of(context)!.kingdomHeirCms),
         actions: [
           IconButton(
             icon: const Icon(Icons.exit_to_app),
@@ -163,11 +172,17 @@ class AdminShell extends StatelessWidget {
         onDestinationSelected: onMobileSelected,
         destinations: const [
           NavigationDestination(
-              icon: Icon(Icons.dashboard_outlined), label: 'Stats',),
+            icon: Icon(Icons.dashboard_outlined),
+            label: 'Stats',
+          ),
           NavigationDestination(
-              icon: Icon(Icons.people_outline), label: 'Users',),
+            icon: Icon(Icons.people_outline),
+            label: 'Users',
+          ),
           NavigationDestination(
-              icon: Icon(Icons.article_outlined), label: 'Content',),
+            icon: Icon(Icons.article_outlined),
+            label: 'Content',
+          ),
           NavigationDestination(icon: Icon(Icons.gavel_outlined), label: 'Mod'),
         ],
       ),

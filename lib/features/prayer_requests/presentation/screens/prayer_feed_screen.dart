@@ -18,6 +18,7 @@ import 'package:kingdom_heir/core/widgets/app_avatar.dart';
 import 'package:kingdom_heir/core/widgets/app_empty_state.dart';
 import 'package:kingdom_heir/features/prayer_requests/domain/entities/prayer_request.dart';
 import 'package:kingdom_heir/features/prayer_requests/presentation/providers/prayer_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 const _categories = [
@@ -52,11 +53,11 @@ class _PrayerFeedScreenState extends ConsumerState<PrayerFeedScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Prayer Wall'),
+        title: Text(AppLocalizations.of(context)!.prayerWall_1),
         actions: [
           IconButton(
             icon: const Icon(Icons.history_rounded),
-            tooltip: 'My Prayer Requests',
+            tooltip: AppLocalizations.of(context)!.myPrayerRequests,
             onPressed: () => context.go(RouteNames.myPrayers),
           ),
         ],
@@ -64,7 +65,7 @@ class _PrayerFeedScreenState extends ConsumerState<PrayerFeedScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.go(RouteNames.submitPrayer),
         icon: const Icon(Icons.add_rounded),
-        label: const Text('Request Prayer'),
+        label: Text(AppLocalizations.of(context)!.requestPrayer),
         backgroundColor: AppColors.gold,
         foregroundColor: AppColors.ink,
       ),
@@ -73,7 +74,7 @@ class _PrayerFeedScreenState extends ConsumerState<PrayerFeedScreen> {
           child: AppLoadingIndicator(label: 'Loading prayers...'),
         ),
         error: (err, stack) => AppErrorWidget(
-          message: 'We could not load prayer requests right now. Please try again.',
+          message: AppLocalizations.of(context)!.weCouldNotLoadPrayerRequests,
           onRetry: () => ref.invalidate(prayerFeedProvider),
         ),
         data: (requests) {
@@ -141,7 +142,8 @@ class _PrayerFeedScreenState extends ConsumerState<PrayerFeedScreen> {
                             backgroundColor: isDark
                                 ? AppColors.surfaceContainerDark
                                 : cs.surfaceContainerLow,
-                            selectedColor: AppColors.gold.withValues(alpha: 0.2),
+                            selectedColor:
+                                AppColors.gold.withValues(alpha: 0.2),
                             checkmarkColor: AppColors.gold,
                             labelStyle:
                                 AppTypography.textTheme.labelSmall?.copyWith(
@@ -172,8 +174,7 @@ class _PrayerFeedScreenState extends ConsumerState<PrayerFeedScreen> {
                   SliverFillRemaining(
                     hasScrollBody: false,
                     child: _PrayerEmptyState(
-                      isFiltered: requests.isNotEmpty &&
-                          _selectedCategory != 0,
+                      isFiltered: requests.isNotEmpty && _selectedCategory != 0,
                       onSubmit: () => context.go(RouteNames.submitPrayer),
                     ),
                   )

@@ -6,13 +6,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/features/groups/domain/entities/group_prayer_models.dart';
 import 'package:kingdom_heir/features/groups/presentation/providers/group_detail_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class PrayerComposerCard extends ConsumerStatefulWidget {
   const PrayerComposerCard({required this.groupId, super.key});
@@ -47,7 +47,8 @@ class _PrayerComposerCardState extends ConsumerState<PrayerComposerCard> {
         _controller.clear();
         setState(() => _sending = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Prayer request shared')),
+          SnackBar(
+              content: Text(AppLocalizations.of(context)!.prayerRequestShared),),
         );
       }
     } catch (e) {
@@ -106,7 +107,7 @@ class _PrayerComposerCardState extends ConsumerState<PrayerComposerCard> {
             minLines: 2,
             maxLines: 4,
             decoration: InputDecoration(
-              hintText: 'What’s on your heart?',
+              hintText: AppLocalizations.of(context)!.whatsOnYourHeart,
               filled: true,
               fillColor: theme.colorScheme.surfaceContainerLow,
               border: OutlineInputBorder(
@@ -170,7 +171,7 @@ class _PrayerComposerCardState extends ConsumerState<PrayerComposerCard> {
                       ),
                     )
                   : const Icon(Icons.send_rounded, size: 16),
-              label: const Text('Share with the group'),
+              label: Text(AppLocalizations.of(context)!.shareWithTheGroup),
               style: FilledButton.styleFrom(
                 backgroundColor: AppColors.gold,
                 foregroundColor: AppColors.ink,

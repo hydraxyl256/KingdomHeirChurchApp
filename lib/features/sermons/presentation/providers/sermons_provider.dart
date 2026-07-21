@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kingdom_heir/core/di/providers.dart';
+import 'package:kingdom_heir/core/localization/locale_provider.dart';
 import 'package:kingdom_heir/features/sermons/data/repositories/sermons_repository_impl.dart';
 import 'package:kingdom_heir/features/sermons/data/services/audio_player_service.dart';
 import 'package:kingdom_heir/features/sermons/domain/entities/sermon.dart';
@@ -70,7 +71,10 @@ class SermonsNotifier extends AsyncNotifier<List<Sermon>> {
   Future<List<Sermon>> build() => _loadSermons();
 
   Future<List<Sermon>> _loadSermons() async {
-    final result = await ref.read(sermonsRepositoryProvider).getSermons();
+    final locale = ref.watch(localeProvider);
+    final result = await ref
+        .read(sermonsRepositoryProvider)
+        .getSermons(languageCode: locale.languageCode);
     return result.fold(
       (l) => throw Exception(l),
       (r) => r,
@@ -110,7 +114,10 @@ final activeLiveStreamProvider = Provider<AsyncValue<Sermon?>>((ref) {
 // ─── New providers (Sermon Home bundle) ─────────────────────────────
 
 final featuredSermonProvider = FutureProvider<Sermon?>((ref) async {
-  final result = await ref.watch(sermonsRepositoryProvider).getSermons();
+  final locale = ref.watch(localeProvider);
+  final result = await ref
+      .watch(sermonsRepositoryProvider)
+      .getSermons(languageCode: locale.languageCode);
   return result.fold((_) => null, (list) {
     for (final s in list) {
       if (s.topics.contains('Grace') || s.viewCount > 10000) {

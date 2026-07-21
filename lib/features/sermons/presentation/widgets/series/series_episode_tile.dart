@@ -29,7 +29,9 @@ class SeriesEpisodeTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg, vertical: AppSpacing.xs,),
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),

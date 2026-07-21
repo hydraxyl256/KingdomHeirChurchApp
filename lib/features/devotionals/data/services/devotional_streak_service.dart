@@ -45,9 +45,8 @@ class DevotionalStreakService {
         current.lastCompletedDate!.day == yesterday.day;
 
     final newStreak = wasYesterday ? current.currentStreak + 1 : 1;
-    final longest = newStreak > current.longestStreak
-        ? newStreak
-        : current.longestStreak;
+    final longest =
+        newStreak > current.longestStreak ? newStreak : current.longestStreak;
 
     // Update weekly completion (0=Mon, 6=Sun)
     final weekday = today.weekday - 1; // Mon=0
@@ -144,8 +143,7 @@ class DevotionalStreakService {
 
   String? getDraft() => _prefs.getString(_draftKey);
 
-  Future<void> saveDraft(String text) =>
-      _prefs.setString(_draftKey, text);
+  Future<void> saveDraft(String text) => _prefs.setString(_draftKey, text);
 
   Future<void> clearDraft() => _prefs.remove(_draftKey);
 

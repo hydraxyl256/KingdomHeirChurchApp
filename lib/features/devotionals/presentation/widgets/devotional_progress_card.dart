@@ -16,6 +16,7 @@ import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/features/devotionals/domain/entities/devotional_series_models.dart';
 import 'package:kingdom_heir/features/devotionals/presentation/providers/devotional_series_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class DevotionalProgressCard extends ConsumerWidget {
   const DevotionalProgressCard({super.key});
@@ -94,7 +95,8 @@ class _LoadingSkeleton extends StatelessWidget {
 }
 
 class _SkeletonLine extends StatelessWidget {
-  const _SkeletonLine({required this.width, required this.height, this.radius = 4});
+  const _SkeletonLine(
+      {required this.width, required this.height, this.radius = 4,});
   final double width;
   final double height;
   final double radius;
@@ -312,10 +314,10 @@ class _CtaButton extends ConsumerWidget {
         );
 
       case DashboardDevotionalStatus.allComplete:
-        return const _InfoRow(
+        return _InfoRow(
           icon: Icons.emoji_events_rounded,
           iconColor: AppColors.gold,
-          message: "You've completed all 90 days! 🎉",
+          message: '${AppLocalizations.of(context)!.allDaysComplete} 🎉',
         );
     }
   }

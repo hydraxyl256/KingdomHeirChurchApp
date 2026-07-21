@@ -15,7 +15,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-
 import 'package:kingdom_heir/core/responsive/breakpoints.dart';
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
@@ -26,6 +25,7 @@ import 'package:kingdom_heir/core/widgets/animated_count.dart';
 import 'package:kingdom_heir/core/widgets/app_button.dart';
 import 'package:kingdom_heir/core/widgets/responsive_section_header.dart';
 import 'package:kingdom_heir/features/dashboard/domain/dashboard_models.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class FinancialStewardshipSection extends StatelessWidget {
   const FinancialStewardshipSection({
@@ -156,7 +156,7 @@ class _GivingSummaryCard extends StatelessWidget {
                     minimumSize: const Size(0, 32),
                     padding: EdgeInsets.symmetric(horizontal: insets.xs),
                   ),
-                  child: const Text('History'),
+                  child: Text(AppLocalizations.of(context)!.history),
                 ),
             ],
           ),

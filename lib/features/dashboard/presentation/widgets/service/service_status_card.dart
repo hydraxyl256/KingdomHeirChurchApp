@@ -38,7 +38,7 @@ class ServiceStatusCard extends StatelessWidget {
               : _NextServiceCard(
                   status: status,
                   onInvite: onAddReminder, // Using for Invite Friend
-                  onDetails: onDirections,  // Using for Details
+                  onDetails: onDirections, // Using for Details
                 )),
     ).animate().fadeIn(delay: 320.ms, duration: 400.ms).slideY(
           begin: 0.06,
@@ -129,7 +129,8 @@ class _LiveCard extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Iconography.live, color: Color(0xFFDC2626), size: 16),
+                      const Icon(Iconography.live,
+                          color: Color(0xFFDC2626), size: 16,),
                       const SizedBox(width: 4),
                       Text(
                         'Watch',
@@ -275,7 +276,8 @@ class _NextServiceCardState extends State<_NextServiceCard> {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.calendar_today_rounded, size: 16, color: AppColors.goldDark),
+                    const Icon(Icons.calendar_today_rounded,
+                        size: 16, color: AppColors.goldDark,),
                     const SizedBox(width: AppSpacing.xs),
                     Text(
                       'NEXT SERVICE',
@@ -327,7 +329,8 @@ class _NextServiceCardState extends State<_NextServiceCard> {
                       const SizedBox(width: AppSpacing.sm),
                       _TimeBlock(value: two(hours), label: 'Hrs'),
                       const SizedBox(width: AppSpacing.sm),
-                      _TimeBlock(value: two(minutes), label: 'Mins', highlight: true),
+                      _TimeBlock(
+                          value: two(minutes), label: 'Mins', highlight: true,),
                     ],
                   ),
                 ),
@@ -349,7 +352,8 @@ class _NextServiceCardState extends State<_NextServiceCard> {
                           ),
                         ),
                         icon: const Icon(Icons.group_add_rounded, size: 18),
-                        label: const Text('Invite Friend', style: TextStyle(fontWeight: FontWeight.bold)),
+                        label: const Text('Invite Friend',
+                            style: TextStyle(fontWeight: FontWeight.bold),),
                       ),
                     ),
                     const SizedBox(width: AppSpacing.sm),
@@ -366,7 +370,8 @@ class _NextServiceCardState extends State<_NextServiceCard> {
                             borderRadius: BorderRadius.circular(999),
                           ),
                         ),
-                        child: const Text('Details', style: TextStyle(fontWeight: FontWeight.bold)),
+                        child: const Text('Details',
+                            style: TextStyle(fontWeight: FontWeight.bold),),
                       ),
                     ),
                   ],
@@ -381,7 +386,8 @@ class _NextServiceCardState extends State<_NextServiceCard> {
 }
 
 class _TimeBlock extends StatelessWidget {
-  const _TimeBlock({required this.value, required this.label, this.highlight = false});
+  const _TimeBlock(
+      {required this.value, required this.label, this.highlight = false,});
   final String value;
   final String label;
   final bool highlight;

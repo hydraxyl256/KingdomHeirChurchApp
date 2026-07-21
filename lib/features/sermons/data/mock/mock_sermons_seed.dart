@@ -311,7 +311,11 @@ class MockSermonSeed {
       audio: true,
       scripture: const [
         SermonScriptureRef(
-            book: 'Hebrews', chapter: 11, verse: 33, endVerse: 40,),
+          book: 'Hebrews',
+          chapter: 11,
+          verse: 33,
+          endVerse: 40,
+        ),
       ],
       desc:
           'Part 2 of the Hall of Names — faith that conquered kingdoms, shut the mouths of lions, and quenched the fury of the flames.',
@@ -426,7 +430,11 @@ class MockSermonSeed {
       audio: true,
       scripture: const [
         SermonScriptureRef(
-            book: 'Ezekiel', chapter: 37, verse: 1, endVerse: 14,),
+          book: 'Ezekiel',
+          chapter: 37,
+          verse: 1,
+          endVerse: 14,
+        ),
       ],
       desc:
           'The valley of dry bones — what happens when the breath of God comes into a place of death. Resurrection is not just an event; it is a way of life.',
@@ -446,7 +454,11 @@ class MockSermonSeed {
       audio: true,
       scripture: const [
         SermonScriptureRef(
-            book: 'Matthew', chapter: 28, verse: 19, endVerse: 20,),
+          book: 'Matthew',
+          chapter: 28,
+          verse: 19,
+          endVerse: 20,
+        ),
       ],
       desc:
           'You are not just saved for heaven — you are sent out to represent the Kingdom on earth. A message on the missionary identity of every believer.',
@@ -466,7 +478,11 @@ class MockSermonSeed {
       audio: true,
       scripture: const [
         SermonScriptureRef(
-            book: 'Hebrews', chapter: 11, verse: 35, endVerse: 38,),
+          book: 'Hebrews',
+          chapter: 11,
+          verse: 35,
+          endVerse: 38,
+        ),
       ],
       desc:
           'Part 3 — faith that refused to be rescued, choosing to be mistreated with the people of God. A sobering and encouraging call to costly obedience.',
@@ -486,7 +502,11 @@ class MockSermonSeed {
       audio: true,
       scripture: const [
         SermonScriptureRef(
-            book: 'Matthew', chapter: 18, verse: 21, endVerse: 22,),
+          book: 'Matthew',
+          chapter: 18,
+          verse: 21,
+          endVerse: 22,
+        ),
       ],
       desc:
           'A compassionate, honest message for anyone who has been told to forgive but does not know how. Forgiveness is a process, not a moment — and grace meets you in the middle of it.',
@@ -525,7 +545,11 @@ class MockSermonSeed {
       audio: true,
       scripture: const [
         SermonScriptureRef(
-            book: '2 Corinthians', chapter: 9, verse: 6, endVerse: 8,),
+          book: '2 Corinthians',
+          chapter: 9,
+          verse: 6,
+          endVerse: 8,
+        ),
       ],
       desc:
           'God loves a cheerful giver — and the cheerful part matters. A refreshing message on generosity that flows from grace, not guilt.',

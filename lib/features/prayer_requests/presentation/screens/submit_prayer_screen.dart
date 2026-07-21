@@ -17,6 +17,7 @@ import 'package:kingdom_heir/core/widgets/app_button.dart';
 import 'package:kingdom_heir/core/widgets/app_text_field.dart';
 import 'package:kingdom_heir/features/prayer_requests/data/models/prayer_request_model.dart';
 import 'package:kingdom_heir/features/prayer_requests/presentation/providers/prayer_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 const _categories = [
   'General',
@@ -126,7 +127,7 @@ class _SubmitPrayerScreenState extends ConsumerState<SubmitPrayerScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Submit Prayer Request'),
+        title: Text(AppLocalizations.of(context)!.submitPrayerRequest),
         leading: const BackButton(),
       ),
       body: _justSubmitted
@@ -134,15 +135,16 @@ class _SubmitPrayerScreenState extends ConsumerState<SubmitPrayerScreen> {
               onViewMyRequests: () => context.go(RouteNames.myPrayers),
               onSubmitAnother: _submitAnother,
             ).animate().fadeIn(duration: 300.ms).slideY(
-              begin: 0.1,
-              end: 0,
-              curve: Curves.easeOutCubic,
-            )
+                begin: 0.1,
+                end: 0,
+                curve: Curves.easeOutCubic,
+              )
           : _buildForm(theme, isDark, cs, isLoading),
     );
   }
 
-  Widget _buildForm(ThemeData theme, bool isDark, ColorScheme cs, bool isLoading) {
+  Widget _buildForm(
+      ThemeData theme, bool isDark, ColorScheme cs, bool isLoading,) {
     return Form(
       key: _formKey,
       child: ListView(

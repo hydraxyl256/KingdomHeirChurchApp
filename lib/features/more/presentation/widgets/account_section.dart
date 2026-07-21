@@ -31,6 +31,7 @@ import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/features/more/domain/more_models.dart';
 import 'package:kingdom_heir/features/more/presentation/widgets/feature_catalog.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class AccountSection extends ConsumerWidget {
   const AccountSection({super.key});
@@ -139,7 +140,7 @@ class AccountSection extends ConsumerWidget {
     showDialog<void>(
       context: context,
       builder: (dialogCtx) => AlertDialog(
-        title: const Text('Select Language'),
+        title: Text(AppLocalizations.of(context)!.selectLanguage),
         contentPadding: const EdgeInsets.symmetric(vertical: 8),
         content: SizedBox(
           width: double.maxFinite,

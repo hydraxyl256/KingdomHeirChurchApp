@@ -36,9 +36,8 @@ class PrayerRequestModel {
 
     // Some Supabase setups use 'prayer_count', others 'pray_count'.
     // We check both and fall back to 0.
-    final prayerCount = (json['prayer_count'] as int?) ??
-        (json['pray_count'] as int?) ??
-        0;
+    final prayerCount =
+        (json['prayer_count'] as int?) ?? (json['pray_count'] as int?) ?? 0;
 
     // updated_at is nullable: some tables omit it or set it to null
     // on the first insert before a trigger fires.
@@ -121,9 +120,8 @@ class PrayerRequestModel {
     final avatarForEntity = isAnonymous ? null : authorAvatarUrl;
     // Public view always returns 'Anonymous' as display_name for anonymous
     // rows. For non-anonymous it returns the requester_name.
-    final displayForEntity = isAnonymous
-        ? 'Anonymous'
-        : (displayName ?? authorName ?? 'Member');
+    final displayForEntity =
+        isAnonymous ? 'Anonymous' : (displayName ?? authorName ?? 'Member');
     return PrayerRequest(
       id: id,
       userId: userId,

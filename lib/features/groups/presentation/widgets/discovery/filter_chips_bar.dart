@@ -134,8 +134,11 @@ class _ActiveChip extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 4),
-              const Icon(Icons.close_rounded,
-                  size: 12, color: AppColors.goldDark,),
+              const Icon(
+                Icons.close_rounded,
+                size: 12,
+                color: AppColors.goldDark,
+              ),
             ],
           ),
         ),

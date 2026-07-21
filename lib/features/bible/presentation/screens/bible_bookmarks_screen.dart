@@ -312,7 +312,7 @@ class _BookmarksTab extends ConsumerWidget {
             bookmark: b,
             onTap: () {
               ref.read(bibleNavigationProvider.notifier).navigate(
-                    bookId:    b.bookId,
+                    bookId: b.bookId,
                     chapterId: b.chapterId,
                   );
               context.go(RouteNames.bible);

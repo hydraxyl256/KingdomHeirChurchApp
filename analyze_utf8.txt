@@ -1,0 +1,563 @@
+﻿Analyzing KingdomHeirChurchAPP...                               
+
+  error - Target of URI doesn't exist: 'package:kingdom_heir/l10n/app_localizations.dart' - lib\app.dart:8:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\app.dart:33:25 - undefined_identifier
+  error - The values in a const list literal must be constants - lib\app.dart:35:9 - non_constant_list_element
+  error - Undefined name 'AppLocalizations' - lib\app.dart:35:9 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\admin\presentation\screens\admin_dashboard_screen.dart:7:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_dashboard_screen.dart:56:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_dashboard_screen.dart:60:22 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_dashboard_screen.dart:68:50 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_dashboard_screen.dart:68:50 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_dashboard_screen.dart:284:40 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_dashboard_screen.dart:284:40 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_dashboard_screen.dart:309:38 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_dashboard_screen.dart:310:38 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_dashboard_screen.dart:311:38 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_dashboard_screen.dart:342:38 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_dashboard_screen.dart:343:38 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\admin\presentation\screens\admin_devotional_day_editor_screen.dart:7:8 - uri_does_not_exist
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_devotional_day_editor_screen.dart:142:27 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_devotional_day_editor_screen.dart:142:27 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_devotional_day_editor_screen.dart:435:31 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\admin\presentation\screens\admin_devotional_series_screen.dart:7:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_devotional_series_screen.dart:33:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_devotional_series_screen.dart:38:25 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_devotional_series_screen.dart:82:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_devotional_series_screen.dart:104:25 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_devotional_series_screen.dart:121:25 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_devotional_series_screen.dart:196:22 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_devotional_series_screen.dart:213:67 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_devotional_series_screen.dart:213:67 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_devotional_series_screen.dart:215:65 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_devotional_series_screen.dart:215:65 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_devotional_series_screen.dart:217:67 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_devotional_series_screen.dart:217:67 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\admin\presentation\screens\admin_events_screen.dart:2:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_events_screen.dart:22:21 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_events_screen.dart:31:46 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_events_screen.dart:31:46 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_events_screen.dart:35:25 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_events_screen.dart:45:39 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_events_screen.dart:103:39 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_events_screen.dart:103:39 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\admin\presentation\screens\admin_global_impact_dashboard_screen.dart:2:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_global_impact_dashboard_screen.dart:64:21 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\admin\presentation\screens\admin_leader_applications_screen.dart:2:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_leader_applications_screen.dart:22:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_leader_applications_screen.dart:35:39 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\admin\presentation\screens\admin_leader_recognition_dashboard_screen.dart:2:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_leader_recognition_dashboard_screen.dart:13:21 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\admin\presentation\screens\admin_media_review_screen.dart:10:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_media_review_screen.dart:54:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_media_review_screen.dart:57:22 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_media_review_screen.dart:114:27 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_media_review_screen.dart:114:27 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_media_review_screen.dart:163:35 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_media_review_screen.dart:164:38 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_media_review_screen.dart:343:24 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_media_review_screen.dart:422:61 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_media_review_screen.dart:422:61 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_media_review_screen.dart:424:61 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_media_review_screen.dart:424:61 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_media_review_screen.dart:426:61 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_media_review_screen.dart:426:61 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_media_review_screen.dart:429:64 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_media_review_screen.dart:429:64 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_media_review_screen.dart:430:64 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_media_review_screen.dart:430:64 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_media_review_screen.dart:431:64 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_media_review_screen.dart:431:64 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_media_review_screen.dart:432:64 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_media_review_screen.dart:432:64 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_media_review_screen.dart:433:64 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_media_review_screen.dart:433:64 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\admin\presentation\screens\admin_members_screen.dart:2:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_members_screen.dart:48:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_members_screen.dart:66:42 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_members_screen.dart:67:42 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_members_screen.dart:68:42 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_members_screen.dart:69:42 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_members_screen.dart:70:42 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_members_screen.dart:71:42 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_members_screen.dart:124:43 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_members_screen.dart:124:43 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_members_screen.dart:128:43 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_members_screen.dart:128:43 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_members_screen.dart:168:63 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_members_screen.dart:170:55 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_members_screen.dart:171:64 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_members_screen.dart:180:31 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_members_screen.dart:192:45 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_members_screen.dart:192:45 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_members_screen.dart:203:31 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_members_screen.dart:217:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_members_screen.dart:223:25 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_members_screen.dart:237:50 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_members_screen.dart:237:50 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_members_screen.dart:248:25 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\admin\presentation\screens\admin_moderation_screen.dart:9:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_moderation_screen.dart:31:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_moderation_screen.dart:50:37 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_moderation_screen.dart:99:39 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\admin\presentation\screens\admin_prayer_moderation_screen.dart:17:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_prayer_moderation_screen.dart:74:36 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_prayer_moderation_screen.dart:76:23 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_prayer_moderation_screen.dart:85:23 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_prayer_moderation_screen.dart:256:20 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_prayer_moderation_screen.dart:666:23 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\admin\presentation\screens\admin_sermons_screen.dart:2:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_sermons_screen.dart:22:21 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_sermons_screen.dart:32:46 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_sermons_screen.dart:32:46 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_sermons_screen.dart:36:25 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_sermons_screen.dart:46:39 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_sermons_screen.dart:122:39 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_sermons_screen.dart:122:39 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\admin\presentation\screens\admin_shell.dart:2:8 - uri_does_not_exist
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_shell.dart:19:21 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_shell.dart:19:21 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_shell.dart:24:21 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_shell.dart:24:21 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_shell.dart:29:21 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_shell.dart:29:21 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_shell.dart:34:21 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_shell.dart:34:21 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_shell.dart:39:21 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_shell.dart:39:21 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_shell.dart:44:21 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_shell.dart:44:21 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_shell.dart:49:21 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_shell.dart:49:21 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_shell.dart:54:21 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_shell.dart:54:21 - undefined_identifier
+  error - Invalid constant value - lib\features\admin\presentation\screens\admin_shell.dart:59:21 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_shell.dart:59:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_shell.dart:102:23 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_shell.dart:106:24 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_shell.dart:161:21 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\admin\presentation\screens\admin_tools_screen.dart:16:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\admin\presentation\screens\admin_tools_screen.dart:136:22 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:kingdom_heir/core/theme/colors.dart' - lib\features\admin\presentation\screens\admin_translation_manager_screen.dart:3:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: 'package:kingdom_heir/core/theme/text_styles.dart' - lib\features\admin\presentation\screens\admin_translation_manager_screen.dart:4:8 - uri_does_not_exist
+  error - Undefined name 'AppColors' - lib\features\admin\presentation\screens\admin_translation_manager_screen.dart:41:23 - undefined_identifier
+  error - Undefined name 'AppColors' - lib\features\admin\presentation\screens\admin_translation_manager_screen.dart:43:27 - undefined_identifier
+  error - Undefined name 'AppTextStyles' - lib\features\admin\presentation\screens\admin_translation_manager_screen.dart:77:22 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\admin\presentation\screens\admin_translation_manager_screen.dart:90:56 - deprecated_member_use
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\auth\presentation\screens\auth_callback_screen.dart:2:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\auth\presentation\screens\auth_callback_screen.dart:86:21 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\auth\presentation\screens\check_your_email_screen.dart:4:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\auth\presentation\screens\check_your_email_screen.dart:330:27 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\auth\presentation\screens\forgot_password_screen.dart:3:8 - uri_does_not_exist
+  error - Invalid constant value - lib\features\auth\presentation\screens\forgot_password_screen.dart:62:25 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\auth\presentation\screens\forgot_password_screen.dart:62:25 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\bible\presentation\screens\bible_discovery_search_screen.dart:3:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\bible\presentation\screens\bible_discovery_search_screen.dart:218:33 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\bible\presentation\screens\bible_reader_screen.dart:4:8 - uri_does_not_exist
+  error - Invalid constant value - lib\features\bible\presentation\screens\bible_reader_screen.dart:462:23 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\bible\presentation\screens\bible_reader_screen.dart:462:23 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\bible\presentation\screens\bible_reader_screen.dart:740:27 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\bible\presentation\screens\bible_reader_screen.dart:1588:27 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\bookstore\presentation\screens\kingdom_bookstore_screen.dart:3:8 - uri_does_not_exist
+  error - Invalid constant value - lib\features\bookstore\presentation\screens\kingdom_bookstore_screen.dart:20:40 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\bookstore\presentation\screens\kingdom_bookstore_screen.dart:20:40 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\bookstore\presentation\screens\kingdom_bookstore_screen.dart:35:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\bookstore\presentation\screens\kingdom_bookstore_screen.dart:89:45 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\challenge\presentation\screens\challenge_hub_screen.dart:2:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\challenge_hub_screen.dart:22:21 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\challenge\presentation\screens\group_reporting_screen.dart:2:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\group_reporting_screen.dart:91:21 - undefined_identifier
+  error - Invalid constant value - lib\features\challenge\presentation\screens\group_reporting_screen.dart:193:39 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\group_reporting_screen.dart:193:39 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\group_reporting_screen.dart:224:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\group_reporting_screen.dart:247:61 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\group_reporting_screen.dart:248:63 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\group_reporting_screen.dart:249:65 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\group_reporting_screen.dart:250:66 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\group_reporting_screen.dart:251:63 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\group_reporting_screen.dart:252:66 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\group_reporting_screen.dart:260:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\group_reporting_screen.dart:279:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\group_reporting_screen.dart:299:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\group_reporting_screen.dart:317:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\group_reporting_screen.dart:339:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\group_reporting_screen.dart:351:27 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\group_reporting_screen.dart:355:27 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\group_reporting_screen.dart:359:27 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\group_reporting_screen.dart:366:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\group_reporting_screen.dart:381:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\group_reporting_screen.dart:387:27 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\group_reporting_screen.dart:391:27 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\group_reporting_screen.dart:395:27 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\group_reporting_screen.dart:399:27 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\group_reporting_screen.dart:403:27 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\challenge\presentation\screens\participant_journey_screen.dart:2:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\challenge\presentation\screens\participant_journey_screen.dart:32:21 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\dashboard\presentation\widgets\giving\financial_stewardship_section.dart:18:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\dashboard\presentation\widgets\giving\financial_stewardship_section.dart:159:31 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\dashboard\presentation\widgets\greeting\greeting_header.dart:32:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\dashboard\presentation\widgets\greeting\greeting_header.dart:100:24 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\dashboard\presentation\widgets\inspiration\bottom_inspiration.dart:11:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\dashboard\presentation\widgets\inspiration\bottom_inspiration.dart:174:29 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\dashboard\presentation\widgets\live\live_and_upcoming_section.dart:21:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\dashboard\presentation\widgets\live\live_and_upcoming_section.dart:405:25 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\dashboard\presentation\widgets\states\dashboard_error_state.dart:7:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\dashboard\presentation\widgets\states\dashboard_error_state.dart:82:25 - undefined_identifier
+warning - The type argument(s) of the function 'rpc' can't be inferred - lib\features\devotionals\data\services\devotional_supabase_service.dart:18:12 - inference_failure_on_function_invocation
+warning - The type argument(s) of the function 'rpc' can't be inferred - lib\features\devotionals\data\services\devotional_supabase_service.dart:48:12 - inference_failure_on_function_invocation
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\devotionals\presentation\screens\devotional_day_reader_screen.dart:9:8 - uri_does_not_exist
+  error - Invalid constant value - lib\features\devotionals\presentation\screens\devotional_day_reader_screen.dart:154:46 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\devotionals\presentation\screens\devotional_day_reader_screen.dart:154:46 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\devotionals\presentation\screens\devotional_day_reader_screen.dart:370:41 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\devotionals\presentation\screens\devotional_prayer_screen.dart:10:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\devotionals\presentation\screens\devotional_prayer_screen.dart:606:29 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\devotionals\presentation\screens\devotional_reader_screen.dart:10:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\devotionals\presentation\screens\devotional_reader_screen.dart:95:39 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\devotionals\presentation\screens\devotional_series_detail_screen.dart:9:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\devotionals\presentation\screens\devotional_series_detail_screen.dart:124:45 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\devotionals\presentation\screens\devotional_series_detail_screen.dart:151:41 - undefined_identifier
+  error - Invalid constant value - lib\features\devotionals\presentation\screens\devotional_series_detail_screen.dart:217:38 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\devotionals\presentation\screens\devotional_series_detail_screen.dart:217:38 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\devotionals\presentation\screens\devotional_series_list_screen.dart:9:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\devotionals\presentation\screens\devotional_series_list_screen.dart:30:21 - undefined_identifier
+  error - Invalid constant value - lib\features\devotionals\presentation\screens\devotional_series_list_screen.dart:67:38 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\devotionals\presentation\screens\devotional_series_list_screen.dart:67:38 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\devotionals\presentation\screens\devotional_series_list_screen.dart:266:39 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\devotionals\presentation\screens\devotional_series_list_screen.dart:274:37 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\devotionals\presentation\screens\devotionals_screen.dart:8:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\devotionals\presentation\screens\devotionals_screen.dart:197:20 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\devotionals\presentation\screens\devotionals_screen.dart:1004:25 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\devotionals\presentation\screens\journal_screen.dart:10:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\devotionals\presentation\screens\journal_screen.dart:281:35 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\devotionals\presentation\screens\reflection_journal_screen.dart:3:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\devotionals\presentation\screens\reflection_journal_screen.dart:34:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\devotionals\presentation\screens\reflection_journal_screen.dart:65:39 - undefined_identifier
+  error - Invalid constant value - lib\features\devotionals\presentation\screens\reflection_journal_screen.dart:116:25 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\devotionals\presentation\screens\reflection_journal_screen.dart:116:25 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\devotionals\presentation\screens\reflection_screen.dart:9:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\devotionals\presentation\screens\reflection_screen.dart:301:29 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\devotionals\presentation\screens\scripture_reader_screen.dart:10:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\devotionals\presentation\screens\scripture_reader_screen.dart:125:41 - undefined_identifier
+   info - Sort directive sections alphabetically - lib\features\devotionals\presentation\widgets\devotional_progress_card.dart:19:1 - directives_ordering
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\devotionals\presentation\widgets\devotional_progress_card.dart:19:8 - uri_does_not_exist
+  error - Invalid constant value - lib\features\devotionals\presentation\widgets\devotional_progress_card.dart:319:20 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\devotionals\presentation\widgets\devotional_progress_card.dart:319:20 - undefined_identifier
+  error - Expected to find ',' - lib\features\devotionals\presentation\widgets\devotional_progress_card.dart:319:56 - expected_token
+  error - Too many positional arguments: 0 expected, but 6 found - lib\features\devotionals\presentation\widgets\devotional_progress_card.dart:319:56 - extra_positional_arguments
+  error - Undefined name 'completed' - lib\features\devotionals\presentation\widgets\devotional_progress_card.dart:319:56 - undefined_identifier
+  error - Expected to find ',' - lib\features\devotionals\presentation\widgets\devotional_progress_card.dart:319:66 - expected_token
+  error - Undefined name 'all' - lib\features\devotionals\presentation\widgets\devotional_progress_card.dart:319:66 - undefined_identifier
+  error - Expected to find ',' - lib\features\devotionals\presentation\widgets\devotional_progress_card.dart:319:70 - expected_token
+  error - Expected to find ',' - lib\features\devotionals\presentation\widgets\devotional_progress_card.dart:319:73 - expected_token
+  error - Undefined name 'days' - lib\features\devotionals\presentation\widgets\devotional_progress_card.dart:319:73 - undefined_identifier
+  error - Expected to find ',' - lib\features\devotionals\presentation\widgets\devotional_progress_card.dart:319:79 - expected_token
+  error - Illegal character '55356' - lib\features\devotionals\presentation\widgets\devotional_progress_card.dart:319:79 - illegal_character
+  error - Undefined name '🎉' - lib\features\devotionals\presentation\widgets\devotional_progress_card.dart:319:79 - undefined_identifier
+  error - Illegal character '57225' - lib\features\devotionals\presentation\widgets\devotional_progress_card.dart:319:80 - illegal_character
+  error - Expected to find ',' - lib\features\devotionals\presentation\widgets\devotional_progress_card.dart:319:81 - expected_token
+  error - Unterminated string literal - lib\features\devotionals\presentation\widgets\devotional_progress_card.dart:319:86 - unterminated_string_literal
+   info - Missing a required trailing comma - lib\features\devotionals\presentation\widgets\devotional_progress_card.dart:320:9 - require_trailing_commas
+warning - The type argument(s) of the function 'rpc' can't be inferred - lib\features\events\data\repositories\events_repository.dart:42:12 - inference_failure_on_function_invocation
+warning - The value of the local variable 'start' isn't used - lib\features\events\data\repositories\events_repository.dart:63:13 - unused_local_variable
+warning - The value of the local variable 'end' isn't used - lib\features\events\data\repositories\events_repository.dart:64:13 - unused_local_variable
+warning - The type argument(s) of the function 'rpc' can't be inferred - lib\features\events\data\repositories\events_repository.dart:67:12 - inference_failure_on_function_invocation
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\events\presentation\screens\event_details_screen.dart:3:8 - uri_does_not_exist
+  error - Invalid constant value - lib\features\events\presentation\screens\event_details_screen.dart:32:34 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\events\presentation\screens\event_details_screen.dart:32:34 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\events\presentation\screens\event_listing_screen.dart:3:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\events\presentation\screens\event_listing_screen.dart:27:21 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\events\presentation\screens\events_calendar_screen.dart:3:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\events\presentation\screens\events_calendar_screen.dart:51:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\events\presentation\screens\events_calendar_screen.dart:139:21 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\events\presentation\screens\tickets_attendance_screen.dart:3:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\events\presentation\screens\tickets_attendance_screen.dart:41:34 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\giving\presentation\screens\giving_history_screen.dart:3:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\giving\presentation\screens\giving_history_screen.dart:21:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\giving\presentation\screens\giving_history_screen.dart:26:25 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\giving\presentation\screens\giving_history_screen.dart:65:31 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\giving\presentation\screens\giving_stewardship_hub_screen.dart:4:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\giving\presentation\screens\giving_stewardship_hub_screen.dart:20:21 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\groups\presentation\screens\community_home_screen.dart:18:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\screens\community_home_screen.dart:63:28 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\groups\presentation\screens\group_chat_screen.dart:16:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\screens\group_chat_screen.dart:103:21 - undefined_identifier
+  error - Invalid constant value - lib\features\groups\presentation\screens\group_chat_screen.dart:108:23 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\screens\group_chat_screen.dart:108:23 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\screens\group_chat_screen.dart:116:25 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\screens\group_chat_screen.dart:125:25 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\screens\group_chat_screen.dart:165:22 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\screens\group_chat_screen.dart:199:26 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\screens\group_chat_screen.dart:249:27 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\screens\group_chat_screen.dart:254:27 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\screens\group_chat_screen.dart:262:27 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\screens\group_chat_screen.dart:343:29 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\screens\group_chat_screen.dart:349:29 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\groups\presentation\screens\group_detail_screen.dart:18:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\screens\group_detail_screen.dart:48:20 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\groups\presentation\screens\group_discovery_screen.dart:8:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\screens\group_discovery_screen.dart:43:21 - undefined_identifier
+  error - Invalid constant value - lib\features\groups\presentation\screens\group_discovery_screen.dart:82:37 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\screens\group_discovery_screen.dart:82:37 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\groups\presentation\screens\group_events_screen.dart:15:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\screens\group_events_screen.dart:64:26 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\groups\presentation\screens\group_leader_screen.dart:24:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\screens\group_leader_screen.dart:59:20 - undefined_identifier
+  error - Invalid constant value - lib\features\groups\presentation\screens\group_leader_screen.dart:189:43 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\screens\group_leader_screen.dart:189:43 - undefined_identifier
+  error - Invalid constant value - lib\features\groups\presentation\screens\group_leader_screen.dart:196:43 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\screens\group_leader_screen.dart:196:43 - undefined_identifier
+  error - Invalid constant value - lib\features\groups\presentation\screens\group_leader_screen.dart:274:40 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\screens\group_leader_screen.dart:274:40 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\screens\group_leader_screen.dart:306:25 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\screens\group_leader_screen.dart:366:29 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\groups\presentation\screens\group_prayer_screen.dart:13:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\screens\group_prayer_screen.dart:45:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\screens\group_prayer_screen.dart:77:26 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\groups\presentation\widgets\chat\chat_input_bar.dart:11:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\chat\chat_input_bar.dart:97:24 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\chat\chat_input_bar.dart:105:24 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\chat\chat_input_bar.dart:126:31 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\chat\chat_input_bar.dart:159:32 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\chat\chat_input_bar.dart:190:32 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\groups\presentation\widgets\chat\prayer_composer.dart:8:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\chat\prayer_composer.dart:162:27 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\groups\presentation\widgets\detail\members_strip.dart:6:8 - uri_does_not_exist
+  error - Invalid constant value - lib\features\groups\presentation\widgets\detail\members_strip.dart:34:44 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\detail\members_strip.dart:34:44 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\groups\presentation\widgets\detail\schedule_card.dart:6:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\detail\schedule_card.dart:58:31 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\groups\presentation\widgets\discovery\filter_sheet.dart:7:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\discovery\filter_sheet.dart:77:33 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\groups\presentation\widgets\home\announcements_section.dart:8:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\home\announcements_section.dart:46:24 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\groups\presentation\widgets\home\my_groups_section.dart:8:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\home\my_groups_section.dart:45:22 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\groups\presentation\widgets\home\prayer_requests_section.dart:10:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\home\prayer_requests_section.dart:49:24 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\groups\presentation\widgets\home\quick_actions_row.dart:8:8 - uri_does_not_exist
+  error - Invalid constant value - lib\features\groups\presentation\widgets\home\quick_actions_row.dart:46:28 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\home\quick_actions_row.dart:46:28 - undefined_identifier
+  error - Invalid constant value - lib\features\groups\presentation\widgets\home\quick_actions_row.dart:61:33 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\home\quick_actions_row.dart:61:33 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\groups\presentation\widgets\home\recently_active_section.dart:9:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\home\recently_active_section.dart:48:24 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\groups\presentation\widgets\home\suggested_groups_section.dart:9:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\home\suggested_groups_section.dart:48:24 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\groups\presentation\widgets\home\upcoming_meetings_section.dart:8:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\home\upcoming_meetings_section.dart:48:24 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\groups\presentation\widgets\leader\member_row.dart:7:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\leader\member_row.dart:78:24 - undefined_identifier
+  error - Invalid constant value - lib\features\groups\presentation\widgets\leader\member_row.dart:95:30 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\leader\member_row.dart:95:30 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\groups\presentation\widgets\leader\pending_request_card.dart:7:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\leader\pending_request_card.dart:138:31 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\leader\pending_request_card.dart:157:31 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\groups\presentation\widgets\prayer\prayer_card.dart:8:8 - uri_does_not_exist
+  error - Invalid constant value - lib\features\groups\presentation\widgets\prayer\prayer_card.dart:47:40 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\prayer\prayer_card.dart:47:40 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\prayer\prayer_card.dart:194:29 - undefined_identifier
+  error - Invalid constant value - lib\features\groups\presentation\widgets\prayer\prayer_card.dart:216:39 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\prayer\prayer_card.dart:216:39 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\prayer\prayer_card.dart:221:31 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\groups\presentation\widgets\prayer\prayer_composer_card.dart:8:8 - uri_does_not_exist
+  error - Invalid constant value - lib\features\groups\presentation\widgets\prayer\prayer_composer_card.dart:50:40 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\prayer\prayer_composer_card.dart:50:40 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\prayer\prayer_composer_card.dart:109:25 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\groups\presentation\widgets\prayer\prayer_composer_card.dart:173:27 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\kids\presentation\screens\parent_dashboard_kids_checkin_screen.dart:3:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\kids\presentation\screens\parent_dashboard_kids_checkin_screen.dart:19:34 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\kids\presentation\screens\parent_dashboard_kids_checkin_screen.dart:26:29 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\leadership\presentation\screens\leader_application_screen.dart:2:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\leadership\presentation\screens\leader_application_screen.dart:28:21 - undefined_identifier
+  error - Invalid constant value - lib\features\leadership\presentation\screens\leader_application_screen.dart:234:39 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\leadership\presentation\screens\leader_application_screen.dart:234:39 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\leadership\presentation\screens\leader_covenant_signature_screen.dart:2:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\leadership\presentation\screens\leader_covenant_signature_screen.dart:25:21 - undefined_identifier
+  error - Invalid constant value - lib\features\leadership\presentation\screens\leader_covenant_signature_screen.dart:96:36 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\leadership\presentation\screens\leader_covenant_signature_screen.dart:96:36 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\leadership\presentation\screens\leader_resources_screen.dart:2:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\leadership\presentation\screens\leader_resources_screen.dart:10:34 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\leadership\presentation\screens\leader_resources_screen.dart:11:32 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\live_service\presentation\widgets\announcements_and_after_live.dart:11:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\live_service\presentation\widgets\announcements_and_after_live.dart:569:27 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\live_service\presentation\widgets\announcements_and_after_live.dart:704:27 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\live_service\presentation\widgets\announcements_and_after_live.dart:797:35 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\live_service\presentation\widgets\announcements_and_after_live.dart:954:35 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\live_service\presentation\widgets\live_chat_panel.dart:12:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\live_service\presentation\widgets\live_chat_panel.dart:273:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\live_service\presentation\widgets\live_chat_panel.dart:278:27 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\live_service\presentation\widgets\live_hero_section.dart:10:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\live_service\presentation\widgets\live_hero_section.dart:66:33 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\live_service\presentation\widgets\live_prayer_panel.dart:9:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\live_service\presentation\widgets\live_prayer_panel.dart:281:25 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\live_service\presentation\widgets\sermon_notes_panel.dart:10:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\live_service\presentation\widgets\sermon_notes_panel.dart:147:31 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\live_service\presentation\widgets\sermon_notes_panel.dart:224:21 - undefined_identifier
+  error - Invalid constant value - lib\features\live_service\presentation\widgets\sermon_notes_panel.dart:228:23 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\live_service\presentation\widgets\sermon_notes_panel.dart:228:23 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\live_service\presentation\widgets\sermon_notes_panel.dart:236:25 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\live_service\presentation\widgets\sermon_notes_panel.dart:240:25 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\members\presentation\screens\member_directory_screen.dart:3:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\members\presentation\screens\member_directory_screen.dart:56:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\members\presentation\screens\member_directory_screen.dart:67:27 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\more\presentation\screens\more_screen.dart:45:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\more\presentation\screens\more_screen.dart:103:22 - undefined_identifier
+  error - Expected to find ',' - lib\features\more\presentation\screens\more_screen.dart:103:60 - expected_token
+  error - Too many positional arguments: 0 expected, but 5 found - lib\features\more\presentation\screens\more_screen.dart:103:60 - extra_positional_arguments_could_be_named
+  error - Undefined name 'load' - lib\features\more\presentation\screens\more_screen.dart:103:60 - undefined_identifier
+  error - Expected to find ',' - lib\features\more\presentation\screens\more_screen.dart:103:65 - expected_token
+  error - Undefined name 'the' - lib\features\more\presentation\screens\more_screen.dart:103:65 - undefined_identifier
+  error - Expected to find ',' - lib\features\more\presentation\screens\more_screen.dart:103:69 - expected_token
+  error - Undefined name 'Kingdom' - lib\features\more\presentation\screens\more_screen.dart:103:69 - undefined_identifier
+  error - Expected to find ',' - lib\features\more\presentation\screens\more_screen.dart:103:77 - expected_token
+  error - The getter '$err' isn't defined for the type 'Center' - lib\features\more\presentation\screens\more_screen.dart:103:85 - undefined_getter
+  error - Expected to find ',' - lib\features\more\presentation\screens\more_screen.dart:103:89 - expected_token
+  error - Unterminated string literal - lib\features\more\presentation\screens\more_screen.dart:103:90 - unterminated_string_literal
+  error - Expected to find ',' - lib\features\more\presentation\screens\more_screen.dart:104:13 - expected_token
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\more\presentation\widgets\account_section.dart:24:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\more\presentation\widgets\account_section.dart:143:21 - undefined_identifier
+warning - The type argument(s) of the function 'rpc' can't be inferred - lib\features\news\data\services\news_supabase_service.dart:24:12 - inference_failure_on_function_invocation
+warning - The type argument(s) of the function 'rpc' can't be inferred - lib\features\news\data\services\news_supabase_service.dart:45:12 - inference_failure_on_function_invocation
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\news\presentation\screens\news_announcements_screen.dart:3:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\news\presentation\screens\news_announcements_screen.dart:21:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\news\presentation\screens\news_announcements_screen.dart:98:43 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\news\presentation\screens\news_announcements_screen.dart:143:43 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\podcasts\presentation\screens\podcasts_audio_hub_screen.dart:3:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\podcasts\presentation\screens\podcasts_audio_hub_screen.dart:20:34 - undefined_identifier
+  error - Invalid constant value - lib\features\podcasts\presentation\screens\podcasts_audio_hub_screen.dart:50:49 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\podcasts\presentation\screens\podcasts_audio_hub_screen.dart:50:49 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\podcasts\presentation\screens\podcasts_audio_hub_screen.dart:141:35 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\prayer_requests\presentation\screens\my_prayers_screen.dart:14:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\prayer_requests\presentation\screens\my_prayers_screen.dart:38:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\prayer_requests\presentation\screens\my_prayers_screen.dart:51:22 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\prayer_requests\presentation\screens\prayer_feed_screen.dart:11:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\prayer_requests\presentation\screens\prayer_feed_screen.dart:56:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\prayer_requests\presentation\screens\prayer_feed_screen.dart:60:22 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\prayer_requests\presentation\screens\prayer_feed_screen.dart:68:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\prayer_requests\presentation\screens\prayer_feed_screen.dart:77:20 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\prayer_requests\presentation\screens\submit_prayer_screen.dart:10:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\prayer_requests\presentation\screens\submit_prayer_screen.dart:130:21 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\profile\presentation\screens\my_profile_screen.dart:4:8 - uri_does_not_exist
+  error - Invalid constant value - lib\features\profile\presentation\screens\my_profile_screen.dart:53:42 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\profile\presentation\screens\my_profile_screen.dart:53:42 - undefined_identifier
+  error - Invalid constant value - lib\features\profile\presentation\screens\my_profile_screen.dart:74:42 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\profile\presentation\screens\my_profile_screen.dart:74:42 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\profile\presentation\screens\my_profile_screen.dart:85:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\profile\presentation\screens\my_profile_screen.dart:89:22 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\search\presentation\screens\global_search_screen.dart:10:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\search\presentation\screens\global_search_screen.dart:182:35 - undefined_identifier
+warning - The type argument(s) of the function 'rpc' can't be inferred - lib\features\sermons\data\repositories\sermons_repository_impl.dart:36:12 - inference_failure_on_function_invocation
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\sermons\presentation\screens\sermon_audio_player_screen.dart:7:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\screens\sermon_audio_player_screen.dart:49:24 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\sermons\presentation\screens\sermon_continue_screen.dart:7:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\screens\sermon_continue_screen.dart:26:21 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\sermons\presentation\screens\sermon_details_screen.dart:10:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\screens\sermon_details_screen.dart:43:24 - undefined_identifier
+  error - Invalid constant value - lib\features\sermons\presentation\screens\sermon_details_screen.dart:93:33 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\screens\sermon_details_screen.dart:93:33 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\screens\sermon_details_screen.dart:198:27 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\screens\sermon_details_screen.dart:211:27 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\sermons\presentation\screens\sermon_downloads_screen.dart:7:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\screens\sermon_downloads_screen.dart:31:21 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\sermons\presentation\screens\sermon_library_screen.dart:8:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\screens\sermon_library_screen.dart:31:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\screens\sermon_library_screen.dart:36:22 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\sermons\presentation\screens\sermon_player_screen.dart:10:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\screens\sermon_player_screen.dart:109:24 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\sermons\presentation\widgets\audio\bookmark_picker.dart:7:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\audio\bookmark_picker.dart:73:33 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\sermons\presentation\widgets\continue_watching\continue_card.dart:9:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\continue_watching\continue_card.dart:126:35 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\sermons\presentation\widgets\details\sermon_hero.dart:7:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\details\sermon_hero.dart:43:20 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\details\sermon_hero.dart:53:20 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\details\sermon_hero.dart:59:20 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\sermons\presentation\widgets\details\sermon_notes_panel.dart:7:8 - uri_does_not_exist
+  error - Invalid constant value - lib\features\sermons\presentation\widgets\details\sermon_notes_panel.dart:105:37 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\details\sermon_notes_panel.dart:105:37 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\details\sermon_notes_panel.dart:178:39 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\sermons\presentation\widgets\details\sermon_prayer_panel.dart:7:8 - uri_does_not_exist
+  error - Invalid constant value - lib\features\sermons\presentation\widgets\details\sermon_prayer_panel.dart:103:29 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\details\sermon_prayer_panel.dart:103:29 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\details\sermon_prayer_panel.dart:112:29 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\details\sermon_prayer_panel.dart:113:32 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\details\sermon_prayer_panel.dart:132:33 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\sermons\presentation\widgets\details\sermon_reflections_panel.dart:8:8 - uri_does_not_exist
+  error - Invalid constant value - lib\features\sermons\presentation\widgets\details\sermon_reflections_panel.dart:127:35 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\details\sermon_reflections_panel.dart:127:35 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\details\sermon_reflections_panel.dart:137:39 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\details\sermon_reflections_panel.dart:146:39 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\details\sermon_reflections_panel.dart:197:41 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\sermons\presentation\widgets\details\sermon_resources_section.dart:9:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\details\sermon_resources_section.dart:110:22 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\sermons\presentation\widgets\home\continue_watching_row.dart:9:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\home\continue_watching_row.dart:58:31 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\sermons\presentation\widgets\home\downloads_shortcut.dart:7:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\home\downloads_shortcut.dart:67:31 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\sermons\presentation\widgets\home\featured_hero.dart:9:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\home\featured_hero.dart:123:39 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\home\featured_hero.dart:137:37 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\sermons\presentation\widgets\library\library_filter_sheet.dart:8:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\library\library_filter_sheet.dart:68:31 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\library\library_filter_sheet.dart:182:25 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\library\library_filter_sheet.dart:190:25 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\library\library_filter_sheet.dart:204:25 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\sermons\presentation\widgets\player\premium_video_controls.dart:12:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\player\premium_video_controls.dart:140:22 - undefined_identifier
+  error - Invalid constant value - lib\features\sermons\presentation\widgets\player\premium_video_controls.dart:144:33 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\player\premium_video_controls.dart:144:33 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\player\premium_video_controls.dart:155:22 - undefined_identifier
+  error - Invalid constant value - lib\features\sermons\presentation\widgets\player\premium_video_controls.dart:159:33 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\player\premium_video_controls.dart:159:33 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\player\premium_video_controls.dart:170:22 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\player\premium_video_controls.dart:178:22 - undefined_identifier
+  error - Invalid constant value - lib\features\sermons\presentation\widgets\player\premium_video_controls.dart:182:33 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\player\premium_video_controls.dart:182:33 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\player\premium_video_controls.dart:207:59 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\player\premium_video_controls.dart:210:29 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\player\premium_video_controls.dart:214:29 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\sermons\presentation\widgets\series\series_related_resources.dart:8:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\sermons\presentation\widgets\series\series_related_resources.dart:113:22 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\settings\presentation\screens\about_screen.dart:3:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\settings\presentation\screens\about_screen.dart:94:20 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\settings\presentation\screens\change_password_screen.dart:3:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\settings\presentation\screens\change_password_screen.dart:88:25 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\settings\presentation\screens\change_password_screen.dart:190:20 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\settings\presentation\screens\settings_notification_center_screen.dart:3:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\settings\presentation\screens\settings_notification_center_screen.dart:153:29 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\settings\presentation\screens\settings_notification_center_screen.dart:179:29 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\settings\presentation\screens\settings_notification_center_screen.dart:265:29 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\settings\presentation\screens\settings_notification_center_screen.dart:279:29 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\settings\presentation\screens\settings_notification_center_screen.dart:296:29 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\settings\presentation\screens\settings_notification_center_screen.dart:310:29 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\settings\presentation\screens\settings_notification_center_screen.dart:355:35 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\settings\presentation\screens\settings_notification_center_screen.dart:356:37 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\settings\presentation\screens\settings_notification_center_screen.dart:360:39 - undefined_identifier
+  error - Invalid constant value - lib\features\settings\presentation\screens\settings_notification_center_screen.dart:395:41 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\settings\presentation\screens\settings_notification_center_screen.dart:395:41 - undefined_identifier
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\features\settings\presentation\screens\settings_notification_center_screen.dart:395:61 - use_build_context_synchronously
+  error - Undefined name 'AppLocalizations' - lib\features\settings\presentation\screens\settings_notification_center_screen.dart:438:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\settings\presentation\screens\settings_notification_center_screen.dart:473:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\settings\presentation\screens\settings_notification_center_screen.dart:520:21 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\start_here\presentation\screens\founder_letter_screen.dart:2:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\start_here\presentation\screens\founder_letter_screen.dart:17:21 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\start_here\presentation\screens\kingdom_heirs_story_screen.dart:4:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\start_here\presentation\screens\kingdom_heirs_story_screen.dart:24:21 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\start_here\presentation\screens\statement_of_faith_screen.dart:4:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\start_here\presentation\screens\statement_of_faith_screen.dart:20:21 - undefined_identifier
+warning - The type argument(s) of the function 'rpc' can't be inferred - lib\features\testimonies\data\repositories\testimony_repository.dart:29:12 - inference_failure_on_function_invocation
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\testimonies\presentation\screens\submit_testimony_screen.dart:3:8 - uri_does_not_exist
+  error - Invalid constant value - lib\features\testimonies\presentation\screens\submit_testimony_screen.dart:68:27 - invalid_constant
+  error - Undefined name 'AppLocalizations' - lib\features\testimonies\presentation\screens\submit_testimony_screen.dart:68:27 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\testimonies\presentation\screens\submit_testimony_screen.dart:81:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\testimonies\presentation\screens\submit_testimony_screen.dart:226:29 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\testimonies\presentation\screens\testimonies_screen.dart:3:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\testimonies\presentation\screens\testimonies_screen.dart:62:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\testimonies\presentation\screens\testimonies_screen.dart:74:25 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\volunteers\presentation\screens\ministry_assignments_screen.dart:3:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\volunteers\presentation\screens\ministry_assignments_screen.dart:35:34 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\volunteers\presentation\screens\ministry_assignments_screen.dart:76:30 - undefined_identifier
+  error - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart' - lib\features\volunteers\presentation\screens\volunteer_hub_screen.dart:3:8 - uri_does_not_exist
+  error - Undefined name 'AppLocalizations' - lib\features\volunteers\presentation\screens\volunteer_hub_screen.dart:29:21 - undefined_identifier
+  error - Undefined name 'AppLocalizations' - lib\features\volunteers\presentation\screens\volunteer_hub_screen.dart:33:25 - undefined_identifier
+

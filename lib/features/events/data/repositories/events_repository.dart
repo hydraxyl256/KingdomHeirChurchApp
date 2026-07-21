@@ -10,10 +10,12 @@ final eventsRepositoryProvider = Provider<EventsRepository>((ref) {
 
 abstract class EventsRepository {
   /// Fetch all upcoming events (paginated/limited).
-  Future<Either<String, List<Event>>> getUpcomingEvents({int limit = 50});
+  Future<Either<String, List<Event>>> getUpcomingEvents(
+      {int limit = 50, String languageCode = 'en',});
 
   /// Fetch events for a specific month (for calendar view).
-  Future<Either<String, List<Event>>> getEventsByMonth(DateTime month);
+  Future<Either<String, List<Event>>> getEventsByMonth(DateTime month,
+      {String languageCode = 'en',});
 
   /// Fetch a single event by ID.
   Future<Either<String, Event>> getEventById(String id);
@@ -32,48 +34,43 @@ class SupabaseEventsRepository implements EventsRepository {
   final supabase.SupabaseClient _client;
 
   @override
-  Future<Either<String, List<Event>>> getUpcomingEvents(
-      {int limit = 50,}) async {
+  Future<Either<String, List<Event>>> getUpcomingEvents({
+    int limit = 50,
+    String languageCode = 'en',
+  }) async {
     try {
       // Public surface: only show events that have been published by an admin.
       // The `events.status` column defaults to 'draft' (see core_schema.sql),
       // so without this filter the query returns zero rows for non-admins.
-      final response = await _client
-          .from('events')
-          .select()
-          .eq('status', 'published')
-          .gte('end_at', DateTime.now().toIso8601String())
-          .order('start_at', ascending: true)
-          .limit(limit);
+      final response = await _client.rpc<List<dynamic>>('get_events_localized',
+          params: {'p_lang': languageCode},);
 
-      final events = (response as List)
-          .map((e) => EventModel.fromJson(e as Map<String, dynamic>))
-          .toList();
-
-      return right(events);
+      if (response.isNotEmpty) {
+        final events = response
+            .map((e) => EventModel.fromJson(e as Map<String, dynamic>))
+            .where((e) => e.endsAt.isAfter(DateTime.now()))
+            .take(limit)
+            .toList();
+        return right(events);
+      }
+      return right([]);
     } catch (e) {
       return left('Failed to load upcoming events: $e');
     }
   }
 
   @override
-  Future<Either<String, List<Event>>> getEventsByMonth(DateTime month) async {
+  Future<Either<String, List<Event>>> getEventsByMonth(DateTime month,
+      {String languageCode = 'en',}) async {
     try {
-      final start = DateTime(month.year, month.month);
-      final end = DateTime(month.year, month.month + 1, 0, 23, 59, 59);
+      final response = await _client.rpc<List<dynamic>>('get_events_localized',
+          params: {'p_lang': languageCode},);
 
-      final response = await _client
-          .from('events')
-          .select()
-          .eq('status', 'published')
-          .gte('start_at', start.toIso8601String())
-          .lte('start_at', end.toIso8601String())
-          .order('start_at', ascending: true);
-
-      final events = (response as List)
+      final events = response
           .map((e) => EventModel.fromJson(e as Map<String, dynamic>))
+          .where((e) =>
+              e.startsAt.year == month.year && e.startsAt.month == month.month,)
           .toList();
-
       return right(events);
     } catch (e) {
       return left('Failed to load events for the selected month: $e');

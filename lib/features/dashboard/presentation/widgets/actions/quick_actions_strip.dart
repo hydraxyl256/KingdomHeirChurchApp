@@ -56,7 +56,9 @@ class QuickActionsStrip extends StatelessWidget {
             builder: (context, constraints) {
               const crossAxisCount = 4;
               const spacing = AppSpacing.sm;
-              final itemWidth = (constraints.maxWidth - (spacing * (crossAxisCount - 1))) / crossAxisCount;
+              final itemWidth =
+                  (constraints.maxWidth - (spacing * (crossAxisCount - 1))) /
+                      crossAxisCount;
 
               return Wrap(
                 spacing: spacing,
@@ -148,9 +150,18 @@ class _ActionButton extends StatelessWidget {
   (IconData, Color) _styleFor(QuickActionItem a) => switch (a) {
         QuickActionItem.bible => (Iconography.bible, const Color(0xFF6366F1)),
         QuickActionItem.prayer => (Iconography.prayer, const Color(0xFFEAB308)),
-        QuickActionItem.live => (Icons.videocam_rounded, const Color(0xFFEF4444)),
-        QuickActionItem.study => (Icons.menu_book_rounded, const Color(0xFF10B981)),
-        QuickActionItem.groups => (Iconography.community, const Color(0xFFF97316)),
+        QuickActionItem.live => (
+            Icons.videocam_rounded,
+            const Color(0xFFEF4444)
+          ),
+        QuickActionItem.study => (
+            Icons.menu_book_rounded,
+            const Color(0xFF10B981)
+          ),
+        QuickActionItem.groups => (
+            Iconography.community,
+            const Color(0xFFF97316)
+          ),
         QuickActionItem.giving => (Iconography.giving, const Color(0xFF8B5CF6)),
         QuickActionItem.events => (Iconography.events, const Color(0xFF06B6D4)),
         QuickActionItem.journal => (Icons.edit_note, const Color(0xFF14B8A6)),

@@ -3,6 +3,7 @@ import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/widgets/app_button.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class ParticipantJourneyScreen extends StatefulWidget {
   const ParticipantJourneyScreen({super.key});
@@ -28,7 +29,7 @@ class _ParticipantJourneyScreenState extends State<ParticipantJourneyScreen> {
       backgroundColor:
           isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
       appBar: AppBar(
-        title: const Text('My Discipleship Journey'),
+        title: Text(AppLocalizations.of(context)!.myDiscipleshipJourney),
         backgroundColor: isDark ? AppColors.navyMid : AppColors.white,
       ),
       body: CustomScrollView(
@@ -80,8 +81,9 @@ class _ParticipantJourneyScreenState extends State<ParticipantJourneyScreen> {
                   title: Text(
                     'Day $dayNumber',
                     style: TextStyle(
-                        fontWeight:
-                            isCurrent ? FontWeight.bold : FontWeight.normal,),
+                      fontWeight:
+                          isCurrent ? FontWeight.bold : FontWeight.normal,
+                    ),
                   ),
                   subtitle: Text('Devotional Reading for Day $dayNumber'),
                   trailing: isCurrent
@@ -106,9 +108,10 @@ class _ParticipantJourneyScreenState extends State<ParticipantJourneyScreen> {
         border: Border.all(color: AppColors.gold.withValues(alpha: 0.2)),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),),
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: Column(
@@ -117,11 +120,15 @@ class _ParticipantJourneyScreenState extends State<ParticipantJourneyScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Overall Progress',
-                  style: AppTypography.textTheme.titleMedium,),
-              Text('${(percentComplete * 100).toInt()}%',
-                  style: AppTypography.textTheme.titleMedium
-                      ?.copyWith(color: AppColors.gold),),
+              Text(
+                'Overall Progress',
+                style: AppTypography.textTheme.titleMedium,
+              ),
+              Text(
+                '${(percentComplete * 100).toInt()}%',
+                style: AppTypography.textTheme.titleMedium
+                    ?.copyWith(color: AppColors.gold),
+              ),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -139,14 +146,19 @@ class _ParticipantJourneyScreenState extends State<ParticipantJourneyScreen> {
               _buildStatMetric('Current Day', currentDay.toString()),
               _buildStatMetric('Completed', '$completedDays / 90'),
               _buildStatMetric(
-                  'Certificate', '${(certificateProgress * 100).toInt()}%',),
+                'Certificate',
+                '${(certificateProgress * 100).toInt()}%',
+              ),
             ],
           ),
           const Divider(height: AppSpacing.xl),
           Row(
             children: [
-              const Icon(Icons.event_rounded,
-                  color: AppColors.navyAccent, size: 20,),
+              const Icon(
+                Icons.event_rounded,
+                color: AppColors.navyAccent,
+                size: 20,
+              ),
               const SizedBox(width: AppSpacing.sm),
               Text(
                 'Next Group Meeting: In 3 Days',
@@ -163,12 +175,16 @@ class _ParticipantJourneyScreenState extends State<ParticipantJourneyScreen> {
   Widget _buildStatMetric(String label, String value) {
     return Column(
       children: [
-        Text(value,
-            style: AppTypography.textTheme.headlineSmall
-                ?.copyWith(color: AppColors.gold, fontWeight: FontWeight.bold),),
-        Text(label,
-            style: AppTypography.textTheme.bodySmall
-                ?.copyWith(color: Colors.grey),),
+        Text(
+          value,
+          style: AppTypography.textTheme.headlineSmall
+              ?.copyWith(color: AppColors.gold, fontWeight: FontWeight.bold),
+        ),
+        Text(
+          label,
+          style:
+              AppTypography.textTheme.bodySmall?.copyWith(color: Colors.grey),
+        ),
       ],
     );
   }
@@ -190,18 +206,24 @@ class _ParticipantJourneyScreenState extends State<ParticipantJourneyScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
-                color: AppColors.gold.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(12),),
-            child: const Text('TODAY',
-                style: TextStyle(
-                    color: AppColors.gold,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,),),
+              color: AppColors.gold.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Text(
+              'TODAY',
+              style: TextStyle(
+                color: AppColors.gold,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
           const SizedBox(height: AppSpacing.md),
-          Text('Day $currentDay: The Power of Prayer',
-              style: AppTypography.textTheme.titleLarge
-                  ?.copyWith(color: Colors.white),),
+          Text(
+            'Day $currentDay: The Power of Prayer',
+            style: AppTypography.textTheme.titleLarge
+                ?.copyWith(color: Colors.white),
+          ),
           const SizedBox(height: AppSpacing.sm),
           const Text(
             'Read Matthew 6:5-15 and reflect on what it means to pray continually...',

@@ -109,8 +109,11 @@ class _LiveVideoPlayerState extends ConsumerState<LiveVideoPlayer> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.replay_rounded,
-                              color: Colors.white70, size: 12,),
+                          const Icon(
+                            Icons.replay_rounded,
+                            color: Colors.white70,
+                            size: 12,
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             'REPLAY',
@@ -257,8 +260,11 @@ class _PlayerError extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline_rounded,
-                color: AppColors.error, size: 36,),
+            const Icon(
+              Icons.error_outline_rounded,
+              color: AppColors.error,
+              size: 36,
+            ),
             const SizedBox(height: AppSpacing.md),
             Text(
               'Could not load stream',
@@ -266,7 +272,6 @@ class _PlayerError extends StatelessWidget {
                 color: Colors.white54,
               ),
             ),
-
           ],
         ),
       ),

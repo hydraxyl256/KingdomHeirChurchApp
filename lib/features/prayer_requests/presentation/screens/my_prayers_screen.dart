@@ -20,6 +20,7 @@ import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/widgets/app_empty_state.dart';
 import 'package:kingdom_heir/features/prayer_requests/domain/entities/prayer_request.dart';
 import 'package:kingdom_heir/features/prayer_requests/presentation/providers/prayer_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class MyPrayersScreen extends ConsumerWidget {
@@ -34,7 +35,7 @@ class MyPrayersScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('My Prayer Requests'),
+        title: Text(AppLocalizations.of(context)!.myPrayerRequests),
       ),
       body: RefreshIndicator(
         color: AppColors.gold,
@@ -47,7 +48,7 @@ class MyPrayersScreen extends ConsumerWidget {
             label: 'Loading your prayers...',
           ),
           error: (err, _) => AppErrorWidget(
-            message: 'We could not load your prayer requests. Please try again.',
+            message: AppLocalizations.of(context)!.weCouldNotLoadYourPrayer,
             onRetry: () => ref.invalidate(myPrayersProvider),
           ),
           data: (requests) {

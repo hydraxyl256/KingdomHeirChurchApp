@@ -126,9 +126,11 @@ class _UserRoleSelectionScreenState
           key: LocalStorageKeys.userRole,
           value: role.name,
         );
-    
+
     try {
-      await ref.read(authRemoteDataSourceProvider).updateProfile({'role': role.name});
+      await ref
+          .read(authRemoteDataSourceProvider)
+          .updateProfile({'role': role.name});
     } catch (_) {
       // Fallback to local storage if RLS blocks update
     }

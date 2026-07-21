@@ -16,7 +16,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/widgets/app_error_widget.dart';
@@ -30,6 +29,7 @@ import 'package:kingdom_heir/features/groups/presentation/widgets/detail/leader_
 import 'package:kingdom_heir/features/groups/presentation/widgets/detail/members_strip.dart';
 import 'package:kingdom_heir/features/groups/presentation/widgets/detail/prayer_wall_section.dart';
 import 'package:kingdom_heir/features/groups/presentation/widgets/detail/schedule_card.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class GroupDetailScreen extends ConsumerWidget {
   const GroupDetailScreen({required this.groupId, super.key});
@@ -45,7 +45,7 @@ class GroupDetailScreen extends ConsumerWidget {
       body: sections.detail.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, _) => AppErrorWidget(
-          message: 'Couldn’t load this group',
+          message: AppLocalizations.of(context)!.couldntLoadThisGroup,
           onRetry: () => ref.invalidate(groupSectionsProvider(groupId)),
         ),
         data: (detail) {

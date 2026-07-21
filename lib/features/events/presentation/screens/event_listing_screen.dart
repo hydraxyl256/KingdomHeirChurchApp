@@ -9,6 +9,7 @@ import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/widgets/app_empty_state.dart';
 import 'package:kingdom_heir/features/events/presentation/providers/events_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class EventListingScreen extends ConsumerWidget {
   const EventListingScreen({super.key});
@@ -23,7 +24,7 @@ class EventListingScreen extends ConsumerWidget {
       backgroundColor:
           isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
       appBar: AppBar(
-        title: const Text('Upcoming Events'),
+        title: Text(AppLocalizations.of(context)!.upcomingEvents),
         actions: [
           IconButton(
             icon: const Icon(Icons.calendar_month_rounded),
@@ -88,7 +89,8 @@ class EventListingScreen extends ConsumerWidget {
                       if (e.coverImageUrl != null)
                         ClipRRect(
                           borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(AppSpacing.radiusLg),),
+                            top: Radius.circular(AppSpacing.radiusLg),
+                          ),
                           child: Image.network(
                             e.coverImageUrl!,
                             height: 120,
@@ -106,12 +108,15 @@ class EventListingScreen extends ConsumerWidget {
                               end: Alignment.bottomRight,
                             ),
                             borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(AppSpacing.radiusLg),),
+                              top: Radius.circular(AppSpacing.radiusLg),
+                            ),
                           ),
                           child: Center(
-                            child: Icon(Icons.church_rounded,
-                                color: AppColors.gold.withValues(alpha: 0.3),
-                                size: 40,),
+                            child: Icon(
+                              Icons.church_rounded,
+                              color: AppColors.gold.withValues(alpha: 0.3),
+                              size: 40,
+                            ),
                           ),
                         ),
 
@@ -124,7 +129,9 @@ class EventListingScreen extends ConsumerWidget {
                               children: [
                                 Container(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 4,),
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
                                   decoration: BoxDecoration(
                                     color:
                                         AppColors.gold.withValues(alpha: 0.15),
@@ -142,17 +149,23 @@ class EventListingScreen extends ConsumerWidget {
                                 ),
                                 const Spacer(),
                                 if (e.isFree)
-                                  const Text('FREE',
-                                      style: TextStyle(
-                                          color: AppColors.success,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,),)
+                                  const Text(
+                                    'FREE',
+                                    style: TextStyle(
+                                      color: AppColors.success,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  )
                                 else
-                                  Text(e.priceLabel,
-                                      style: const TextStyle(
-                                          color: AppColors.tertiary,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,),),
+                                  Text(
+                                    e.priceLabel,
+                                    style: const TextStyle(
+                                      color: AppColors.tertiary,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
                               ],
                             ),
                             const SizedBox(height: AppSpacing.sm),
@@ -164,8 +177,11 @@ class EventListingScreen extends ConsumerWidget {
                             const SizedBox(height: AppSpacing.xs),
                             Row(
                               children: [
-                                const Icon(Icons.calendar_today_rounded,
-                                    size: 14, color: Colors.grey,),
+                                const Icon(
+                                  Icons.calendar_today_rounded,
+                                  size: 14,
+                                  color: Colors.grey,
+                                ),
                                 const SizedBox(width: 4),
                                 Text(
                                   DateFormat('EEEE, MMM d · h:mm a')
@@ -178,8 +194,11 @@ class EventListingScreen extends ConsumerWidget {
                             const SizedBox(height: 4),
                             Row(
                               children: [
-                                const Icon(Icons.location_on_rounded,
-                                    size: 14, color: Colors.grey,),
+                                const Icon(
+                                  Icons.location_on_rounded,
+                                  size: 14,
+                                  color: Colors.grey,
+                                ),
                                 const SizedBox(width: 4),
                                 Expanded(
                                   child: Text(

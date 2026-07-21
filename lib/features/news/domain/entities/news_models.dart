@@ -42,7 +42,8 @@ class NewsArticle extends Equatable {
     return NewsArticle(
       id: json['id'] as String,
       categoryId: json['category_id'] as String?,
-      categoryName: (json['news_categories'] as Map<String, dynamic>?)?['name'] as String?,
+      categoryName: (json['news_categories'] as Map<String, dynamic>?)?['name']
+          as String?,
       title: json['title'] as String,
       content: json['content'] as String,
       preview: json['preview'] as String,

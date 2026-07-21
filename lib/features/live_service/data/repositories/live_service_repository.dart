@@ -85,7 +85,8 @@ class LiveServiceRepository {
         });
   }
 
-  Future<void> sendChatMessage(String serviceId, String body, String userId) async {
+  Future<void> sendChatMessage(
+      String serviceId, String body, String userId,) async {
     await _db.from('live_chat_messages').insert({
       'live_service_id': serviceId,
       'user_id': userId,
@@ -93,7 +94,8 @@ class LiveServiceRepository {
     });
   }
 
-  Future<void> saveSermonNote(String serviceId, String userId, String body) async {
+  Future<void> saveSermonNote(
+      String serviceId, String userId, String body,) async {
     await _db.from('sermon_notes').insert({
       'live_service_id': serviceId,
       'user_id': userId,

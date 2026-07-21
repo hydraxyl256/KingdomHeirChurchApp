@@ -63,8 +63,7 @@ class CommunityHighlightSection extends StatelessWidget {
         icon: Iconography.meeting,
         color: AppColors.success,
         title: 'Meeting',
-        subtitle: highlight.upcomingGroupMeeting ??
-            'No meeting scheduled',
+        subtitle: highlight.upcomingGroupMeeting ?? 'No meeting scheduled',
         isEmpty: highlight.upcomingGroupMeeting == null,
         onTap: onGroupsTap,
       ),
@@ -96,8 +95,7 @@ class CommunityHighlightSection extends StatelessWidget {
                 height: 36,
                 decoration: BoxDecoration(
                   color: AppColors.goldContainer,
-                  borderRadius:
-                      BorderRadius.circular(AppSpacing.radiusSm),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                 ),
                 child: const Icon(
                   Iconography.community,
@@ -211,8 +209,7 @@ class _Tile extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                borderRadius:
-                    BorderRadius.circular(AppSpacing.radiusMd),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                 border: Border.all(color: AppColors.dividerLight),
                 boxShadow: [
                   BoxShadow(
@@ -256,8 +253,7 @@ class _Tile extends StatelessWidget {
                                   ),
                                   decoration: BoxDecoration(
                                     color: data.color,
-                                    borderRadius:
-                                        BorderRadius.circular(7),
+                                    borderRadius: BorderRadius.circular(7),
                                   ),
                                   child: Center(
                                     child: Text(

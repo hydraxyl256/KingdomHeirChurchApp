@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
@@ -16,6 +15,7 @@ import 'package:kingdom_heir/core/theme/motion.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/features/devotionals/domain/entities/devotional_journey_models.dart';
 import 'package:kingdom_heir/features/devotionals/presentation/providers/devotional_journey_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class ReflectionScreen extends ConsumerStatefulWidget {
   const ReflectionScreen({required this.devotionalId, super.key});
@@ -268,10 +268,7 @@ class _PromptCard extends StatelessWidget {
                   ),
                 ],
               ),
-            )
-                .animate()
-                .fadeIn(duration: AppMotion.emphasized)
-                .slideY(
+            ).animate().fadeIn(duration: AppMotion.emphasized).slideY(
                   begin: 0.06,
                   end: 0,
                   duration: AppMotion.emphasized,
@@ -298,7 +295,8 @@ class _PromptCard extends StatelessWidget {
                   height: 1.65,
                 ),
                 decoration: InputDecoration(
-                  hintText: 'Write your thoughts here… (optional)',
+                  hintText: AppLocalizations.of(context)!
+                      .writeYourThoughtsHereOptional,
                   hintStyle: AppTypography.textTheme.bodyLarge?.copyWith(
                     color: AppColors.textDisabled,
                     height: 1.65,
@@ -307,9 +305,7 @@ class _PromptCard extends StatelessWidget {
                   contentPadding: const EdgeInsets.all(AppSpacing.lg),
                 ),
               ),
-            )
-                .animate()
-                .fadeIn(
+            ).animate().fadeIn(
                   delay: 150.ms,
                   duration: AppMotion.standard,
                 ),
@@ -355,7 +351,8 @@ class _ReflectionActionBar extends StatelessWidget {
       ),
       decoration: const BoxDecoration(
         color: AppColors.backgroundLight,
-        border: Border(top: BorderSide(color: AppColors.dividerLight, width: 0.5)),
+        border:
+            Border(top: BorderSide(color: AppColors.dividerLight, width: 0.5)),
       ),
       child: Row(
         children: [
@@ -411,8 +408,11 @@ class _ReflectionActionBar extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: AppSpacing.sm),
-                    const Icon(Icons.arrow_forward_rounded,
-                        color: AppColors.ink, size: 18,),
+                    const Icon(
+                      Icons.arrow_forward_rounded,
+                      color: AppColors.ink,
+                      size: 18,
+                    ),
                   ],
                 ),
               ),

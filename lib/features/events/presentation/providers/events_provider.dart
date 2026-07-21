@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kingdom_heir/core/localization/locale_provider.dart';
 import 'package:kingdom_heir/features/events/data/repositories/events_repository.dart';
 import 'package:kingdom_heir/features/events/domain/entities/event.dart';
 
@@ -23,7 +24,9 @@ class UpcomingEventsNotifier extends AsyncNotifier<List<Event>> {
   @override
   Future<List<Event>> build() async {
     final repo = ref.watch(eventsRepositoryProvider);
-    final result = await repo.getUpcomingEvents();
+    final locale = ref.watch(localeProvider);
+    final result =
+        await repo.getUpcomingEvents(languageCode: locale.languageCode);
 
     return result.fold(
       (err) => throw Exception(err),
@@ -59,7 +62,9 @@ class UpcomingEventsNotifier extends AsyncNotifier<List<Event>> {
 final monthlyEventsProvider =
     FutureProvider.family<List<Event>, DateTime>((ref, month) async {
   final repo = ref.watch(eventsRepositoryProvider);
-  final result = await repo.getEventsByMonth(month);
+  final locale = ref.watch(localeProvider);
+  final result =
+      await repo.getEventsByMonth(month, languageCode: locale.languageCode);
 
   return result.fold(
     (err) => throw Exception(err),

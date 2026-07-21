@@ -103,7 +103,8 @@ class GlassCard extends StatelessWidget {
               child: Padding(
                 padding: padding ??
                     EdgeInsets.all(
-                        Insets.of(context).lg + Insets.of(context).xs,),
+                      Insets.of(context).lg + Insets.of(context).xs,
+                    ),
                 child: child,
               ),
             ),
@@ -131,7 +132,8 @@ class GlassCard extends StatelessWidget {
   ) =>
       switch (tone) {
         GlassCardTone.navyGold => section.heroBackgroundTop,
-        GlassCardTone.warm => isDark ? AppColors.navyAccent : AppColors.goldContainer,
+        GlassCardTone.warm =>
+          isDark ? AppColors.navyAccent : AppColors.goldContainer,
         GlassCardTone.pure =>
           isDark ? AppColors.surfaceContainerHighLight : AppColors.warmWhite,
       };

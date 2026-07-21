@@ -17,8 +17,11 @@ abstract final class AppValidators {
   }
 
   /// Returns an error string if [value] is shorter than [minLength].
-  static String? minLength(String? value, int minLength,
-      [String fieldName = 'Password',]) {
+  static String? minLength(
+    String? value,
+    int minLength, [
+    String fieldName = 'Password',
+  ]) {
     if (value == null || value.isEmpty) return '$fieldName is required';
     if (value.length < minLength) {
       return '$fieldName must be at least $minLength characters';

@@ -11,13 +11,13 @@ import 'package:flutter/foundation.dart';
 
 /// The 7 steps of a daily devotional journey.
 enum JourneyStep {
-  home,       // 0 — Devotional home / selection
-  scripture,  // 1 — Read scripture
-  content,    // 2 — Read devotional body
+  home, // 0 — Devotional home / selection
+  scripture, // 1 — Read scripture
+  content, // 2 — Read devotional body
   reflection, // 3 — Reflect on prompts
-  prayer,     // 4 — Guided prayer
-  journal,    // 5 — Journal entry
-  complete,   // 6 — Journey complete
+  prayer, // 4 — Guided prayer
+  journal, // 5 — Journal entry
+  complete, // 6 — Journey complete
 }
 
 extension JourneyStepX on JourneyStep {
@@ -112,7 +112,15 @@ class DevotionalStreak {
         longestStreak = 0,
         totalCompletedDays = 0,
         lastCompletedDate = null,
-        weeklyCompletion = const [false, false, false, false, false, false, false];
+        weeklyCompletion = const [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+        ];
 
   factory DevotionalStreak.fromJson(Map<String, dynamic> json) {
     return DevotionalStreak(

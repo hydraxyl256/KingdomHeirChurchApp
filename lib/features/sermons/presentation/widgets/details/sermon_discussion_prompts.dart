@@ -39,8 +39,11 @@ class SermonDiscussionPrompts extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.groups_rounded,
-                      color: AppColors.gold, size: 18,),
+                  const Icon(
+                    Icons.groups_rounded,
+                    color: AppColors.gold,
+                    size: 18,
+                  ),
                   const SizedBox(width: AppSpacing.xs),
                   Text(
                     'Discuss together',

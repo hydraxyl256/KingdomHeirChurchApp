@@ -37,6 +37,14 @@ class KingdomHeirApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
+      builder: (context, child) {
+        // Enforce RTL directionality for Urdu, LTR for others
+        final isRtl = locale.languageCode == 'ur';
+        return Directionality(
+          textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
   }
 }

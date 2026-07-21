@@ -8,6 +8,7 @@ import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/widgets/app_button.dart';
 import 'package:kingdom_heir/core/widgets/app_text_field.dart';
 import 'package:kingdom_heir/features/testimonies/presentation/providers/testimony_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 const _categories = [
   'General',
@@ -63,8 +64,9 @@ class _SubmitTestimonyScreenState extends ConsumerState<SubmitTestimonyScreen> {
       } else {
         context.pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('🙌 Testimony submitted for review. Thank you!'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!
+                .testimonySubmittedForReviewThankYou,),
           ),
         );
       }
@@ -77,7 +79,7 @@ class _SubmitTestimonyScreenState extends ConsumerState<SubmitTestimonyScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Share Your Testimony'),
+        title: Text(AppLocalizations.of(context)!.shareYourTestimony),
         leading: const BackButton(),
       ),
       body: Form(
@@ -222,7 +224,7 @@ class _SubmitTestimonyScreenState extends ConsumerState<SubmitTestimonyScreen> {
             Card(
               margin: EdgeInsets.zero,
               child: SwitchListTile(
-                title: const Text('Share anonymously'),
+                title: Text(AppLocalizations.of(context)!.shareAnonymously),
                 subtitle: const Text(
                   'Your name will be hidden from other members',
                 ),

@@ -5,11 +5,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:kingdom_heir/core/widgets/app_error_widget.dart';
 import 'package:kingdom_heir/features/sermons/presentation/providers/sermon_continue_provider.dart';
 import 'package:kingdom_heir/features/sermons/presentation/providers/sermons_provider.dart';
 import 'package:kingdom_heir/features/sermons/presentation/widgets/audio/full_audio_player.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class SermonAudioPlayerScreen extends ConsumerStatefulWidget {
   const SermonAudioPlayerScreen({required this.sermonId, super.key});
@@ -46,7 +46,7 @@ class _SermonAudioPlayerScreenState
         data: (sermon) {
           if (sermon == null) {
             return AppErrorWidget(
-              message: 'Sermon not found',
+              message: AppLocalizations.of(context)!.sermonNotFound,
               onRetry: () =>
                   ref.invalidate(sermonDetailProvider(widget.sermonId)),
             );

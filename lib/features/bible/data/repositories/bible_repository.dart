@@ -48,9 +48,9 @@ class BibleRepositoryImpl implements BibleRepository {
     required this.supabaseService,
   });
 
-  final BibleApiService       apiService;
-  final BibleLocalCache       localCache;
-  final BibleSupabaseService  supabaseService;
+  final BibleApiService apiService;
+  final BibleLocalCache localCache;
+  final BibleSupabaseService supabaseService;
 
   // ── Versions ─────────────────────────────────────────────────────────────────
 
@@ -112,8 +112,7 @@ class BibleRepositoryImpl implements BibleRepository {
       final cached = localCache.getCachedContent(versionId, chapterId);
       if (cached != null) return right(cached);
 
-      final content =
-          await apiService.getChapterContent(versionId, chapterId);
+      final content = await apiService.getChapterContent(versionId, chapterId);
       await localCache.cacheContent(versionId, chapterId, content);
       return right(content);
     } catch (e) {
@@ -152,7 +151,8 @@ class BibleRepositoryImpl implements BibleRepository {
 
   @override
   Future<Either<String, List<BibleHighlight>>> getHighlights(
-          int versionId,) =>
+    int versionId,
+  ) =>
       supabaseService.getHighlights(versionId);
 
   @override

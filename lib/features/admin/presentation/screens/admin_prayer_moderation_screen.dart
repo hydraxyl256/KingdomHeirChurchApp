@@ -23,6 +23,7 @@ import 'package:kingdom_heir/core/widgets/app_text_field.dart';
 import 'package:kingdom_heir/features/auth/presentation/providers/auth_provider.dart';
 import 'package:kingdom_heir/features/prayer_requests/domain/entities/prayer_request.dart';
 import 'package:kingdom_heir/features/prayer_requests/presentation/providers/prayer_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class AdminPrayerModerationScreen extends ConsumerStatefulWidget {
@@ -63,16 +64,18 @@ class _AdminPrayerModerationScreenState
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text(
-                  'You do not have admin permissions to view this page.',),
+                'You do not have admin permissions to view this page.',
+              ),
               backgroundColor: scheme.error,
             ),
           );
         }
       });
       return Scaffold(
-        appBar: AppBar(title: const Text('Prayer Moderation')),
-        body: const Center(
-          child: Text('Redirecting…'),
+        appBar:
+            AppBar(title: Text(AppLocalizations.of(context)!.prayerModeration)),
+        body: Center(
+          child: Text(AppLocalizations.of(context)!.redirecting),
         ),
       );
     }
@@ -81,7 +84,7 @@ class _AdminPrayerModerationScreenState
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Prayer Moderation'),
+          title: Text(AppLocalizations.of(context)!.prayerModeration),
           bottom: TabBar(
             controller: _tab,
             tabs: const [
@@ -177,9 +180,8 @@ class _ApprovedTab extends ConsumerWidget {
             dialogBody:
                 'This will hide the request from the Prayer Wall again until it is re-approved.',
             confirmLabel: 'Move to pending',
-            onConfirm: (_) => ref
-                .read(adminPrayerModerationProvider)
-                .returnToPending(req.id),
+            onConfirm: (_) =>
+                ref.read(adminPrayerModerationProvider).returnToPending(req.id),
             successMessage: 'Prayer request moved back to the pending queue.',
           ),
         ],
@@ -212,9 +214,8 @@ class _RejectedTab extends ConsumerWidget {
             dialogBody:
                 'This will move the request back into the pending queue so it can be reviewed again.',
             confirmLabel: 'Restore',
-            onConfirm: (_) => ref
-                .read(adminPrayerModerationProvider)
-                .returnToPending(req.id),
+            onConfirm: (_) =>
+                ref.read(adminPrayerModerationProvider).returnToPending(req.id),
             successMessage: 'Prayer request restored to pending review.',
           ),
         ],
@@ -252,8 +253,7 @@ class _PrayerList extends StatelessWidget {
           label: 'Loading prayer requests...',
         ),
         error: (err, _) => AppErrorWidget(
-          message:
-              'We could not load the moderation queue. Please try again.',
+          message: AppLocalizations.of(context)!.weCouldNotLoadTheModeration,
           onRetry: onRefresh,
         ),
         data: (requests) {
@@ -276,8 +276,7 @@ class _PrayerList extends StatelessWidget {
             padding: const EdgeInsets.all(AppSpacing.lg),
             physics: const AlwaysScrollableScrollPhysics(),
             itemCount: requests.length,
-            separatorBuilder: (_, __) =>
-                const SizedBox(height: AppSpacing.md),
+            separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.md),
             itemBuilder: (_, i) => buildCard(requests[i]),
           );
         },
@@ -663,13 +662,13 @@ class _AdminActionDialogState extends State<_AdminActionDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(AppLocalizations.of(context)!.cancel),
         ),
         ElevatedButton(
-          onPressed: () => Navigator.of(context).pop(_noteController.text.trim()),
+          onPressed: () =>
+              Navigator.of(context).pop(_noteController.text.trim()),
           style: ElevatedButton.styleFrom(
-            backgroundColor:
-                widget.destructive ? scheme.error : AppColors.gold,
+            backgroundColor: widget.destructive ? scheme.error : AppColors.gold,
             foregroundColor:
                 widget.destructive ? scheme.onError : AppColors.ink,
             elevation: 0,

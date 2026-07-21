@@ -2,12 +2,11 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:kingdom_heir/core/di/providers.dart';
-import 'package:kingdom_heir/core/router/route_names.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/utils/donation_launcher.dart';
 import 'package:kingdom_heir/features/giving/presentation/providers/giving_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class GivingStewardshipHubScreen extends ConsumerWidget {
   const GivingStewardshipHubScreen({super.key});
@@ -18,14 +17,7 @@ class GivingStewardshipHubScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Giving & Stewardship'),
-        actions: [
-          TextButton.icon(
-            onPressed: () => context.go(RouteNames.givingHistory),
-            icon: const Icon(Icons.history_rounded),
-            label: const Text('History'),
-          ),
-        ],
+        title: Text(AppLocalizations.of(context)!.givingStewardship),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.md),
@@ -298,11 +290,9 @@ class _DonateSecurelyCtaState extends State<_DonateSecurelyCta> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: scheme.primary,
                 foregroundColor: scheme.onPrimary,
-                disabledBackgroundColor:
-                    scheme.primary.withValues(alpha: 0.45),
+                disabledBackgroundColor: scheme.primary.withValues(alpha: 0.45),
                 shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(AppSpacing.radiusMd),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                 ),
                 elevation: 0,
               ),
@@ -338,18 +328,6 @@ class _DonateSecurelyCtaState extends State<_DonateSecurelyCta> {
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
-          Center(
-            child: TextButton.icon(
-              onPressed: _busy
-                  ? null
-                  : () => context.go(RouteNames.givingHistory),
-              icon: const Icon(Icons.history_rounded, size: 18),
-              label: const Text('View giving history'),
-              style: TextButton.styleFrom(
-                foregroundColor: scheme.primary,
-              ),
-            ),
-          ),
         ],
       ),
     );

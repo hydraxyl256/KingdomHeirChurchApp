@@ -5,6 +5,7 @@ import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/widgets/app_button.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class ChallengeHubScreen extends StatelessWidget {
   const ChallengeHubScreen({super.key});
@@ -18,7 +19,7 @@ class ChallengeHubScreen extends StatelessWidget {
       backgroundColor:
           isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
       appBar: AppBar(
-        title: const Text('90-Day Challenge'),
+        title: Text(AppLocalizations.of(context)!.ninetyDayChallenge),
         backgroundColor: isDark ? AppColors.navyMid : AppColors.white,
       ),
       body: SingleChildScrollView(
@@ -38,8 +39,11 @@ class ChallengeHubScreen extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  const Icon(Icons.shield_rounded,
-                      size: 64, color: AppColors.gold,),
+                  const Icon(
+                    Icons.shield_rounded,
+                    size: 64,
+                    color: AppColors.gold,
+                  ),
                   const SizedBox(height: AppSpacing.md),
                   Text(
                     '90-Day Discipleship Challenge',

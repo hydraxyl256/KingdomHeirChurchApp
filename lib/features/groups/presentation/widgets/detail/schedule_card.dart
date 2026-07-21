@@ -6,13 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/features/groups/domain/entities/group_event_models.dart';
 import 'package:kingdom_heir/features/groups/presentation/providers/groups_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class ScheduleCard extends ConsumerWidget {
   const ScheduleCard({required this.groupId, super.key});
@@ -55,7 +55,7 @@ class ScheduleCard extends ConsumerWidget {
                     minimumSize: const Size(0, 28),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                  child: const Text('View all'),
+                  child: Text(AppLocalizations.of(context)!.viewAll),
                 ),
               ],
             ),

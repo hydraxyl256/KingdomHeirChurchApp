@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
@@ -26,6 +25,7 @@ import 'package:kingdom_heir/features/sermons/presentation/widgets/details/sermo
 import 'package:kingdom_heir/features/sermons/presentation/widgets/details/sermon_reflections_panel.dart';
 import 'package:kingdom_heir/features/sermons/presentation/widgets/details/sermon_resources_section.dart';
 import 'package:kingdom_heir/features/sermons/presentation/widgets/details/sermon_scripture_chips.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class SermonDetailsScreen extends ConsumerWidget {
   const SermonDetailsScreen({required this.sermonId, super.key});
@@ -40,7 +40,7 @@ class SermonDetailsScreen extends ConsumerWidget {
         data: (sermon) {
           if (sermon == null) {
             return AppErrorWidget(
-              message: 'Sermon not found',
+              message: AppLocalizations.of(context)!.sermonNotFound,
               onRetry: () => ref.invalidate(sermonDetailProvider(sermonId)),
             );
           }
@@ -89,8 +89,9 @@ class _DetailsBody extends ConsumerWidget {
                   .read(sermonsListProvider.notifier)
                   .toggleFavourite(sermon.id),
               onDownload: () => ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Audio download — coming soon'),
+                SnackBar(
+                  content: Text(
+                      AppLocalizations.of(context)!.audioDownloadComingSoon,),
                   behavior: SnackBarBehavior.floating,
                 ),
               ),
@@ -195,7 +196,7 @@ class _BottomActionBar extends StatelessWidget {
                 minimumSize: const Size.fromHeight(48),
               ),
               icon: const Icon(Icons.play_arrow_rounded),
-              label: const Text('Watch'),
+              label: Text(AppLocalizations.of(context)!.watch),
             ),
           ),
           if (sermon.hasAudio) ...[
@@ -208,7 +209,7 @@ class _BottomActionBar extends StatelessWidget {
                 minimumSize: const Size.fromHeight(48),
               ),
               icon: const Icon(Icons.headphones_rounded),
-              label: const Text('Audio'),
+              label: Text(AppLocalizations.of(context)!.audio),
             ),
           ],
         ],

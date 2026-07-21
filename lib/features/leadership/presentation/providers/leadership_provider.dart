@@ -6,7 +6,8 @@ final submitLeaderApplicationProvider =
     StateNotifierProvider<SubmitLeaderApplicationNotifier, AsyncValue<void>>(
         (ref) {
   return SubmitLeaderApplicationNotifier(
-      ref.watch(leadershipRepositoryProvider),);
+    ref.watch(leadershipRepositoryProvider),
+  );
 });
 
 class SubmitLeaderApplicationNotifier extends StateNotifier<AsyncValue<void>> {

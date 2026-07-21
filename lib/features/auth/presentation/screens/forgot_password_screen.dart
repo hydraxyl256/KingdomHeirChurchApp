@@ -8,6 +8,7 @@ import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/widgets/app_button.dart';
 import 'package:kingdom_heir/core/widgets/app_text_field.dart';
 import 'package:kingdom_heir/features/auth/presentation/providers/auth_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
@@ -57,8 +58,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     }
     if (!opened && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No mail app available on this device.'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.noMailAppAvailableOnThis),
         ),
       );
     }

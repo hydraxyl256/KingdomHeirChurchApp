@@ -123,7 +123,8 @@ class _TaskTimeline extends StatelessWidget {
           children: [
             for (int i = 0; i < tasks.length; i++)
               Padding(
-                padding: EdgeInsets.only(bottom: i == tasks.length - 1 ? 0 : AppSpacing.lg),
+                padding: EdgeInsets.only(
+                    bottom: i == tasks.length - 1 ? 0 : AppSpacing.lg,),
                 child: _TimelineNode(
                   task: tasks[i],
                   onTap: () => onTaskTap?.call(tasks[i]),
@@ -157,7 +158,8 @@ class _TimelineNode extends StatelessWidget {
 
     return Semantics(
       button: true,
-      label: 'Task: ${task.displayLabel}. ${task.isCompleted ? "Completed" : "Not completed"}',
+      label:
+          'Task: ${task.displayLabel}. ${task.isCompleted ? "Completed" : "Not completed"}',
       child: GestureDetector(
         onTap: () {
           if (task.isCompleted) {
@@ -179,7 +181,9 @@ class _TimelineNode extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   // Completed = gold filled; uncompleted = adaptive surface
-                  color: task.isCompleted ? AppColors.goldDark : cs.surfaceContainerHigh,
+                  color: task.isCompleted
+                      ? AppColors.goldDark
+                      : cs.surfaceContainerHigh,
                   border: Border.all(
                     color: AppColors.goldDark,
                     width: 2,
@@ -188,7 +192,8 @@ class _TimelineNode extends StatelessWidget {
                 ),
                 child: Center(
                   child: task.isCompleted
-                      ? const Icon(Icons.check_rounded, color: Colors.white, size: 20)
+                      ? const Icon(Icons.check_rounded,
+                          color: Colors.white, size: 20,)
                       : Icon(icon, color: AppColors.goldDark, size: 20),
                 ),
               ),
@@ -204,11 +209,11 @@ class _TimelineNode extends StatelessWidget {
                     task.displayLabel,
                     style: AppTypography.textTheme.titleMedium?.copyWith(
                       // Completed = muted; pending = primary adaptive
-                      color: task.isCompleted
-                          ? cs.onSurfaceVariant
-                          : cs.onSurface,
+                      color:
+                          task.isCompleted ? cs.onSurfaceVariant : cs.onSurface,
                       fontWeight: FontWeight.bold,
-                      decoration: task.isCompleted ? TextDecoration.lineThrough : null,
+                      decoration:
+                          task.isCompleted ? TextDecoration.lineThrough : null,
                     ),
                   ),
                 ],

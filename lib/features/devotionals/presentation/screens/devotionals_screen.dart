@@ -17,6 +17,7 @@ import 'package:kingdom_heir/features/devotionals/domain/entities/devotional_jou
 import 'package:kingdom_heir/features/devotionals/domain/entities/devotional_models.dart';
 import 'package:kingdom_heir/features/devotionals/presentation/providers/devotional_journey_provider.dart';
 import 'package:kingdom_heir/features/devotionals/presentation/providers/devotionals_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class DevotionalsScreen extends ConsumerWidget {
   const DevotionalsScreen({super.key});
@@ -61,8 +62,8 @@ class DevotionalsScreen extends ConsumerWidget {
                   error: (_, __) => const _TodayCardError(),
                   data: (devotional) {
                     if (devotional == null) return const _NoDevotionalCard();
-                    final progress = ref
-                        .watch(journeyProgressProvider(devotional.id));
+                    final progress =
+                        ref.watch(journeyProgressProvider(devotional.id));
                     return _TodayHeroCard(
                       devotional: devotional,
                       progress: progress,
@@ -193,7 +194,7 @@ class _DevotionalAppBar extends StatelessWidget {
           ),
         IconButton(
           icon: const Icon(Icons.edit_note_rounded, color: AppColors.navy),
-          tooltip: 'My Journal',
+          tooltip: AppLocalizations.of(context)!.myJournal,
           onPressed: () => context.push('/home/devotionals/journal'),
         ),
         const SizedBox(width: AppSpacing.xs),
@@ -373,8 +374,11 @@ class _StreakBanner extends StatelessWidget {
                       ),
                       child: Center(
                         child: done
-                            ? const Icon(Icons.check_rounded,
-                                color: Colors.white, size: 14,)
+                            ? const Icon(
+                                Icons.check_rounded,
+                                color: Colors.white,
+                                size: 14,
+                              )
                             : Text(
                                 labels[i],
                                 style: TextStyle(
@@ -603,8 +607,7 @@ class _TodayHeroCard extends StatelessWidget {
                                 : fraction > 0
                                     ? 'Continue Journey'
                                     : 'Begin Journey',
-                            style:
-                                AppTypography.textTheme.labelLarge?.copyWith(
+                            style: AppTypography.textTheme.labelLarge?.copyWith(
                               color: AppColors.ink,
                               fontWeight: FontWeight.w800,
                             ),
@@ -627,10 +630,7 @@ class _TodayHeroCard extends StatelessWidget {
           ],
         ),
       ),
-    )
-        .animate()
-        .fadeIn(delay: 250.ms, duration: AppMotion.emphasized)
-        .scale(
+    ).animate().fadeIn(delay: 250.ms, duration: AppMotion.emphasized).scale(
           begin: const Offset(0.97, 0.97),
           end: const Offset(1, 1),
           delay: 250.ms,
@@ -791,9 +791,7 @@ class _PreviousDevotionalTile extends StatelessWidget {
                       completed
                           ? Icons.check_circle_rounded
                           : Icons.auto_stories_rounded,
-                      color: completed
-                          ? AppColors.success
-                          : AppColors.goldDark,
+                      color: completed ? AppColors.success : AppColors.goldDark,
                       size: 22,
                     ),
                   ),
@@ -828,8 +826,7 @@ class _PreviousDevotionalTile extends StatelessWidget {
                           child: LinearProgressIndicator(
                             value: fraction,
                             minHeight: 3,
-                            backgroundColor:
-                                AppColors.dividerLight,
+                            backgroundColor: AppColors.dividerLight,
                             valueColor: const AlwaysStoppedAnimation<Color>(
                               AppColors.goldDark,
                             ),
@@ -891,8 +888,11 @@ class _TodayCardError extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.cloud_off_rounded,
-                color: AppColors.error, size: 32,),
+            const Icon(
+              Icons.cloud_off_rounded,
+              color: AppColors.error,
+              size: 32,
+            ),
             const SizedBox(height: AppSpacing.sm),
             Text(
               "Could not load today's devotional.",
@@ -987,8 +987,11 @@ class _PreviousListError extends ConsumerWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.cloud_off_rounded,
-              color: AppColors.error, size: 32,),
+          const Icon(
+            Icons.cloud_off_rounded,
+            color: AppColors.error,
+            size: 32,
+          ),
           const SizedBox(height: AppSpacing.md),
           Text(
             'Could not load previous devotionals.',
@@ -1000,7 +1003,7 @@ class _PreviousListError extends ConsumerWidget {
           FilledButton.icon(
             onPressed: () => ref.invalidate(previousDevotionalsProvider),
             icon: const Icon(Icons.refresh_rounded),
-            label: const Text('Try Again'),
+            label: Text(AppLocalizations.of(context)!.tryAgain_1),
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.gold,
               foregroundColor: AppColors.ink,

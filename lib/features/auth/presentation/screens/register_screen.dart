@@ -214,7 +214,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     // registration — even if Supabase happens to confirm the email
     // synchronously, the screen handles that and forwards to the
     // dashboard.
-    context.go('${RouteNames.checkYourEmail}?email=${Uri.encodeComponent(email)}');
+    context
+        .go('${RouteNames.checkYourEmail}?email=${Uri.encodeComponent(email)}');
   }
 
   // ── Submit — Google OAuth ────────────────────────────────────────────────
@@ -310,7 +311,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               duration: AppMotion.standard,
                               delay: const Duration(milliseconds: 80),
                             ),
-
 
                         const SizedBox(height: AppSpacing.xl),
 

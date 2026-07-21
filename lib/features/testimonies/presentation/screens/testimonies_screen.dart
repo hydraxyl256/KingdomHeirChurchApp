@@ -11,6 +11,7 @@ import 'package:kingdom_heir/core/widgets/app_empty_state.dart';
 import 'package:kingdom_heir/features/testimonies/data/repositories/testimony_repository.dart';
 import 'package:kingdom_heir/features/testimonies/domain/entities/testimony.dart';
 import 'package:kingdom_heir/features/testimonies/presentation/providers/testimony_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 // Mock data removed.
@@ -58,7 +59,7 @@ class _TestimoniesScreenState extends ConsumerState<TestimoniesScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Testimonies'),
+        title: Text(AppLocalizations.of(context)!.testimonies),
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
@@ -70,7 +71,7 @@ class _TestimoniesScreenState extends ConsumerState<TestimoniesScreen>
           FilledButton.icon(
             onPressed: () => context.go(RouteNames.submitTestimony),
             icon: const Icon(Icons.add_rounded, size: 16),
-            label: const Text('Share'),
+            label: Text(AppLocalizations.of(context)!.scriptureShare),
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.gold,
               foregroundColor: AppColors.ink,
@@ -162,9 +163,9 @@ class _TestimoniesScreenState extends ConsumerState<TestimoniesScreen>
                                   (liked: !cur.liked, amen: cur.amen);
                             });
                             // Call repo
-                            ref
-                                .read(testimonyRepositoryProvider)
-                                .toggleLike(t.id, isLiking: !(r?.liked ?? t.isLiked));
+                            ref.read(testimonyRepositoryProvider).toggleLike(
+                                t.id,
+                                isLiking: !(r?.liked ?? t.isLiked),);
                           },
                         ).animate().fadeIn(
                               delay: Duration(milliseconds: i * 80),
@@ -232,7 +233,9 @@ class _TestimonyCard extends StatelessWidget {
                 Row(
                   children: [
                     AppAvatar(
-                        name: item.displayName, size: AppSpacing.avatarSm,),
+                      name: item.displayName,
+                      size: AppSpacing.avatarSm,
+                    ),
                     const SizedBox(width: AppSpacing.sm),
                     Expanded(
                       child: Column(

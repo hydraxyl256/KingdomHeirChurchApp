@@ -8,12 +8,12 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/features/live_service/domain/entities/live_service_models.dart';
 import 'package:kingdom_heir/features/live_service/presentation/providers/live_service_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class LiveHeroSection extends ConsumerWidget {
   const LiveHeroSection({super.key});
@@ -26,49 +26,47 @@ class LiveHeroSection extends ConsumerWidget {
     return stateAsync.when(
       loading: () => const _HeroSkeleton(),
       error: (error, stackTrace) => Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.cloud_off_rounded,
-                    color: AppColors.error,
-                    size: 48,
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Live service unavailable',
-                    style: TextStyle(
-                      color: AppColors.error,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Please check your connection and try again.',
-                    style: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 14,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                  FilledButton(
-                    onPressed: () => ref.refresh(liveServiceStateProvider),
-                    style: ButtonStyle(
-                      backgroundColor:
-                          WidgetStateProperty.all(AppColors.gold),
-                      foregroundColor:
-                          WidgetStateProperty.all(AppColors.ink),
-                    ),
-                    child: const Text('Try Again'),
-                  ),
-                ],
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.cloud_off_rounded,
+                color: AppColors.error,
+                size: 48,
               ),
-            ),
+              const SizedBox(height: 16),
+              const Text(
+                'Live service unavailable',
+                style: TextStyle(
+                  color: AppColors.error,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Please check your connection and try again.',
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 14,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              FilledButton(
+                onPressed: () => ref.refresh(liveServiceStateProvider),
+                style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all(AppColors.gold),
+                  foregroundColor: WidgetStateProperty.all(AppColors.ink),
+                ),
+                child: Text(AppLocalizations.of(context)!.tryAgain_1),
+              ),
+            ],
           ),
+        ),
+      ),
       data: (state) => _HeroContent(state: state, viewerCount: viewerCount),
     );
   }
@@ -145,7 +143,9 @@ class _HeroContent extends StatelessWidget {
 
                   // Service title
                   Text(
-                    state.serviceTitle ?? state.nextServiceTitle ?? 'Kingdom Heirs Church',
+                    state.serviceTitle ??
+                        state.nextServiceTitle ??
+                        'Kingdom Heirs Church',
                     style: AppTypography.textTheme.titleLarge?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w800,
@@ -176,8 +176,11 @@ class _HeroContent extends StatelessWidget {
                   Row(
                     children: [
                       if (state.speakerName != null) ...[
-                        const Icon(Icons.person_rounded,
-                            color: Colors.white54, size: 13,),
+                        const Icon(
+                          Icons.person_rounded,
+                          color: Colors.white54,
+                          size: 13,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           state.speakerName!,
@@ -189,8 +192,11 @@ class _HeroContent extends StatelessWidget {
                         const SizedBox(width: AppSpacing.md),
                       ],
                       if (state.isLive && state.durationLabel.isNotEmpty) ...[
-                        const Icon(Icons.schedule_rounded,
-                            color: Colors.white54, size: 13,),
+                        const Icon(
+                          Icons.schedule_rounded,
+                          color: Colors.white54,
+                          size: 13,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           state.startedLabel,

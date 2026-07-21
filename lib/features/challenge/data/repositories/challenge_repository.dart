@@ -19,7 +19,8 @@ class SupabaseChallengeRepository implements ChallengeRepository {
 
   @override
   Future<Either<String, void>> submitGroupReport(
-      GroupReportingPacket packet,) async {
+    GroupReportingPacket packet,
+  ) async {
     try {
       final user = _client.auth.currentUser;
       if (user == null) {

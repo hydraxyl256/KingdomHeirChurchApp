@@ -5,12 +5,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/features/sermons/domain/entities/sermon.dart';
 import 'package:kingdom_heir/features/sermons/presentation/widgets/shared/sermon_thumbnail.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class SermonHero extends StatelessWidget {
   const SermonHero({
@@ -40,7 +40,7 @@ class SermonHero extends StatelessWidget {
           onPressed: onShare,
           icon: const Icon(Icons.ios_share_rounded),
           color: AppColors.warmWhite,
-          tooltip: 'Share',
+          tooltip: AppLocalizations.of(context)!.scriptureShare,
         ),
         IconButton(
           onPressed: onFavorite,
@@ -50,13 +50,13 @@ class SermonHero extends StatelessWidget {
                 : Icons.favorite_border_rounded,
             color: isFavorited ? AppColors.gold : AppColors.warmWhite,
           ),
-          tooltip: 'Save',
+          tooltip: AppLocalizations.of(context)!.scriptureSave,
         ),
         IconButton(
           onPressed: onDownload,
           icon: const Icon(Icons.download_rounded),
           color: AppColors.warmWhite,
-          tooltip: 'Download',
+          tooltip: AppLocalizations.of(context)!.download,
         ),
         const SizedBox(width: 4),
       ],

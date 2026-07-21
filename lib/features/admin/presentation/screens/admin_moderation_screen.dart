@@ -7,9 +7,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/features/admin/data/repositories/admin_moderation_repository.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 final adminModerationProvider = FutureProvider.autoDispose
     .family<List<Map<String, dynamic>>, String>((ref, type) async {
@@ -17,7 +17,7 @@ final adminModerationProvider = FutureProvider.autoDispose
   // Only testimonies remain on this screen. The 'prayers' family entry
   // is preserved for any in-flight call sites but returns an empty
   // list — the prayer moderation UI is the dedicated screen now.
-  if (type == 'prayers') return const [];
+  if (type == 'prayers') return [];
   return repo.getPendingTestimonies();
 });
 
@@ -28,7 +28,7 @@ class AdminModerationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Testimony Moderation'),
+        title: Text(AppLocalizations.of(context)!.testimonyModeration),
       ),
       body: const _TestimonyModerationTab(),
     );
@@ -47,7 +47,8 @@ class _TestimonyModerationTab extends ConsumerWidget {
       error: (err, _) => Center(child: Text('Error: $err')),
       data: (items) {
         if (items.isEmpty) {
-          return const Center(child: Text('No pending testimonies!'));
+          return Center(
+              child: Text(AppLocalizations.of(context)!.noPendingTestimonies),);
         }
 
         return ListView.builder(
@@ -65,9 +66,13 @@ class _TestimonyModerationTab extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 18,),),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
                     const SizedBox(height: 8),
                     Text(body),
                     const SizedBox(height: 16),
@@ -80,11 +85,14 @@ class _TestimonyModerationTab extends ConsumerWidget {
                                 ref.read(adminModerationRepositoryProvider);
                             await repo.rejectTestimony(itemId);
                             ref.invalidate(
-                                adminModerationProvider('testimonies'),);
+                              adminModerationProvider('testimonies'),
+                            );
                           },
                           icon: const Icon(Icons.close, color: AppColors.error),
-                          label: const Text('Reject',
-                              style: TextStyle(color: AppColors.error),),
+                          label: const Text(
+                            'Reject',
+                            style: TextStyle(color: AppColors.error),
+                          ),
                         ),
                         const SizedBox(width: 8),
                         FilledButton.icon(
@@ -93,10 +101,12 @@ class _TestimonyModerationTab extends ConsumerWidget {
                                 ref.read(adminModerationRepositoryProvider);
                             await repo.approveTestimony(itemId);
                             ref.invalidate(
-                                adminModerationProvider('testimonies'),);
+                              adminModerationProvider('testimonies'),
+                            );
                           },
                           icon: const Icon(Icons.check),
-                          label: const Text('Approve & Publish'),
+                          label: Text(
+                              AppLocalizations.of(context)!.approvePublish,),
                         ),
                       ],
                     ),

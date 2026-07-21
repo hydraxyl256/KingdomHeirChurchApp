@@ -14,6 +14,7 @@ import 'package:kingdom_heir/features/sermons/presentation/providers/sermon_down
 import 'package:kingdom_heir/features/sermons/presentation/widgets/downloads/download_storage_indicator.dart';
 import 'package:kingdom_heir/features/sermons/presentation/widgets/downloads/download_tile.dart';
 import 'package:kingdom_heir/features/sermons/presentation/widgets/shared/sermons_empty_state.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class SermonDownloadsScreen extends ConsumerWidget {
   const SermonDownloadsScreen({super.key});
@@ -27,7 +28,7 @@ class SermonDownloadsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title: const Text('Downloads'),
+        title: Text(AppLocalizations.of(context)!.downloads),
         backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
       ),

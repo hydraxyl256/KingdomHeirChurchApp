@@ -47,7 +47,8 @@ class SupabaseGlobalSearchRepository {
     return GlobalSearchResults(items: items, query: q);
   }
 
-  Future<void> _searchSermons(String pattern, List<SearchResultItem> out) async {
+  Future<void> _searchSermons(
+      String pattern, List<SearchResultItem> out,) async {
     try {
       final response = await _client
           .from('sermons')
@@ -60,14 +61,16 @@ class SupabaseGlobalSearchRepository {
           .limit(5);
       for (final row in response as List) {
         final map = row as Map<String, dynamic>;
-        out.add(SearchResultItem(
-          id: map['id'] as String,
-          kind: SearchResultKind.sermon,
-          title: (map['title'] as String?) ?? '',
-          subtitle: (map['speaker'] as String?) ?? '',
-          description: (map['summary'] as String?) ?? '',
-          imageUrl: map['thumbnail_url'] as String?,
-        ),);
+        out.add(
+          SearchResultItem(
+            id: map['id'] as String,
+            kind: SearchResultKind.sermon,
+            title: (map['title'] as String?) ?? '',
+            subtitle: (map['speaker'] as String?) ?? '',
+            description: (map['summary'] as String?) ?? '',
+            imageUrl: map['thumbnail_url'] as String?,
+          ),
+        );
       }
     } catch (_) {
       // Best-effort — if sermons table or columns differ, skip silently.
@@ -87,14 +90,16 @@ class SupabaseGlobalSearchRepository {
           .limit(5);
       for (final row in response as List) {
         final map = row as Map<String, dynamic>;
-        out.add(SearchResultItem(
-          id: map['id'] as String,
-          kind: SearchResultKind.event,
-          title: (map['title'] as String?) ?? '',
-          subtitle: (map['location'] as String?) ?? '',
-          description: (map['description'] as String?) ?? '',
-          imageUrl: map['hero_image_url'] as String?,
-        ),);
+        out.add(
+          SearchResultItem(
+            id: map['id'] as String,
+            kind: SearchResultKind.event,
+            title: (map['title'] as String?) ?? '',
+            subtitle: (map['location'] as String?) ?? '',
+            description: (map['description'] as String?) ?? '',
+            imageUrl: map['hero_image_url'] as String?,
+          ),
+        );
       }
     } catch (_) {/* skip */}
   }
@@ -115,14 +120,16 @@ class SupabaseGlobalSearchRepository {
           .limit(5);
       for (final row in response as List) {
         final map = row as Map<String, dynamic>;
-        out.add(SearchResultItem(
-          id: map['id'] as String,
-          kind: SearchResultKind.devotional,
-          title: (map['title'] as String?) ?? '',
-          subtitle: (map['scripture_reference'] as String?) ?? '',
-          description: (map['summary'] as String?) ?? '',
-          imageUrl: map['cover_image_url'] as String?,
-        ),);
+        out.add(
+          SearchResultItem(
+            id: map['id'] as String,
+            kind: SearchResultKind.devotional,
+            title: (map['title'] as String?) ?? '',
+            subtitle: (map['scripture_reference'] as String?) ?? '',
+            description: (map['summary'] as String?) ?? '',
+            imageUrl: map['cover_image_url'] as String?,
+          ),
+        );
       }
     } catch (_) {/* skip */}
   }
@@ -141,18 +148,19 @@ class SupabaseGlobalSearchRepository {
       for (final row in response as List) {
         final map = row as Map<String, dynamic>;
         final authorRaw = map['profiles'];
-        final author = authorRaw is Map
-            ? (authorRaw['full_name'] as String?)
-            : null;
-        out.add(SearchResultItem(
-          id: map['id'] as String,
-          kind: SearchResultKind.prayer,
-          title: (map['title'] as String?) ?? '',
-          subtitle: author == null || author.isEmpty
-              ? 'Community prayer'
-              : 'Prayed for by $author',
-          description: (map['content'] as String?) ?? '',
-        ),);
+        final author =
+            authorRaw is Map ? (authorRaw['full_name'] as String?) : null;
+        out.add(
+          SearchResultItem(
+            id: map['id'] as String,
+            kind: SearchResultKind.prayer,
+            title: (map['title'] as String?) ?? '',
+            subtitle: author == null || author.isEmpty
+                ? 'Community prayer'
+                : 'Prayed for by $author',
+            description: (map['content'] as String?) ?? '',
+          ),
+        );
       }
     } catch (_) {/* skip */}
   }
@@ -168,21 +176,21 @@ class SupabaseGlobalSearchRepository {
           .limit(5);
       for (final row in response as List) {
         final map = row as Map<String, dynamic>;
-        out.add(SearchResultItem(
-          id: map['id'] as String,
-          kind: SearchResultKind.news,
-          title: (map['title'] as String?) ?? '',
-          subtitle: (map['preview'] as String?) ?? '',
-          description: '',
-          imageUrl: map['cover_image_url'] as String?,
-        ),);
+        out.add(
+          SearchResultItem(
+            id: map['id'] as String,
+            kind: SearchResultKind.news,
+            title: (map['title'] as String?) ?? '',
+            subtitle: (map['preview'] as String?) ?? '',
+            description: '',
+            imageUrl: map['cover_image_url'] as String?,
+          ),
+        );
       }
     } catch (_) {/* skip */}
   }
 
   /// Escape % and _ for PostgREST ilike patterns.
-  String _escape(String s) => s
-      .replaceAll(r'\', r'\\')
-      .replaceAll('%', r'\%')
-      .replaceAll('_', r'\_');
+  String _escape(String s) =>
+      s.replaceAll(r'\', r'\\').replaceAll('%', r'\%').replaceAll('_', r'\_');
 }

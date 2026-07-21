@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kingdom_heir/core/localization/locale_provider.dart';
 import 'package:kingdom_heir/features/testimonies/data/repositories/testimony_repository.dart';
 import 'package:kingdom_heir/features/testimonies/domain/entities/testimony.dart';
 
@@ -9,8 +10,10 @@ final testimoniesFeedProvider =
   final repo = ref.watch(testimonyRepositoryProvider);
   final category = ref.watch(testimonyCategoryFilterProvider);
 
-  final result =
-      await repo.getTestimonies(category: category == 'All' ? null : category);
+  final locale = ref.watch(localeProvider);
+  final result = await repo.getTestimonies(
+      category: category == 'All' ? null : category,
+      languageCode: locale.languageCode,);
   return result.fold(
     (err) => throw Exception(err),
     (list) => list,

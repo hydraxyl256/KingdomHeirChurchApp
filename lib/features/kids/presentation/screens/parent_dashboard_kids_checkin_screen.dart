@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/features/kids/presentation/providers/kids_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class ParentDashboardKidsCheckinScreen extends ConsumerWidget {
   const ParentDashboardKidsCheckinScreen({super.key});
@@ -15,14 +16,16 @@ class ParentDashboardKidsCheckinScreen extends ConsumerWidget {
     final kidsAsync = ref.watch(myKidsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Kids Check-In')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.kidsCheckin)),
       body: sessionAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, _) => Center(child: Text('Error: $err')),
         data: (session) {
           if (session == null) {
-            return const Center(
-                child: Text('No active kids sessions right now.'),);
+            return Center(
+              child: Text(
+                  AppLocalizations.of(context)!.noActiveKidsSessionsRightNow,),
+            );
           }
 
           final checkinsAsync = ref.watch(myCheckinsProvider(session.id));
@@ -45,25 +48,35 @@ class ParentDashboardKidsCheckinScreen extends ConsumerWidget {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.child_care_rounded,
-                          color: Colors.white, size: 40,),
+                      const Icon(
+                        Icons.child_care_rounded,
+                        color: Colors.white,
+                        size: 40,
+                      ),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(session.name,
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 18,),),
                             Text(
-                                '${session.sessionDate.day}/${session.sessionDate.month}/${session.sessionDate.year} · ${session.startTime}',
-                                style: const TextStyle(color: Colors.white70),),
-                            const Text('Session is Active',
-                                style: TextStyle(
-                                    color: AppColors.secondary,
-                                    fontWeight: FontWeight.w600,),),
+                              session.name,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 18,
+                              ),
+                            ),
+                            Text(
+                              '${session.sessionDate.day}/${session.sessionDate.month}/${session.sessionDate.year} · ${session.startTime}',
+                              style: const TextStyle(color: Colors.white70),
+                            ),
+                            const Text(
+                              'Session is Active',
+                              style: TextStyle(
+                                color: AppColors.secondary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -88,7 +101,8 @@ class ParentDashboardKidsCheckinScreen extends ConsumerWidget {
                         child: Padding(
                           padding: EdgeInsets.all(AppSpacing.lg),
                           child: Text(
-                              'You have not registered any children yet. Please contact an admin to register your kids.',),
+                            'You have not registered any children yet. Please contact an admin to register your kids.',
+                          ),
                         ),
                       );
                     }
@@ -114,14 +128,16 @@ class ParentDashboardKidsCheckinScreen extends ConsumerWidget {
 
                               // Find checkin state
                               final checkinRec = checkins
-                                  .where((c) =>
-                                      c.kidId == child.id && c.isCheckedIn,)
+                                  .where(
+                                    (c) => c.kidId == child.id && c.isCheckedIn,
+                                  )
                                   .firstOrNull;
                               final isCheckedIn = checkinRec != null;
 
                               return Card(
                                 margin: const EdgeInsets.only(
-                                    bottom: AppSpacing.md,),
+                                  bottom: AppSpacing.md,
+                                ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(AppSpacing.md),
                                   child: Row(
@@ -145,13 +161,15 @@ class ParentDashboardKidsCheckinScreen extends ConsumerWidget {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Text(child.fullName,
-                                                style: theme
-                                                    .textTheme.titleMedium,),
                                             Text(
-                                                'Age ${child.age} · ${child.gradeClass}',
-                                                style:
-                                                    theme.textTheme.bodySmall,),
+                                              child.fullName,
+                                              style:
+                                                  theme.textTheme.titleMedium,
+                                            ),
+                                            Text(
+                                              'Age ${child.age} · ${child.gradeClass}',
+                                              style: theme.textTheme.bodySmall,
+                                            ),
                                             const SizedBox(height: 4),
                                             Row(
                                               children: [
@@ -191,15 +209,19 @@ class ParentDashboardKidsCheckinScreen extends ConsumerWidget {
                                           if (isCheckedIn) {
                                             ref
                                                 .read(
-                                                    kidsCheckinNotifierProvider
-                                                        .notifier,)
+                                                  kidsCheckinNotifierProvider
+                                                      .notifier,
+                                                )
                                                 .checkOut(
-                                                    checkinRec.id, session.id,);
+                                                  checkinRec.id,
+                                                  session.id,
+                                                );
                                           } else {
                                             ref
                                                 .read(
-                                                    kidsCheckinNotifierProvider
-                                                        .notifier,)
+                                                  kidsCheckinNotifierProvider
+                                                      .notifier,
+                                                )
                                                 .checkIn(child.id, session.id);
                                           }
                                         },
@@ -210,17 +232,19 @@ class ParentDashboardKidsCheckinScreen extends ConsumerWidget {
                                           minimumSize: const Size(90, 36),
                                         ),
                                         child: Text(
-                                            isCheckedIn
-                                                ? 'Check Out'
-                                                : 'Check In',
-                                            style:
-                                                const TextStyle(fontSize: 12),),
+                                          isCheckedIn
+                                              ? 'Check Out'
+                                              : 'Check In',
+                                          style: const TextStyle(fontSize: 12),
+                                        ),
                                       ),
                                     ],
                                   ),
                                 ),
                               ).animate().fadeIn(
-                                  delay: Duration(milliseconds: 200 + i * 100),);
+                                    delay:
+                                        Duration(milliseconds: 200 + i * 100),
+                                  );
                             }),
                             const SizedBox(height: AppSpacing.xl),
                             if (safetyCode != null)
@@ -229,24 +253,27 @@ class ParentDashboardKidsCheckinScreen extends ConsumerWidget {
                                   padding: const EdgeInsets.all(AppSpacing.md),
                                   child: Row(
                                     children: [
-                                      const Icon(Icons.security_rounded,
-                                          color: AppColors.primary,),
+                                      const Icon(
+                                        Icons.security_rounded,
+                                        color: AppColors.primary,
+                                      ),
                                       const SizedBox(width: AppSpacing.md),
                                       Expanded(
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Text('Safety Code: $safetyCode',
-                                                style: theme
-                                                    .textTheme.titleSmall
-                                                    ?.copyWith(
-                                                        color:
-                                                            AppColors.primary,),),
                                             Text(
-                                                'Required for child pick-up today',
-                                                style:
-                                                    theme.textTheme.bodySmall,),
+                                              'Safety Code: $safetyCode',
+                                              style: theme.textTheme.titleSmall
+                                                  ?.copyWith(
+                                                color: AppColors.primary,
+                                              ),
+                                            ),
+                                            Text(
+                                              'Required for child pick-up today',
+                                              style: theme.textTheme.bodySmall,
+                                            ),
                                           ],
                                         ),
                                       ),

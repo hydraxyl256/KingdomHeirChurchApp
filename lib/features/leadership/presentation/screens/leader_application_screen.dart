@@ -5,6 +5,7 @@ import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/widgets/app_button.dart';
 import 'package:kingdom_heir/features/leadership/domain/entities/leader_application.dart';
 import 'package:kingdom_heir/features/leadership/presentation/providers/leadership_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class LeaderApplicationScreen extends ConsumerStatefulWidget {
   const LeaderApplicationScreen({super.key});
@@ -24,7 +25,7 @@ class _LeaderApplicationScreenState
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Group Leader Application'),
+        title: Text(AppLocalizations.of(context)!.groupLeaderApplication),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
       ),
@@ -41,115 +42,154 @@ class _LeaderApplicationScreenState
                 _buildTextField('Phone', keyName: 'phone'),
                 _buildTextField('Country', keyName: 'country'),
                 _buildTextField('City / State', keyName: 'cityState'),
-                _buildTextField('Church / Ministry Affiliation',
-                    required: false, keyName: 'churchAffiliation',),
-                _buildTextField('Pastor or Spiritual Leader Name',
-                    required: false, keyName: 'pastorName',),
-                _buildTextField('Pastor / Leader Contact Information',
-                    required: false, keyName: 'pastorContact',),
+                _buildTextField(
+                  'Church / Ministry Affiliation',
+                  required: false,
+                  keyName: 'churchAffiliation',
+                ),
+                _buildTextField(
+                  'Pastor or Spiritual Leader Name',
+                  required: false,
+                  keyName: 'pastorName',
+                ),
+                _buildTextField(
+                  'Pastor / Leader Contact Information',
+                  required: false,
+                  keyName: 'pastorContact',
+                ),
               ],
             ),
             _buildSectionHeader('SECTION 2 - TESTIMONY'),
             _buildCard(
               children: [
-                _buildTextField('How did you come to faith in Jesus Christ?',
-                    maxLines: 3, keyName: 'conversionStory',),
-                _buildTextField('How long have you been following Christ?',
-                    keyName: 'yearsFollowingChrist',),
-                _buildTextField('Describe your current walk with Christ.',
-                    maxLines: 3, keyName: 'currentWalk',),
                 _buildTextField(
-                    'What is God currently working on in your life?',
-                    maxLines: 3,
-                    keyName: 'areasOfGrowth',),
+                  'How did you come to faith in Jesus Christ?',
+                  maxLines: 3,
+                  keyName: 'conversionStory',
+                ),
+                _buildTextField(
+                  'How long have you been following Christ?',
+                  keyName: 'yearsFollowingChrist',
+                ),
+                _buildTextField(
+                  'Describe your current walk with Christ.',
+                  maxLines: 3,
+                  keyName: 'currentWalk',
+                ),
+                _buildTextField(
+                  'What is God currently working on in your life?',
+                  maxLines: 3,
+                  keyName: 'areasOfGrowth',
+                ),
               ],
             ),
             _buildSectionHeader('SECTION 3 - SPIRITUAL PRACTICES'),
             _buildCard(
               children: [
                 _buildDropdown(
-                    'How often do you read Scripture?',
-                    [
-                      'Daily',
-                      'Several times per week',
-                      'Weekly',
-                      'Occasionally',
-                    ],
-                    keyName: 'bibleReadingFrequency',),
+                  'How often do you read Scripture?',
+                  [
+                    'Daily',
+                    'Several times per week',
+                    'Weekly',
+                    'Occasionally',
+                  ],
+                  keyName: 'bibleReadingFrequency',
+                ),
                 _buildDropdown(
-                    'How often do you pray?',
-                    [
-                      'Daily',
-                      'Several times per week',
-                      'Weekly',
-                      'Occasionally',
-                    ],
-                    keyName: 'prayerFrequency',),
+                  'How often do you pray?',
+                  [
+                    'Daily',
+                    'Several times per week',
+                    'Weekly',
+                    'Occasionally',
+                  ],
+                  keyName: 'prayerFrequency',
+                ),
                 _buildDropdown(
-                    'Are you active in church or Christian fellowship?',
-                    ['Yes', 'No'],
-                    keyName: 'churchAttendanceFrequency',),
+                  'Are you active in church or Christian fellowship?',
+                  ['Yes', 'No'],
+                  keyName: 'churchAttendanceFrequency',
+                ),
                 _buildDropdown(
-                    'Do you currently serve in ministry?', ['Yes', 'No'],
-                    keyName: 'currentlyServing',),
-                _buildTextField('If yes, describe',
-                    required: false,
-                    maxLines: 2,
-                    keyName: 'servingDescription',),
+                  'Do you currently serve in ministry?',
+                  ['Yes', 'No'],
+                  keyName: 'currentlyServing',
+                ),
+                _buildTextField(
+                  'If yes, describe',
+                  required: false,
+                  maxLines: 2,
+                  keyName: 'servingDescription',
+                ),
               ],
             ),
             _buildSectionHeader('SECTION 4 - CHARACTER & REPUTATION'),
             _buildCard(
               children: [
                 _buildDropdown(
-                    'Do you strive to live a life honoring Jesus Christ?',
-                    ['Yes', 'No'],
-                    keyName: 'honoringChrist',),
+                  'Do you strive to live a life honoring Jesus Christ?',
+                  ['Yes', 'No'],
+                  keyName: 'honoringChrist',
+                ),
                 _buildDropdown(
-                    'Are you willing to submit to biblical accountability?',
-                    ['Yes', 'No'],
-                    keyName: 'willingToSubmit',),
+                  'Are you willing to submit to biblical accountability?',
+                  ['Yes', 'No'],
+                  keyName: 'willingToSubmit',
+                ),
                 _buildDropdown(
-                    'Do you have unresolved conflicts that may affect your leadership?',
-                    ['Yes', 'No'],
-                    keyName: 'hasUnresolvedConflict',),
+                  'Do you have unresolved conflicts that may affect your leadership?',
+                  ['Yes', 'No'],
+                  keyName: 'hasUnresolvedConflict',
+                ),
                 _buildDropdown(
-                    'Are you currently involved in any lifestyle that would bring reproach?',
-                    ['Yes', 'No'],
-                    keyName: 'involvedInReproach',),
+                  'Are you currently involved in any lifestyle that would bring reproach?',
+                  ['Yes', 'No'],
+                  keyName: 'involvedInReproach',
+                ),
                 _buildDropdown(
-                    'Have you been convicted of a serious criminal offense within the past 10 years?',
-                    ['Yes', 'No'],
-                    keyName: 'hasCriminalConviction',),
-                _buildTextField('If yes, explain',
-                    required: false,
-                    maxLines: 2,
-                    keyName: 'convictionExplanation',),
+                  'Have you been convicted of a serious criminal offense within the past 10 years?',
+                  ['Yes', 'No'],
+                  keyName: 'hasCriminalConviction',
+                ),
+                _buildTextField(
+                  'If yes, explain',
+                  required: false,
+                  maxLines: 2,
+                  keyName: 'convictionExplanation',
+                ),
               ],
             ),
             _buildSectionHeader('SECTION 5 - LEADERSHIP EXPERIENCE'),
             _buildCard(
               children: [
                 const Text(
-                    'Have you led any of the following? (Select all that apply)',),
+                  'Have you led any of the following? (Select all that apply)',
+                ),
                 // Placeholder for checkboxes
                 const SizedBox(height: AppSpacing.sm),
-                _buildTextField('Describe your leadership experience',
-                    maxLines: 3, keyName: 'previousLeadershipDescription',),
                 _buildTextField(
-                    'Why do you want to become a Kingdom Heirs Group Leader?',
-                    maxLines: 3,
-                    keyName: 'whyBecomeLeader',),
+                  'Describe your leadership experience',
+                  maxLines: 3,
+                  keyName: 'previousLeadershipDescription',
+                ),
                 _buildTextField(
-                    'Where do you plan to start a group? (e.g. Home, Church, Online)',
-                    keyName: 'previousLeadershipAreas',),
+                  'Why do you want to become a Kingdom Heirs Group Leader?',
+                  maxLines: 3,
+                  keyName: 'whyBecomeLeader',
+                ),
+                _buildTextField(
+                  'Where do you plan to start a group? (e.g. Home, Church, Online)',
+                  keyName: 'previousLeadershipAreas',
+                ),
               ],
             ),
             _buildSectionHeader('SECTION 6 - LEADER COMMITMENTS'),
             _buildCard(
               children: [
                 const Text(
-                    'By submitting this application, I commit to follow Jesus Christ faithfully, lead with humility and integrity, and protect unity among believers.',),
+                  'By submitting this application, I commit to follow Jesus Christ faithfully, lead with humility and integrity, and protect unity among believers.',
+                ),
               ],
             ),
             const SizedBox(height: AppSpacing.xl),
@@ -229,8 +269,9 @@ class _LeaderApplicationScreenState
                   } else {
                     Navigator.of(context).pop();
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Application submitted successfully!'),
+                      SnackBar(
+                        content: Text(AppLocalizations.of(context)!
+                            .applicationSubmittedSuccessfully,),
                       ),
                     );
                   }
@@ -247,7 +288,9 @@ class _LeaderApplicationScreenState
   Widget _buildSectionHeader(String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(
-          vertical: AppSpacing.md, horizontal: AppSpacing.xs,),
+        vertical: AppSpacing.md,
+        horizontal: AppSpacing.xs,
+      ),
       child: Text(
         title,
         style: const TextStyle(
@@ -274,8 +317,12 @@ class _LeaderApplicationScreenState
     );
   }
 
-  Widget _buildTextField(String label,
-      {required String keyName, bool required = true, int maxLines = 1,}) {
+  Widget _buildTextField(
+    String label, {
+    required String keyName,
+    bool required = true,
+    int maxLines = 1,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
       child: TextFormField(
@@ -294,8 +341,11 @@ class _LeaderApplicationScreenState
     );
   }
 
-  Widget _buildDropdown(String label, List<String> options,
-      {required String keyName,}) {
+  Widget _buildDropdown(
+    String label,
+    List<String> options, {
+    required String keyName,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
       child: DropdownButtonFormField<String>(

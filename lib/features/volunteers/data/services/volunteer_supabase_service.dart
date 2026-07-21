@@ -13,9 +13,12 @@ class VolunteerSupabaseService {
           .select()
           .eq('is_active', true)
           .order('created_at');
-      return right((data as List<dynamic>)
-          .map((e) => VolunteerOpportunity.fromJson(e as Map<String, dynamic>))
-          .toList(),);
+      return right(
+        (data as List<dynamic>)
+            .map(
+                (e) => VolunteerOpportunity.fromJson(e as Map<String, dynamic>),)
+            .toList(),
+      );
     } catch (e) {
       return left(e.toString());
     }
@@ -30,16 +33,20 @@ class VolunteerSupabaseService {
           .from('volunteer_applications')
           .select()
           .eq('user_id', user.id);
-      return right((data as List<dynamic>)
-          .map((e) => VolunteerApplication.fromJson(e as Map<String, dynamic>))
-          .toList(),);
+      return right(
+        (data as List<dynamic>)
+            .map(
+                (e) => VolunteerApplication.fromJson(e as Map<String, dynamic>),)
+            .toList(),
+      );
     } catch (e) {
       return left(e.toString());
     }
   }
 
   Future<Either<String, VolunteerApplication>> applyForOpportunity(
-      String opportunityId,) async {
+    String opportunityId,
+  ) async {
     try {
       final user = _client.auth.currentUser;
       if (user == null) return left('Not authenticated.');

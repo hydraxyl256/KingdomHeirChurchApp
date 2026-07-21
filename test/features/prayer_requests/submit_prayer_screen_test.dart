@@ -65,15 +65,18 @@ class _FakePrayerRepository implements PrayerRepository {
 
   @override
   Future<Either<String, List<PrayerRequestModel>>>
-      getPendingPrayerRequestsForAdmin({int limit = 50}) async => const Right([]);
+      getPendingPrayerRequestsForAdmin({int limit = 50}) async =>
+          const Right([]);
 
   @override
   Future<Either<String, List<PrayerRequestModel>>>
-      getApprovedPrayerRequestsForAdmin({int limit = 50}) async => const Right([]);
+      getApprovedPrayerRequestsForAdmin({int limit = 50}) async =>
+          const Right([]);
 
   @override
   Future<Either<String, List<PrayerRequestModel>>>
-      getRejectedPrayerRequestsForAdmin({int limit = 50}) async => const Right([]);
+      getRejectedPrayerRequestsForAdmin({int limit = 50}) async =>
+          const Right([]);
 
   @override
   Future<Either<String, void>> approvePrayerRequest({
@@ -148,7 +151,8 @@ void main() {
   testWidgets(
     'Submitting the form replaces it with the confirmation card',
     (tester) async {
-      final repo = _FakePrayerRepository(delay: const Duration(milliseconds: 30));
+      final repo =
+          _FakePrayerRepository(delay: const Duration(milliseconds: 30));
       await _pumpSubmitScreen(tester, repo: repo);
 
       await tester.enterText(
@@ -184,7 +188,8 @@ void main() {
   testWidgets(
     'Submit another clears the form so a second submission works',
     (tester) async {
-      final repo = _FakePrayerRepository(delay: const Duration(milliseconds: 20));
+      final repo =
+          _FakePrayerRepository(delay: const Duration(milliseconds: 20));
       await _pumpSubmitScreen(tester, repo: repo);
 
       await tester.enterText(

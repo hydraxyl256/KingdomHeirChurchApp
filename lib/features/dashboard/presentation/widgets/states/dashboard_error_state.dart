@@ -5,12 +5,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/providers/dashboard_providers.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class DashboardErrorState extends ConsumerWidget {
   const DashboardErrorState({
@@ -79,7 +79,7 @@ class DashboardErrorState extends ConsumerWidget {
           FilledButton.icon(
             onPressed: onRetry ?? () => ref.invalidate(dashboardDataProvider),
             icon: const Icon(Icons.refresh_rounded, size: 18),
-            label: const Text('Try again'),
+            label: Text(AppLocalizations.of(context)!.tryAgain),
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.gold,
               foregroundColor: AppColors.ink,

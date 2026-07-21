@@ -11,6 +11,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:kingdom_heir/core/utils/prayer_error_mapper.dart';
 import 'package:kingdom_heir/features/prayer_requests/data/models/prayer_request_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
+
 final prayerRepositoryProvider = Provider<PrayerRepository>((ref) {
   return SupabasePrayerRepository(supabase.Supabase.instance.client);
 });
@@ -121,8 +122,9 @@ class SupabasePrayerRepository implements PrayerRepository {
               .order('approved_at', ascending: false)
               .limit(limit);
           final requests = (response as List)
-              .map((e) =>
-                  PrayerRequestModel.fromJson(e as Map<String, dynamic>),)
+              .map(
+                (e) => PrayerRequestModel.fromJson(e as Map<String, dynamic>),
+              )
               .toList();
           return right(requests);
         } catch (e2) {
@@ -210,11 +212,15 @@ class SupabasePrayerRepository implements PrayerRepository {
         .from('prayer_requests')
         .stream(primaryKey: ['id'])
         .order('created_at')
-        .map((rows) => rows
-            .where((r) =>
-                (r['status'] as String? ?? 'pending') == 'approved' &&
-                ((r['visibility'] as String?) ?? 'public') != 'private',)
-            .toList(),);
+        .map(
+          (rows) => rows
+              .where(
+                (r) =>
+                    (r['status'] as String? ?? 'pending') == 'approved' &&
+                    ((r['visibility'] as String?) ?? 'public') != 'private',
+              )
+              .toList(),
+        );
   }
 
   @override
@@ -228,11 +234,9 @@ class SupabasePrayerRepository implements PrayerRepository {
           .select('prayer_request_id')
           .eq('user_id', user.id);
 
-      return (response as List<dynamic>)
-          .map((dynamic e) {
-            return (e as Map<String, dynamic>)['prayer_request_id'] as String;
-          })
-          .toList();
+      return (response as List<dynamic>).map((dynamic e) {
+        return (e as Map<String, dynamic>)['prayer_request_id'] as String;
+      }).toList();
     } catch (_) {
       return const [];
     }

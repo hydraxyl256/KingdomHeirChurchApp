@@ -16,6 +16,7 @@ import 'package:kingdom_heir/features/sermons/presentation/providers/sermon_cont
 import 'package:kingdom_heir/features/sermons/presentation/providers/sermons_provider.dart';
 import 'package:kingdom_heir/features/sermons/presentation/widgets/player/premium_video_controls.dart';
 import 'package:kingdom_heir/features/sermons/presentation/widgets/player/related_carousel.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 import 'package:video_player/video_player.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
@@ -105,7 +106,7 @@ class _SermonPlayerScreenState extends ConsumerState<SermonPlayerScreen> {
         data: (sermon) {
           if (sermon == null) {
             return AppErrorWidget(
-              message: 'Sermon not found',
+              message: AppLocalizations.of(context)!.sermonNotFound,
               onRetry: () =>
                   ref.invalidate(sermonDetailProvider(widget.sermonId)),
             );

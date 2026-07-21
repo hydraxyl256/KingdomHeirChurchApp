@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:kingdom_heir/core/theme/app_colors.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class AdminLeaderRecognitionDashboardScreen extends ConsumerWidget {
   const AdminLeaderRecognitionDashboardScreen({super.key});
@@ -10,7 +10,7 @@ class AdminLeaderRecognitionDashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Leader Recognition Dashboard'),
+        title: Text(AppLocalizations.of(context)!.leaderRecognitionDashboard),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -20,16 +20,31 @@ class AdminLeaderRecognitionDashboardScreen extends ConsumerWidget {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
-          _buildEligibilityCard('Conference Discounts',
-              'Leaders who submitted all reports', Icons.confirmation_num,),
-          _buildEligibilityCard('Kingdom Heirs Swag',
-              'Leaders with highest completion rates', Icons.checkroom,),
-          _buildEligibilityCard('Free Books',
-              'Leaders who raised future leaders', Icons.menu_book,),
-          _buildEligibilityCard('School of Ministry Scholarships',
-              'Leaders who launched new groups', Icons.school,),
-          _buildEligibilityCard('Leadership Recognition Awards',
-              'Top performers', Icons.emoji_events,),
+          _buildEligibilityCard(
+            'Conference Discounts',
+            'Leaders who submitted all reports',
+            Icons.confirmation_num,
+          ),
+          _buildEligibilityCard(
+            'Kingdom Heirs Swag',
+            'Leaders with highest completion rates',
+            Icons.checkroom,
+          ),
+          _buildEligibilityCard(
+            'Free Books',
+            'Leaders who raised future leaders',
+            Icons.menu_book,
+          ),
+          _buildEligibilityCard(
+            'School of Ministry Scholarships',
+            'Leaders who launched new groups',
+            Icons.school,
+          ),
+          _buildEligibilityCard(
+            'Leadership Recognition Awards',
+            'Top performers',
+            Icons.emoji_events,
+          ),
           const SizedBox(height: 32),
           const Text(
             'Top Leaders',
@@ -37,12 +52,24 @@ class AdminLeaderRecognitionDashboardScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           _buildLeaderRow(
-              'John Doe', 'Kingdom Multiplier', '28 Groups', 'Trainer',),
+            'John Doe',
+            'Kingdom Multiplier',
+            '28 Groups',
+            'Trainer',
+          ),
           _buildLeaderRow(
-              'Sarah Smith', 'Kingdom Builder', '12 Groups', 'Group Leader',),
+            'Sarah Smith',
+            'Kingdom Builder',
+            '12 Groups',
+            'Group Leader',
+          ),
           _buildLeaderRow('Samuel O.', 'Gold Leader', '5 Groups', 'Trainer'),
           _buildLeaderRow(
-              'David K.', 'Silver Leader', '3 Groups', 'Group Leader',),
+            'David K.',
+            'Silver Leader',
+            '3 Groups',
+            'Group Leader',
+          ),
         ],
       ),
     );
@@ -63,7 +90,11 @@ class AdminLeaderRecognitionDashboardScreen extends ConsumerWidget {
   }
 
   Widget _buildLeaderRow(
-      String name, String badge, String groups, String cert,) {
+    String name,
+    String badge,
+    String groups,
+    String cert,
+  ) {
     return Card(
       child: ListTile(
         leading: CircleAvatar(child: Text(name[0])),

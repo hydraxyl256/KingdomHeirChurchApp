@@ -67,8 +67,10 @@ class SupabaseNotificationsRepository implements NotificationsRepository {
           .limit(limit);
 
       return (response as List)
-          .map((e) => NotificationModel.fromJson(e as Map<String, dynamic>)
-              .toEntity(),)
+          .map(
+            (e) => NotificationModel.fromJson(e as Map<String, dynamic>)
+                .toEntity(),
+          )
           .toList(growable: false);
     } catch (_) {
       // Network / RLS / unknown — return empty list so the UI shows

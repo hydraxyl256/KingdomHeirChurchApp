@@ -19,6 +19,7 @@ import 'package:kingdom_heir/features/bible/presentation/providers/bible_provide
 import 'package:kingdom_heir/features/bible/presentation/screens/bible_chapter_picker_sheet.dart';
 import 'package:kingdom_heir/features/bible/presentation/screens/bible_reader_settings_sheet.dart';
 import 'package:kingdom_heir/features/bible/presentation/theme/bible_reader_palette.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 /// Kingdom Heirs — Premium Bible Reader
 ///
@@ -43,7 +44,7 @@ class _BibleReaderScreenState extends ConsumerState<BibleReaderScreen> {
   BibleVerse? _selectedVerse;
   final ScrollController _scrollController = ScrollController();
   bool _appBarCollapsed = false;
-  List<BibleVerse> _parsedVerses = const [];
+  List<BibleVerse> _parsedVerses = [];
   bool _engagementHydrated = false;
 
   @override
@@ -279,7 +280,9 @@ class _BibleReaderScreenState extends ConsumerState<BibleReaderScreen> {
   // ── Helpers ─────────────────────────────────────────────────────────────
 
   BibleBook _resolveCurrentBook(
-      AsyncValue<List<BibleBook>> booksAsync, String bookId,) {
+    AsyncValue<List<BibleBook>> booksAsync,
+    String bookId,
+  ) {
     return booksAsync.maybeWhen(
       data: (books) {
         if (books.isEmpty) {
@@ -327,10 +330,10 @@ class _BibleReaderScreenState extends ConsumerState<BibleReaderScreen> {
       return;
     }
     // Fallback: arithmetic within the same book
-    final nav   = ref.read(bibleNavigationProvider);
+    final nav = ref.read(bibleNavigationProvider);
     final parts = nav.chapterId.split('.');
     if (parts.length < 2) return;
-    final num   = int.tryParse(parts[1]);
+    final num = int.tryParse(parts[1]);
     if (num == null || num <= 1) return; // Already at first chapter
     ref
         .read(bibleNavigationProvider.notifier)
@@ -352,10 +355,10 @@ class _BibleReaderScreenState extends ConsumerState<BibleReaderScreen> {
       return;
     }
     // Fallback: arithmetic within the same book
-    final nav   = ref.read(bibleNavigationProvider);
+    final nav = ref.read(bibleNavigationProvider);
     final parts = nav.chapterId.split('.');
     if (parts.length < 2) return;
-    final num   = int.tryParse(parts[1]);
+    final num = int.tryParse(parts[1]);
     if (num == null) return;
     ref
         .read(bibleNavigationProvider.notifier)
@@ -375,18 +378,16 @@ class _BibleReaderScreenState extends ConsumerState<BibleReaderScreen> {
   }
 
   void _openPicker(BibleReaderPalette palette) {
-    final nav     = ref.read(bibleNavigationProvider);
+    final nav = ref.read(bibleNavigationProvider);
     final chapter = int.tryParse(nav.chapterId.split('.').last) ?? 1;
     BibleChapterPickerSheet.show(
-      context:        context,
-      palette:        palette,
-      currentBookId:  nav.bookId,
+      context: context,
+      palette: palette,
+      currentBookId: nav.bookId,
       currentChapter: chapter,
       onPicked: (bookId, chapterNumber) {
-        ref
-            .read(bibleNavigationProvider.notifier)
-            .navigate(
-              bookId:    bookId,
+        ref.read(bibleNavigationProvider.notifier).navigate(
+              bookId: bookId,
               chapterId: '$bookId.$chapterNumber',
             );
         _scrollToTop();
@@ -457,8 +458,8 @@ class _BibleReaderScreenState extends ConsumerState<BibleReaderScreen> {
     );
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Verse copied to clipboard'),
+      SnackBar(
+        content: Text(AppLocalizations.of(context)!.verseCopiedToClipboard),
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -736,7 +737,7 @@ class _ErrorView extends StatelessWidget {
                   borderRadius: AppRadius.brFull,
                 ),
               ),
-              child: const Text('Try again'),
+              child: Text(AppLocalizations.of(context)!.tryAgain),
             ),
           ],
         ),
@@ -1584,7 +1585,8 @@ class _NoteSheetState extends State<_NoteSheet> {
                 height: 1.5,
               ),
               decoration: InputDecoration(
-                hintText: 'What is God teaching you here?',
+                hintText:
+                    AppLocalizations.of(context)!.whatIsGodTeachingYouHere,
                 hintStyle: AppTypography.textTheme.bodyMedium?.copyWith(
                   color: widget.palette.foregroundMuted,
                   fontStyle: FontStyle.italic,

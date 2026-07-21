@@ -49,7 +49,10 @@ class AdminContentRepository {
   }
 
   Future<void> _logAction(
-      String action, String targetId, Map<String, dynamic> details,) async {
+    String action,
+    String targetId,
+    Map<String, dynamic> details,
+  ) async {
     try {
       final adminId = _supabase.auth.currentUser?.id;
       if (adminId == null) return;

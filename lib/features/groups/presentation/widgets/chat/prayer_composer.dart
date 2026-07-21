@@ -6,13 +6,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/features/groups/domain/entities/group_prayer_models.dart';
 import 'package:kingdom_heir/features/groups/presentation/providers/groups_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 /// Opens the prayer composer for [groupId]. If [seed] is provided it
 /// pre-fills the body field. Resolves with `true` if the user confirmed.
@@ -159,7 +159,7 @@ class _PrayerComposerSheetState extends ConsumerState<_PrayerComposerSheet> {
               maxLines: 6,
               autofocus: widget.seed == null,
               decoration: InputDecoration(
-                hintText: 'What’s on your heart?',
+                hintText: AppLocalizations.of(context)!.whatsOnYourHeart,
                 filled: true,
                 fillColor: theme.colorScheme.surfaceContainerLow,
                 border: OutlineInputBorder(

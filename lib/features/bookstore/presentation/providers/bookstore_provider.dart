@@ -6,7 +6,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 final bookstoreRepositoryProvider = Provider<BookstoreRepository>((ref) {
   return BookstoreRepositoryImpl(
-      BookstoreSupabaseService(Supabase.instance.client),);
+    BookstoreSupabaseService(Supabase.instance.client),
+  );
 });
 
 final bookstoreCategoriesProvider =

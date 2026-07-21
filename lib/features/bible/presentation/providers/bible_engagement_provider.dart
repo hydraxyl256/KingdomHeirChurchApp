@@ -125,7 +125,9 @@ final highlightsProvider =
 
 /// Convenience: lookup a highlight color for a verse (or null).
 String? highlightColorFor(
-    List<BibleHighlightLocal> highlights, String verseId,) {
+  List<BibleHighlightLocal> highlights,
+  String verseId,
+) {
   for (final h in highlights) {
     if (h.verseId == verseId) return h.colorHex;
   }

@@ -239,7 +239,9 @@ class TodaysFocusCard extends StatelessWidget {
             return body
                 .animate()
                 .fadeIn(
-                    duration: AppMotion.emphasized, curve: AppMotion.decelerate,)
+                  duration: AppMotion.emphasized,
+                  curve: AppMotion.decelerate,
+                )
                 .slideY(begin: 0.06, end: 0, duration: AppMotion.emphasized);
           },
         ),

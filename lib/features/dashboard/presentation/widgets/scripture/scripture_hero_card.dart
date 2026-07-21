@@ -85,7 +85,8 @@ class ScriptureHeroCard extends StatelessWidget {
                         color: AppColors.gold.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(999),
                         border: Border.all(
-                            color: AppColors.gold.withValues(alpha: 0.3),),
+                          color: AppColors.gold.withValues(alpha: 0.3),
+                        ),
                       ),
                       child: Text(
                         'VERSE OF THE DAY',
@@ -116,16 +117,16 @@ class ScriptureHeroCard extends StatelessWidget {
                           children: [
                             Text(
                               scripture.reference,
-                              style: AppTypography.textTheme.titleMedium
-                                  ?.copyWith(
+                              style:
+                                  AppTypography.textTheme.titleMedium?.copyWith(
                                 color: AppColors.goldDark,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
                               scripture.translation,
-                              style: AppTypography.textTheme.labelMedium
-                                  ?.copyWith(
+                              style:
+                                  AppTypography.textTheme.labelMedium?.copyWith(
                                 color: AppColors.textSecondary,
                               ),
                             ),
@@ -148,14 +149,18 @@ class ScriptureHeroCard extends StatelessWidget {
                                   color: AppColors.surfaceLight
                                       .withValues(alpha: 0.5),
                                   border: Border.all(
-                                      color: AppColors.dividerLight,),
+                                    color: AppColors.dividerLight,
+                                  ),
                                   borderRadius: BorderRadius.circular(999),
                                 ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Icon(Icons.play_arrow_rounded,
-                                        size: 20, color: AppColors.goldDark,),
+                                    const Icon(
+                                      Icons.play_arrow_rounded,
+                                      size: 20,
+                                      color: AppColors.goldDark,
+                                    ),
                                     const SizedBox(width: AppSpacing.xs),
                                     Text(
                                       'Listen',

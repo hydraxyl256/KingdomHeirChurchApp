@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/features/admin/data/repositories/admin_members_repository.dart';
 import 'package:kingdom_heir/features/auth/domain/entities/app_user.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 final adminMembersProvider =
     FutureProvider.autoDispose<List<AppUser>>((ref) async {
@@ -44,7 +45,7 @@ class AdminMembersScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Member Management'),
+        title: Text(AppLocalizations.of(context)!.memberManagement),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -61,13 +62,14 @@ class AdminMembersScreen extends ConsumerWidget {
             scrollDirection: Axis.horizontal,
             child: SingleChildScrollView(
               child: DataTable(
-                columns: const [
-                  DataColumn(label: Text('Name')),
-                  DataColumn(label: Text('Email')),
-                  DataColumn(label: Text('Role')),
-                  DataColumn(label: Text('Status')),
-                  DataColumn(label: Text('Joined')),
-                  DataColumn(label: Text('Actions')),
+                columns: [
+                  DataColumn(label: Text(AppLocalizations.of(context)!.name)),
+                  DataColumn(label: Text(AppLocalizations.of(context)!.email)),
+                  DataColumn(label: Text(AppLocalizations.of(context)!.role)),
+                  DataColumn(label: Text(AppLocalizations.of(context)!.status)),
+                  DataColumn(label: Text(AppLocalizations.of(context)!.joined)),
+                  DataColumn(
+                      label: Text(AppLocalizations.of(context)!.actions),),
                 ],
                 rows: members.map((member) {
                   return DataRow(
@@ -94,7 +96,9 @@ class AdminMembersScreen extends ConsumerWidget {
                         Chip(
                           label: Text(member.role?.displayName ?? 'Member'),
                           backgroundColor: _getRoleColor(
-                              context, member.role?.name ?? 'member',),
+                            context,
+                            member.role?.name ?? 'member',
+                          ),
                         ),
                       ),
                       const DataCell(
@@ -103,11 +107,15 @@ class AdminMembersScreen extends ConsumerWidget {
                           color: AppColors.success,
                         ),
                       ),
-                      DataCell(Text(member.createdAt
-                              ?.toLocal()
-                              .toString()
-                              .split(' ')[0] ??
-                          'Unknown',),),
+                      DataCell(
+                        Text(
+                          member.createdAt
+                                  ?.toLocal()
+                                  .toString()
+                                  .split(' ')[0] ??
+                              'Unknown',
+                        ),
+                      ),
                       DataCell(
                         PopupMenuButton<String>(
                           onSelected: (action) {
@@ -118,13 +126,15 @@ class AdminMembersScreen extends ConsumerWidget {
                             }
                           },
                           itemBuilder: (context) => [
-                            const PopupMenuItem(
+                            PopupMenuItem(
                               value: 'edit_role',
-                              child: Text('Edit Role'),
+                              child:
+                                  Text(AppLocalizations.of(context)!.editRole),
                             ),
-                            const PopupMenuItem(
+                            PopupMenuItem(
                               value: 'deactivate',
-                              child: Text('Suspend (Soft Delete)'),
+                              child: Text(AppLocalizations.of(context)!
+                                  .suspendSoftDelete,),
                             ),
                           ],
                         ),
@@ -163,11 +173,17 @@ class AdminMembersScreen extends ConsumerWidget {
               content: DropdownButtonFormField<String>(
                 initialValue: selectedRole,
                 decoration: const InputDecoration(labelText: 'Role'),
-                items: const [
-                  DropdownMenuItem(value: 'USER', child: Text('Member')),
+                items: [
                   DropdownMenuItem(
-                      value: 'MODERATOR', child: Text('Moderator'),),
-                  DropdownMenuItem(value: 'ADMIN', child: Text('Admin')),
+                      value: 'USER',
+                      child: Text(AppLocalizations.of(context)!.member),),
+                  DropdownMenuItem(
+                    value: 'MODERATOR',
+                    child: Text(AppLocalizations.of(context)!.moderator),
+                  ),
+                  DropdownMenuItem(
+                      value: 'ADMIN',
+                      child: Text(AppLocalizations.of(context)!.admin),),
                 ],
                 onChanged: (val) {
                   if (val != null) setState(() => selectedRole = val);
@@ -176,7 +192,7 @@ class AdminMembersScreen extends ConsumerWidget {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel'),
+                  child: Text(AppLocalizations.of(context)!.cancel),
                 ),
                 FilledButton(
                   onPressed: () async {
@@ -187,8 +203,10 @@ class AdminMembersScreen extends ConsumerWidget {
                       ref.invalidate(adminMembersProvider);
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Role updated successfully'),),
+                          SnackBar(
+                            content: Text(AppLocalizations.of(context)!
+                                .roleUpdatedSuccessfully,),
+                          ),
                         );
                       }
                     } catch (e) {
@@ -199,7 +217,7 @@ class AdminMembersScreen extends ConsumerWidget {
                       }
                     }
                   },
-                  child: const Text('Save'),
+                  child: Text(AppLocalizations.of(context)!.scriptureSave),
                 ),
               ],
             );
@@ -213,18 +231,20 @@ class AdminMembersScreen extends ConsumerWidget {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Suspend User'),
+        title: Text(AppLocalizations.of(context)!.suspendUser),
         content: Text(
-            'Are you sure you want to suspend ${member.displayName}? They will be soft-deleted and unable to access the app.',),
+          'Are you sure you want to suspend ${member.displayName}? They will be soft-deleted and unable to access the app.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.error,
-                foregroundColor: Colors.white,),
+              backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Colors.white,
+            ),
             onPressed: () async {
               Navigator.pop(context);
               try {
@@ -233,7 +253,9 @@ class AdminMembersScreen extends ConsumerWidget {
                 ref.invalidate(adminMembersProvider);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('User suspended')),
+                    SnackBar(
+                        content:
+                            Text(AppLocalizations.of(context)!.userSuspended),),
                   );
                 }
               } catch (e) {
@@ -244,7 +266,7 @@ class AdminMembersScreen extends ConsumerWidget {
                 }
               }
             },
-            child: const Text('Suspend'),
+            child: Text(AppLocalizations.of(context)!.suspend),
           ),
         ],
       ),

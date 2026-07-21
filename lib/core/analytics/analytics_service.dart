@@ -88,16 +88,20 @@ class AnalyticsService {
     await _logEvent('user_registration', {'method': method});
   }
 
-  Future<void> logSermonPlay(
-      {required String sermonId, required String title,}) async {
+  Future<void> logSermonPlay({
+    required String sermonId,
+    required String title,
+  }) async {
     await _logEvent('sermon_play', {
       'sermon_id': sermonId,
       'title': title,
     });
   }
 
-  Future<void> logSermonCompleted(
-      {required String sermonId, required int watchDuration,}) async {
+  Future<void> logSermonCompleted({
+    required String sermonId,
+    required int watchDuration,
+  }) async {
     await _logEvent('sermon_completed', {
       'sermon_id': sermonId,
       'watch_duration': watchDuration,
@@ -119,16 +123,20 @@ class AnalyticsService {
     }
   }
 
-  Future<void> logDevotionalRead(
-      {required String devotionalId, required String title,}) async {
+  Future<void> logDevotionalRead({
+    required String devotionalId,
+    required String title,
+  }) async {
     await _logEvent('devotional_read', {
       'devotional_id': devotionalId,
       'title': title,
     });
   }
 
-  Future<void> logDevotionalCompleted(
-      {required String devotionalId, required int readingDuration,}) async {
+  Future<void> logDevotionalCompleted({
+    required String devotionalId,
+    required int readingDuration,
+  }) async {
     await _logEvent('devotional_completed', {
       'devotional_id': devotionalId,
       'reading_duration': readingDuration,
@@ -150,10 +158,11 @@ class AnalyticsService {
     }
   }
 
-  Future<void> logDonationStarted(
-      {required double amount,
-      required String fund,
-      required String paymentMethod,}) async {
+  Future<void> logDonationStarted({
+    required double amount,
+    required String fund,
+    required String paymentMethod,
+  }) async {
     await _logEvent('donation_started', {
       'amount': amount,
       'fund': fund,
@@ -161,10 +170,11 @@ class AnalyticsService {
     });
   }
 
-  Future<void> logDonationCompleted(
-      {required double amount,
-      required String fund,
-      required String paymentMethod,}) async {
+  Future<void> logDonationCompleted({
+    required double amount,
+    required String fund,
+    required String paymentMethod,
+  }) async {
     await _logEvent('donation_completed', {
       'amount': amount,
       'fund': fund,
@@ -172,18 +182,21 @@ class AnalyticsService {
     });
   }
 
-  Future<void> logPrayerSubmitted(
-      {required String category, required String visibility,}) async {
+  Future<void> logPrayerSubmitted({
+    required String category,
+    required String visibility,
+  }) async {
     await _logEvent('prayer_submitted', {
       'category': category,
       'visibility': visibility,
     });
   }
 
-  Future<void> logEventRegistration(
-      {required String eventId,
-      required String title,
-      required String rsvpStatus,}) async {
+  Future<void> logEventRegistration({
+    required String eventId,
+    required String title,
+    required String rsvpStatus,
+  }) async {
     await _logEvent('event_registration', {
       'event_id': eventId,
       'title': title,

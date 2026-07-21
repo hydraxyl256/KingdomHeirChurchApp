@@ -7,13 +7,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/features/live_service/domain/entities/live_service_models.dart';
 import 'package:kingdom_heir/features/live_service/presentation/providers/live_service_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class LivePrayerPanel extends ConsumerStatefulWidget {
   const LivePrayerPanel({super.key});
@@ -97,8 +97,7 @@ class _LivePrayerPanelState extends ConsumerState<LivePrayerPanel> {
                         submitting: _submitting,
                         history: history,
                         showHistory: _showHistory,
-                        onTypeSelect: (t) =>
-                            setState(() => _selectedType = t),
+                        onTypeSelect: (t) => setState(() => _selectedType = t),
                         onSubmit: _submit,
                         onToggleHistory: () =>
                             setState(() => _showHistory = !_showHistory),
@@ -235,8 +234,11 @@ class _FormContent extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(Icons.warning_amber_rounded,
-                    color: AppColors.error, size: 16,),
+                const Icon(
+                  Icons.warning_amber_rounded,
+                  color: AppColors.error,
+                  size: 16,
+                ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
@@ -279,7 +281,7 @@ class _FormContent extends StatelessWidget {
             ),
             decoration: InputDecoration(
               hintText:
-                  'Share your prayer request here. Be as specific as you like…',
+                  AppLocalizations.of(context)!.shareYourPrayerRequestHereBe,
               hintStyle: AppTypography.textTheme.bodyLarge?.copyWith(
                 color: AppColors.textDisabled,
                 height: 1.6,
@@ -419,7 +421,6 @@ class _PrayerTeamAvailability extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Row(
       children: [
         Container(
@@ -461,9 +462,7 @@ class _SubmittedState extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const SizedBox(height: 48),
-        const Text('🙏', style: TextStyle(fontSize: 56))
-            .animate()
-            .scale(
+        const Text('🙏', style: TextStyle(fontSize: 56)).animate().scale(
               begin: const Offset(0.5, 0.5),
               end: const Offset(1, 1),
               duration: 500.ms,

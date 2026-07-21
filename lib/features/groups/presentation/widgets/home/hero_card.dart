@@ -46,17 +46,20 @@ class HomeHeroCard extends StatelessWidget {
             runSpacing: insets.sm,
             children: [
               _Stat(
-                  label: 'My groups',
-                  value: '$activeGroups',
-                  icon: Icons.groups_2_rounded,),
+                label: 'My groups',
+                value: '$activeGroups',
+                icon: Icons.groups_2_rounded,
+              ),
               _Stat(
-                  label: 'Total',
-                  value: '$totalGroups',
-                  icon: Icons.public_rounded,),
+                label: 'Total',
+                value: '$totalGroups',
+                icon: Icons.public_rounded,
+              ),
               _Stat(
-                  label: 'Praying',
-                  value: '$prayerCount',
-                  icon: Icons.volunteer_activism_rounded,),
+                label: 'Praying',
+                value: '$prayerCount',
+                icon: Icons.volunteer_activism_rounded,
+              ),
             ],
           );
 
@@ -154,7 +157,9 @@ class HomeHeroCard extends StatelessWidget {
           )
               .animate()
               .fadeIn(
-                  duration: AppMotion.emphasized, curve: AppMotion.decelerate,)
+                duration: AppMotion.emphasized,
+                curve: AppMotion.decelerate,
+              )
               .slideY(begin: 0.06, end: 0, duration: AppMotion.emphasized);
         },
       ),

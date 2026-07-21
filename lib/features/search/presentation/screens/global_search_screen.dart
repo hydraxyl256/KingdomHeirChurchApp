@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:kingdom_heir/core/router/route_names.dart';
 import 'package:kingdom_heir/core/search/global_search_models.dart';
 import 'package:kingdom_heir/core/search/global_search_provider.dart';
@@ -18,6 +17,7 @@ import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/iconography.dart';
 import 'package:kingdom_heir/core/utils/donation_launcher.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class GlobalSearchScreen extends ConsumerStatefulWidget {
   const GlobalSearchScreen({super.key});
@@ -52,8 +52,9 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
     final isDark = theme.brightness == Brightness.dark;
     final bg = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
     final titleColor = isDark ? AppColors.warmWhite : AppColors.navy;
-    final muted =
-        isDark ? AppColors.warmWhite.withValues(alpha: 0.6) : AppColors.textSecondary;
+    final muted = isDark
+        ? AppColors.warmWhite.withValues(alpha: 0.6)
+        : AppColors.textSecondary;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.white;
 
     final async = ref.watch(globalSearchProvider);
@@ -179,9 +180,9 @@ class _SearchHeader extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                       decoration: InputDecoration(
-                        hintText: 'Search the kingdom…',
-                        hintStyle:
-                            AppTypography.textTheme.bodyLarge?.copyWith(
+                        hintText:
+                            AppLocalizations.of(context)!.searchTheKingdom,
+                        hintStyle: AppTypography.textTheme.bodyLarge?.copyWith(
                           color: muted,
                         ),
                         border: InputBorder.none,
@@ -237,7 +238,8 @@ class _SearchBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (query.trim().isEmpty) {
-      return _IdleSearch(cardColor: cardColor, titleColor: titleColor, muted: muted);
+      return _IdleSearch(
+          cardColor: cardColor, titleColor: titleColor, muted: muted,);
     }
     return async.when(
       loading: () => const Center(
@@ -287,8 +289,12 @@ class _IdleSearch extends StatelessWidget {
     _QuickLink(Iconography.devotional, 'Devotionals', RouteNames.devotionals),
     _QuickLink(Iconography.events, 'Events', RouteNames.events),
     _QuickLink(Iconography.prayer, 'Prayer Wall', RouteNames.prayerFeed),
-    _QuickLink(Iconography.giving, 'Giving', RouteNames.giving,
-        opensDonationPage: true,),
+    _QuickLink(
+      Iconography.giving,
+      'Giving',
+      RouteNames.giving,
+      opensDonationPage: true,
+    ),
   ];
 
   @override
@@ -373,10 +379,7 @@ class _IdleSearch extends StatelessWidget {
                   ),
                 ),
               ),
-            )
-                .animate()
-                .fadeIn(delay: (40 * i).ms, duration: 240.ms)
-                .scale(
+            ).animate().fadeIn(delay: (40 * i).ms, duration: 240.ms).scale(
                   begin: const Offset(0.96, 0.96),
                   end: const Offset(1, 1),
                 );
@@ -388,8 +391,12 @@ class _IdleSearch extends StatelessWidget {
 }
 
 class _QuickLink {
-  const _QuickLink(this.icon, this.label, this.route,
-      {this.opensDonationPage = false,});
+  const _QuickLink(
+    this.icon,
+    this.label,
+    this.route, {
+    this.opensDonationPage = false,
+  });
   final IconData icon;
   final String label;
   final String route;

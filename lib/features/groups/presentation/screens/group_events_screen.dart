@@ -19,6 +19,7 @@ import 'package:kingdom_heir/features/groups/presentation/providers/group_detail
 import 'package:kingdom_heir/features/groups/presentation/providers/groups_provider.dart';
 import 'package:kingdom_heir/features/groups/presentation/widgets/events/event_card.dart';
 import 'package:kingdom_heir/features/groups/presentation/widgets/events/event_filter_chips.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class GroupEventsScreen extends ConsumerStatefulWidget {
   const GroupEventsScreen({required this.groupId, super.key});
@@ -60,7 +61,7 @@ class _GroupEventsScreenState extends ConsumerState<GroupEventsScreen> {
             child: async.when(
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (err, _) => AppErrorWidget(
-                message: 'Couldn’t load events',
+                message: AppLocalizations.of(context)!.couldntLoadEvents,
                 onRetry: () =>
                     ref.invalidate(groupEventsProvider(widget.groupId)),
               ),

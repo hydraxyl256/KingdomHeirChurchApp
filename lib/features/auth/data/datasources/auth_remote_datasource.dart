@@ -35,9 +35,8 @@ class AuthRemoteDataSource {
   //
   // scopes: 'email' and 'profile' give us the name + avatar for profile creation.
   GoogleSignIn get _googleSignIn => GoogleSignIn(
-        serverClientId: Env.googleWebClientId.isNotEmpty
-            ? Env.googleWebClientId
-            : null,
+        serverClientId:
+            Env.googleWebClientId.isNotEmpty ? Env.googleWebClientId : null,
         scopes: const ['email', 'profile'],
       );
 
@@ -336,7 +335,8 @@ class AuthRemoteDataSource {
     required User user,
     required GoogleSignInAccount googleAccount,
   }) async {
-    dev.log('[Google Auth] Upserting profile for ${user.email}', name: 'AuthDS');
+    dev.log('[Google Auth] Upserting profile for ${user.email}',
+        name: 'AuthDS',);
 
     try {
       // Check whether the profile row already exists.
@@ -357,7 +357,8 @@ class AuthRemoteDataSource {
         await _client.from('profiles').insert({
           'id': user.id,
           'email': user.email ?? googleAccount.email,
-          'full_name': googleAccount.displayName ?? user.email?.split('@').first,
+          'full_name':
+              googleAccount.displayName ?? user.email?.split('@').first,
           'avatar_url': googleAccount.photoUrl,
           'role': 'member',
           'created_at': now,
@@ -374,14 +375,11 @@ class AuthRemoteDataSource {
           '[Google Auth] Existing user — refreshing display_name + avatar_url',
           name: 'AuthDS',
         );
-        await _client
-            .from('profiles')
-            .update({
-              'full_name': googleAccount.displayName,
-              'avatar_url': googleAccount.photoUrl,
-              'updated_at': now,
-            })
-            .eq('id', user.id);
+        await _client.from('profiles').update({
+          'full_name': googleAccount.displayName,
+          'avatar_url': googleAccount.photoUrl,
+          'updated_at': now,
+        }).eq('id', user.id);
         dev.log('[Google Auth] Profile refreshed ✓', name: 'AuthDS');
       }
     } catch (e) {
@@ -418,8 +416,7 @@ class AuthRemoteDataSource {
     }
 
     // User already signed in with email — account conflict.
-    if (msg.contains('already registered') ||
-        msg.contains('email already')) {
+    if (msg.contains('already registered') || msg.contains('email already')) {
       throw const AuthException(
         'This email is already registered. Please sign in with email and password.',
       );

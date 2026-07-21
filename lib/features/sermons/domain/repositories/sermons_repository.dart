@@ -11,7 +11,7 @@ import 'package:kingdom_heir/features/sermons/domain/entities/sermon_speaker.dar
 
 abstract class SermonsRepository {
   // ─── Legacy (kept for backwards compatibility) ─────────────────────
-  Future<Either<String, List<Sermon>>> getSermons();
+  Future<Either<String, List<Sermon>>> getSermons({String languageCode = 'en'});
   Future<Either<String, void>> incrementViewCount(String sermonId);
   Future<Either<String, void>> updateWatchHistory(
     String sermonId,
@@ -49,13 +49,16 @@ abstract class SermonsRepository {
   Future<Either<String, void>> deleteNote(String noteId);
 
   Future<Either<String, List<SermonReflection>>> getReflections(
-      String sermonId,);
+    String sermonId,
+  );
   Future<Either<String, void>> saveReflection(SermonReflection reflection);
 
   Future<Either<String, SermonPrayerResponse?>> getPrayerResponse(
-      String sermonId,);
+    String sermonId,
+  );
   Future<Either<String, void>> savePrayerResponse(
-      SermonPrayerResponse response,);
+    SermonPrayerResponse response,
+  );
 
   // ─── Discovery feeds ───────────────────────────────────────────────
   Future<Either<String, List<Sermon>>> getTrending();

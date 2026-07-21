@@ -4,13 +4,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/widgets/app_avatar.dart';
 import 'package:kingdom_heir/core/widgets/responsive_section_header.dart';
 import 'package:kingdom_heir/features/groups/presentation/providers/groups_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class MembersStrip extends ConsumerWidget {
   const MembersStrip({required this.groupId, super.key});
@@ -31,7 +31,9 @@ class MembersStrip extends ConsumerWidget {
           actionLabel: 'View all',
           onAction: () {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Member list coming soon')),
+              SnackBar(
+                  content:
+                      Text(AppLocalizations.of(context)!.memberListComingSoon),),
             );
           },
         ),

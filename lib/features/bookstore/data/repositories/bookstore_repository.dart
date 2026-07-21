@@ -4,8 +4,9 @@ import 'package:kingdom_heir/features/bookstore/domain/entities/bookstore_models
 
 abstract class BookstoreRepository {
   Future<Either<String, List<BookstoreCategory>>> getCategories();
-  Future<Either<String, List<BookstoreProduct>>> getProducts(
-      {String? categoryId,});
+  Future<Either<String, List<BookstoreProduct>>> getProducts({
+    String? categoryId,
+  });
 }
 
 class BookstoreRepositoryImpl implements BookstoreRepository {
@@ -17,7 +18,8 @@ class BookstoreRepositoryImpl implements BookstoreRepository {
       _service.getCategories();
 
   @override
-  Future<Either<String, List<BookstoreProduct>>> getProducts(
-          {String? categoryId,}) =>
+  Future<Either<String, List<BookstoreProduct>>> getProducts({
+    String? categoryId,
+  }) =>
       _service.getProducts(categoryId: categoryId);
 }

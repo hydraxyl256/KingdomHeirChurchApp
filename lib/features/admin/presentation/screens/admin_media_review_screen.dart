@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -29,8 +30,7 @@ final pendingMediaProvider =
 
 final lastSyncRunProvider =
     FutureProvider.autoDispose<Map<String, dynamic>?>((ref) async {
-  final data = await _supabase
-      .rpc<dynamic>('get_latest_sync_run');
+  final data = await _supabase.rpc<dynamic>('get_latest_sync_run');
   if (data == null) return null;
   return data as Map<String, dynamic>;
 });
@@ -44,16 +44,16 @@ class AdminMediaReviewScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mediaAsync  = ref.watch(pendingMediaProvider);
-    final syncAsync   = ref.watch(lastSyncRunProvider);
-    final isSyncing   = ref.watch(_isSyncingProvider);
+    final mediaAsync = ref.watch(pendingMediaProvider);
+    final syncAsync = ref.watch(lastSyncRunProvider);
+    final isSyncing = ref.watch(_isSyncingProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Media Review Queue'),
+        title: Text(AppLocalizations.of(context)!.mediaReviewQueue),
         actions: [
           IconButton(
-            tooltip: 'Refresh',
+            tooltip: AppLocalizations.of(context)!.refresh,
             icon: const Icon(Icons.refresh),
             onPressed: () {
               ref
@@ -77,8 +77,7 @@ class AdminMediaReviewScreen extends ConsumerWidget {
           // ── Media list ───────────────────────────────────────────
           Expanded(
             child: mediaAsync.when(
-              loading: () =>
-                  const Center(child: CircularProgressIndicator()),
+              loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, __) => Center(child: Text('Error: $e')),
               data: (items) {
                 if (items.isEmpty) {
@@ -87,8 +86,7 @@ class AdminMediaReviewScreen extends ConsumerWidget {
                 return ListView.separated(
                   padding: const EdgeInsets.all(AppSpacing.md),
                   itemCount: items.length,
-                  separatorBuilder: (_, __) =>
-                      const Divider(height: 1),
+                  separatorBuilder: (_, __) => const Divider(height: 1),
                   itemBuilder: (context, i) =>
                       _MediaItemTile(item: items[i], ref: ref),
                 );
@@ -109,8 +107,8 @@ class AdminMediaReviewScreen extends ConsumerWidget {
         ..invalidate(lastSyncRunProvider);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('YouTube sync completed!'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.youtubeSyncCompleted),
             backgroundColor: AppColors.success,
             behavior: SnackBarBehavior.floating,
           ),
@@ -159,8 +157,10 @@ class _SyncBar extends StatelessWidget {
         children: [
           Expanded(
             child: syncAsync.when(
-              loading: () => const Text('Loading sync info…'),
-              error: (_, __) => const Text('Sync info unavailable'),
+              loading: () =>
+                  Text(AppLocalizations.of(context)!.loadingSyncInfo),
+              error: (_, __) =>
+                  Text(AppLocalizations.of(context)!.syncInfoUnavailable),
               data: (run) {
                 if (run == null) {
                   return Text(
@@ -168,8 +168,8 @@ class _SyncBar extends StatelessWidget {
                     style: AppTypography.textTheme.bodySmall,
                   );
                 }
-                final status  = run['status'] as String? ?? 'unknown';
-                final found   = run['videos_found'] as int? ?? 0;
+                final status = run['status'] as String? ?? 'unknown';
+                final found = run['videos_found'] as int? ?? 0;
                 final created = run['videos_created'] as int? ?? 0;
                 final updated = run['videos_updated'] as int? ?? 0;
 
@@ -211,7 +211,8 @@ class _SyncBar extends StatelessWidget {
                     Text(
                       'Found: $found  ·  Created: $created  ·  Updated: $updated',
                       style: AppTypography.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                     if (run['error_message'] != null)
@@ -244,8 +245,7 @@ class _SyncBar extends StatelessWidget {
             label: Text(isSyncing ? 'Syncing…' : 'Sync YouTube'),
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.navy,
-              disabledBackgroundColor:
-                  AppColors.navy.withValues(alpha: 0.4),
+              disabledBackgroundColor: AppColors.navy.withValues(alpha: 0.4),
             ),
           ),
         ],
@@ -262,19 +262,19 @@ class _MediaItemTile extends StatelessWidget {
   final Map<String, dynamic> item;
   final WidgetRef ref;
 
-  String get _id            => item['id'] as String;
-  String get _title         => item['title'] as String? ?? 'Untitled';
-  String? get _thumbnail    => item['thumbnail_url'] as String?;
-  String? get _youtubeUrl   => item['youtube_url'] as String?;
-  String get _contentType   => item['content_type'] as String? ?? 'sermon';
-  String get _status        => item['status'] as String? ?? 'pending_review';
-  bool   get _isFeatured    => item['is_featured'] as bool? ?? false;
+  String get _id => item['id'] as String;
+  String get _title => item['title'] as String? ?? 'Untitled';
+  String? get _thumbnail => item['thumbnail_url'] as String?;
+  String? get _youtubeUrl => item['youtube_url'] as String?;
+  String get _contentType => item['content_type'] as String? ?? 'sermon';
+  String get _status => item['status'] as String? ?? 'pending_review';
+  bool get _isFeatured => item['is_featured'] as bool? ?? false;
 
   Color _statusColor() => switch (_status) {
-        'published'      => AppColors.success,
+        'published' => AppColors.success,
         'pending_review' => AppColors.warning,
-        'archived'       => AppColors.error,
-        _                => AppColors.navyLight,
+        'archived' => AppColors.error,
+        _ => AppColors.navyLight,
       };
 
   @override
@@ -339,7 +339,7 @@ class _MediaItemTile extends StatelessWidget {
         children: [
           if (_youtubeUrl != null)
             IconButton(
-              tooltip: 'View on YouTube',
+              tooltip: AppLocalizations.of(context)!.viewOnYoutube,
               icon: const Icon(Icons.open_in_new_rounded, size: 18),
               onPressed: () => launchUrl(
                 Uri.parse(_youtubeUrl!),
@@ -361,8 +361,7 @@ class _TypeChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Chip(
       label: Text(type.toUpperCase()),
-      backgroundColor:
-          AppColors.navyAccent.withValues(alpha: 0.15),
+      backgroundColor: AppColors.navyAccent.withValues(alpha: 0.15),
       labelStyle: const TextStyle(
         color: AppColors.navyLight,
         fontSize: 10,
@@ -389,16 +388,14 @@ class _ActionMenu extends StatelessWidget {
   Future<void> _setContentType(BuildContext context, String type) async {
     await _supabase
         .from('media_content')
-        .update({'content_type': type})
-        .eq('id', itemId);
+        .update({'content_type': type}).eq('id', itemId);
     ref.invalidate(pendingMediaProvider);
   }
 
   Future<void> _setStatus(BuildContext context, String newStatus) async {
     await _supabase
         .from('media_content')
-        .update({'status': newStatus})
-        .eq('id', itemId);
+        .update({'status': newStatus}).eq('id', itemId);
     ref.invalidate(pendingMediaProvider);
   }
 
@@ -406,30 +403,61 @@ class _ActionMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
       onSelected: (val) async {
-        if (val == 'publish' && context.mounted)      await _setStatus(context, 'published');
-        if (val == 'archive' && context.mounted)      await _setStatus(context, 'archived');
-        if (val == 'pending' && context.mounted)      await _setStatus(context, 'pending_review');
-        if (val == 'sermon' && context.mounted)       await _setContentType(context, 'sermon');
-        if (val == 'podcast' && context.mounted)      await _setContentType(context, 'podcast');
-        if (val == 'teaching' && context.mounted)     await _setContentType(context, 'teaching');
-        if (val == 'testimony' && context.mounted)    await _setContentType(context, 'testimony');
-        if (val == 'announcement' && context.mounted) await _setContentType(context, 'announcement');
+        if (val == 'publish' && context.mounted) {
+          await _setStatus(context, 'published');
+        }
+        if (val == 'archive' && context.mounted) {
+          await _setStatus(context, 'archived');
+        }
+        if (val == 'pending' && context.mounted) {
+          await _setStatus(context, 'pending_review');
+        }
+        if (val == 'sermon' && context.mounted) {
+          await _setContentType(context, 'sermon');
+        }
+        if (val == 'podcast' && context.mounted) {
+          await _setContentType(context, 'podcast');
+        }
+        if (val == 'teaching' && context.mounted) {
+          await _setContentType(context, 'teaching');
+        }
+        if (val == 'testimony' && context.mounted) {
+          await _setContentType(context, 'testimony');
+        }
+        if (val == 'announcement' && context.mounted) {
+          await _setContentType(context, 'announcement');
+        }
       },
       itemBuilder: (_) => [
         _sectionLabel('STATUS'),
         if (status != 'published')
-          const PopupMenuItem(value: 'publish', child: Text('✅ Publish')),
+          PopupMenuItem(
+              value: 'publish',
+              child: Text(AppLocalizations.of(context)!.publish),),
         if (status != 'pending_review')
-          const PopupMenuItem(value: 'pending', child: Text('⏳ Set Pending')),
+          PopupMenuItem(
+              value: 'pending',
+              child: Text(AppLocalizations.of(context)!.setPending),),
         if (status != 'archived')
-          const PopupMenuItem(value: 'archive', child: Text('🗄 Archive')),
+          PopupMenuItem(
+              value: 'archive',
+              child: Text(AppLocalizations.of(context)!.archive),),
         const PopupMenuDivider(),
         _sectionLabel('TYPE'),
-        const PopupMenuItem(value: 'sermon',       child: Text('Sermon')),
-        const PopupMenuItem(value: 'podcast',      child: Text('Podcast')),
-        const PopupMenuItem(value: 'teaching',     child: Text('Teaching')),
-        const PopupMenuItem(value: 'testimony',    child: Text('Testimony')),
-        const PopupMenuItem(value: 'announcement', child: Text('Announcement')),
+        PopupMenuItem(
+            value: 'sermon', child: Text(AppLocalizations.of(context)!.sermon),),
+        PopupMenuItem(
+            value: 'podcast',
+            child: Text(AppLocalizations.of(context)!.podcast),),
+        PopupMenuItem(
+            value: 'teaching',
+            child: Text(AppLocalizations.of(context)!.teaching),),
+        PopupMenuItem(
+            value: 'testimony',
+            child: Text(AppLocalizations.of(context)!.testimony),),
+        PopupMenuItem(
+            value: 'announcement',
+            child: Text(AppLocalizations.of(context)!.announcement),),
       ],
     );
   }
@@ -449,7 +477,6 @@ class _ActionMenu extends StatelessWidget {
       );
 }
 
-
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 class _EmptyState extends StatelessWidget {
   @override
@@ -460,8 +487,11 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.video_library_rounded,
-                size: 56, color: AppColors.gold,),
+            const Icon(
+              Icons.video_library_rounded,
+              size: 56,
+              color: AppColors.gold,
+            ),
             const SizedBox(height: AppSpacing.md),
             Text(
               'No media content found.\nRun a YouTube sync to import videos.',

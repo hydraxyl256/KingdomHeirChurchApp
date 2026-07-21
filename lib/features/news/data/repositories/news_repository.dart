@@ -4,9 +4,14 @@ import 'package:kingdom_heir/features/news/domain/entities/news_models.dart';
 
 abstract class NewsRepository {
   Future<Either<String, List<NewsCategory>>> getCategories();
-  Future<Either<String, List<NewsArticle>>> getArticles(
-      {String? categoryId, bool? isPinned, bool? isFeatured,});
-  Future<Either<String, NewsArticle?>> getPinnedAnnouncement();
+  Future<Either<String, List<NewsArticle>>> getArticles({
+    String? categoryId,
+    bool? isPinned,
+    bool? isFeatured,
+    String languageCode = 'en',
+  });
+  Future<Either<String, NewsArticle?>> getPinnedAnnouncement(
+      {String languageCode = 'en',});
   Future<Either<String, void>> recordArticleView(String articleId);
   Future<Either<String, void>> recordArticleShare(String articleId);
 }
@@ -20,14 +25,23 @@ class NewsRepositoryImpl implements NewsRepository {
       _service.getCategories();
 
   @override
-  Future<Either<String, List<NewsArticle>>> getArticles(
-          {String? categoryId, bool? isPinned, bool? isFeatured,}) =>
+  Future<Either<String, List<NewsArticle>>> getArticles({
+    String? categoryId,
+    bool? isPinned,
+    bool? isFeatured,
+    String languageCode = 'en',
+  }) =>
       _service.getArticles(
-          categoryId: categoryId, isPinned: isPinned, isFeatured: isFeatured,);
+        categoryId: categoryId,
+        isPinned: isPinned,
+        isFeatured: isFeatured,
+        languageCode: languageCode,
+      );
 
   @override
-  Future<Either<String, NewsArticle?>> getPinnedAnnouncement() =>
-      _service.getPinnedAnnouncement();
+  Future<Either<String, NewsArticle?>> getPinnedAnnouncement(
+          {String languageCode = 'en',}) =>
+      _service.getPinnedAnnouncement(languageCode: languageCode);
 
   @override
   Future<Either<String, void>> recordArticleView(String articleId) =>

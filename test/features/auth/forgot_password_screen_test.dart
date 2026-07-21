@@ -25,8 +25,7 @@ class _StubAuthRepository implements AuthRepository {
   Stream<AppUser?> watchAuthState() => const Stream.empty();
 
   @override
-  Future<Either<Failure, AppUser?>> getCurrentUser() async =>
-      const Right(null);
+  Future<Either<Failure, AppUser?>> getCurrentUser() async => const Right(null);
 
   @override
   Future<Either<Failure, AppUser>> signInWithEmail({
@@ -88,7 +87,8 @@ void main() {
         ProviderScope(
           overrides: <Override>[
             sharedPreferencesProvider.overrideWithValue(prefs),
-            authRepositoryProvider.overrideWithValue(const _StubAuthRepository()),
+            authRepositoryProvider
+                .overrideWithValue(const _StubAuthRepository()),
             // Empty stream so the screen doesn't try to listen to Supabase.
             authStateProvider.overrideWith((ref) => const Stream.empty()),
           ],

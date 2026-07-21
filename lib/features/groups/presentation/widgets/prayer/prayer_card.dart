@@ -7,7 +7,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
@@ -16,6 +15,7 @@ import 'package:kingdom_heir/core/widgets/app_avatar.dart';
 import 'package:kingdom_heir/features/groups/domain/entities/group_prayer_models.dart';
 import 'package:kingdom_heir/features/groups/presentation/providers/group_detail_provider.dart';
 import 'package:kingdom_heir/features/groups/presentation/widgets/prayer/prayer_count_chip.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class PrayerCard extends ConsumerStatefulWidget {
   const PrayerCard({
@@ -44,7 +44,7 @@ class _PrayerCardState extends ConsumerState<PrayerCard> {
           );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('You’re praying 🙏')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.yourePraying)),
         );
       }
     } catch (_) {
@@ -191,7 +191,7 @@ class _PrayerCardState extends ConsumerState<PrayerCard> {
               FilledButton.tonalIcon(
                 onPressed: _busy ? null : _markPraying,
                 icon: const Icon(Icons.favorite_rounded, size: 16),
-                label: const Text('I prayed'),
+                label: Text(AppLocalizations.of(context)!.iPrayed),
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.goldContainer,
                   foregroundColor: AppColors.goldDark,
@@ -212,13 +212,14 @@ class _PrayerCardState extends ConsumerState<PrayerCard> {
                 TextButton.icon(
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Praise report — feature coming soon'),
+                      SnackBar(
+                        content: Text(AppLocalizations.of(context)!
+                            .praiseReportFeatureComingSoon,),
                       ),
                     );
                   },
                   icon: const Icon(Icons.celebration_outlined, size: 16),
-                  label: const Text('Praise'),
+                  label: Text(AppLocalizations.of(context)!.praise),
                   style: TextButton.styleFrom(
                     foregroundColor: theme.colorScheme.onSurfaceVariant,
                     textStyle: AppTypography.textTheme.labelMedium?.copyWith(

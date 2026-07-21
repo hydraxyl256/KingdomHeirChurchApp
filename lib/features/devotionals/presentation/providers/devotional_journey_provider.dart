@@ -15,7 +15,8 @@ import 'package:kingdom_heir/features/devotionals/domain/entities/devotional_jou
 // Service Provider
 // ─────────────────────────────────────────────────────────────────────────────
 
-final devotionalStreakServiceProvider = Provider<DevotionalStreakService>((ref) {
+final devotionalStreakServiceProvider =
+    Provider<DevotionalStreakService>((ref) {
   return DevotionalStreakService(ref.watch(sharedPreferencesProvider));
 });
 

@@ -67,8 +67,7 @@ abstract final class HomeDashboardMock {
 
   static const List<ScriptureCard> scriptureRoster = <ScriptureCard>[
     ScriptureCard(
-      verseText:
-          'I can do all things through Christ who strengthens me.',
+      verseText: 'I can do all things through Christ who strengthens me.',
       reference: 'Philippians 4:13',
       translation: 'NKJV',
       backgroundUrl: 'assets/images/dashboard/verse_bg.jpg',

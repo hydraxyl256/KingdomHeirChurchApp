@@ -6,6 +6,7 @@ import 'package:kingdom_heir/core/router/route_names.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/features/volunteers/presentation/providers/volunteer_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class VolunteerHubScreen extends ConsumerWidget {
   const VolunteerHubScreen({super.key});
@@ -25,11 +26,11 @@ class VolunteerHubScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Volunteer Hub'),
+        title: Text(AppLocalizations.of(context)!.volunteerHub),
         actions: [
           TextButton(
             onPressed: () => context.go(RouteNames.ministryAssignments),
-            child: const Text('My Schedule'),
+            child: Text(AppLocalizations.of(context)!.mySchedule),
           ),
         ],
       ),
@@ -70,9 +71,13 @@ class VolunteerHubScreen extends ConsumerWidget {
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
-                              Text(s['label']!,
-                                  style: const TextStyle(
-                                      color: Colors.white70, fontSize: 11,),),
+                              Text(
+                                s['label']!,
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 11,
+                                ),
+                              ),
                             ],
                           ),
                         )
@@ -95,8 +100,10 @@ class VolunteerHubScreen extends ConsumerWidget {
               data: (opportunities) {
                 if (opportunities.isEmpty) {
                   return const Center(
-                      child: Text(
-                          'No volunteer opportunities available right now.',),);
+                    child: Text(
+                      'No volunteer opportunities available right now.',
+                    ),
+                  );
                 }
 
                 return applicationsAsync.when(
@@ -127,18 +134,25 @@ class VolunteerHubScreen extends ConsumerWidget {
                                     BorderRadius.circular(AppSpacing.radiusSm),
                               ),
                               child: const Icon(
-                                  Icons.volunteer_activism_rounded,
-                                  color: AppColors.primary,),
+                                Icons.volunteer_activism_rounded,
+                                color: AppColors.primary,
+                              ),
                             ),
-                            title: Text(o.title,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,),),
+                            title: Text(
+                              o.title,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             subtitle: Text(
-                                '${o.timeDescription} · ${o.openSlots} slots open',),
+                              '${o.timeDescription} · ${o.openSlots} slots open',
+                            ),
                             trailing: hasApplied
                                 ? Container(
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 6,),
+                                      horizontal: 12,
+                                      vertical: 6,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: application?.status == 'approved'
                                           ? AppColors.success
@@ -162,21 +176,26 @@ class VolunteerHubScreen extends ConsumerWidget {
                                     onPressed: () {
                                       ref
                                           .read(
-                                              volunteerApplicationNotifierProvider
-                                                  .notifier,)
+                                            volunteerApplicationNotifierProvider
+                                                .notifier,
+                                          )
                                           .apply(o.id);
                                     },
                                     style: ElevatedButton.styleFrom(
                                       minimumSize: const Size(0, 32),
                                       padding: const EdgeInsets.symmetric(
-                                          horizontal: 16,),
+                                        horizontal: 16,
+                                      ),
                                     ),
-                                    child: const Text('Sign Up',
-                                        style: TextStyle(fontSize: 12),),
+                                    child: const Text(
+                                      'Sign Up',
+                                      style: TextStyle(fontSize: 12),
+                                    ),
                                   ),
                           ),
                         ).animate().fadeIn(
-                            delay: Duration(milliseconds: 200 + i * 80),);
+                              delay: Duration(milliseconds: 200 + i * 80),
+                            );
                       }).toList(),
                     );
                   },

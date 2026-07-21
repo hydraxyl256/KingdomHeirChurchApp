@@ -44,13 +44,17 @@ Future<ProviderContainer> bootstrap() async {
     );
   } catch (e) {
     logger.w(
-        'Firebase initialization skipped/failed. Ensure flutterfire configure was run: $e',);
+      'Firebase initialization skipped/failed. Ensure flutterfire configure was run: $e',
+    );
   }
 
   // 6. Setup Flutter error handling (Crashlytics + Sentry)
   FlutterError.onError = (details) {
-    logger.e('FlutterError',
-        error: details.exception, stackTrace: details.stack,);
+    logger.e(
+      'FlutterError',
+      error: details.exception,
+      stackTrace: details.stack,
+    );
 
     if (config.enableCrashReporting) {
       // Send to Sentry

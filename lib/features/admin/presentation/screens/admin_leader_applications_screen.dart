@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/features/admin/data/repositories/admin_leader_apps_repository.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 final adminLeaderAppsProvider =
     FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
@@ -18,7 +19,7 @@ class AdminLeaderApplicationsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Leader Applications'),
+        title: Text(AppLocalizations.of(context)!.leaderApplications),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -31,7 +32,9 @@ class AdminLeaderApplicationsScreen extends ConsumerWidget {
         error: (err, _) => Center(child: Text('Error: $err')),
         data: (apps) {
           if (apps.isEmpty) {
-            return const Center(child: Text('No pending applications.'));
+            return Center(
+                child:
+                    Text(AppLocalizations.of(context)!.noPendingApplications),);
           }
           return ListView.builder(
             itemCount: apps.length,
@@ -45,8 +48,10 @@ class AdminLeaderApplicationsScreen extends ConsumerWidget {
               return Card(
                 margin: const EdgeInsets.all(8),
                 child: ListTile(
-                  title: Text(applicantName,
-                      style: const TextStyle(fontWeight: FontWeight.bold),),
+                  title: Text(
+                    applicantName,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   subtitle: Text('Submitted: $submittedAt'),
                   trailing: PopupMenuButton<String>(
                     onSelected: (val) async {
@@ -57,13 +62,17 @@ class AdminLeaderApplicationsScreen extends ConsumerWidget {
                     itemBuilder: (context) => [
                       const PopupMenuItem(
                         value: 'APPROVED',
-                        child: Text('Approve',
-                            style: TextStyle(color: AppColors.success),),
+                        child: Text(
+                          'Approve',
+                          style: TextStyle(color: AppColors.success),
+                        ),
                       ),
                       const PopupMenuItem(
                         value: 'REJECTED',
-                        child: Text('Reject',
-                            style: TextStyle(color: AppColors.error),),
+                        child: Text(
+                          'Reject',
+                          style: TextStyle(color: AppColors.error),
+                        ),
                       ),
                     ],
                   ),

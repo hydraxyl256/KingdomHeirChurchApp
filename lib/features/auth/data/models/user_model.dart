@@ -14,8 +14,10 @@ class UserModel {
     this.createdAt,
   });
 
-  factory UserModel.fromSupabaseUser(User user,
-      [Map<String, dynamic>? profile,]) {
+  factory UserModel.fromSupabaseUser(
+    User user, [
+    Map<String, dynamic>? profile,
+  ]) {
     return UserModel(
       id: user.id,
       email: user.email ?? '',

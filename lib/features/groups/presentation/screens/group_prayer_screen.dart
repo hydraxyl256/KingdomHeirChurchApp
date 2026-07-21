@@ -11,7 +11,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
@@ -21,6 +20,7 @@ import 'package:kingdom_heir/features/groups/domain/entities/group_prayer_models
 import 'package:kingdom_heir/features/groups/presentation/providers/groups_provider.dart';
 import 'package:kingdom_heir/features/groups/presentation/widgets/prayer/prayer_card.dart';
 import 'package:kingdom_heir/features/groups/presentation/widgets/prayer/prayer_composer_card.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class GroupPrayerScreen extends ConsumerStatefulWidget {
   const GroupPrayerScreen({required this.groupId, super.key});
@@ -42,7 +42,7 @@ class _GroupPrayerScreenState extends ConsumerState<GroupPrayerScreen> {
     return Scaffold(
       backgroundColor: theme.colorScheme.surfaceContainerLowest,
       appBar: AppBar(
-        title: const Text('Prayer wall'),
+        title: Text(AppLocalizations.of(context)!.prayerWall),
       ),
       body: Column(
         children: [
@@ -74,7 +74,7 @@ class _GroupPrayerScreenState extends ConsumerState<GroupPrayerScreen> {
             child: async.when(
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (err, _) => AppErrorWidget(
-                message: 'Couldn’t load prayers',
+                message: AppLocalizations.of(context)!.couldntLoadPrayers,
                 onRetry: () =>
                     ref.invalidate(groupPrayerProvider(widget.groupId)),
               ),

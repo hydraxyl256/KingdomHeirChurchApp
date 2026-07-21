@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:kingdom_heir/core/responsive/breakpoints.dart';
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
@@ -20,6 +19,7 @@ import 'package:kingdom_heir/core/widgets/responsive_section_header.dart';
 import 'package:kingdom_heir/features/groups/domain/entities/group_models.dart';
 import 'package:kingdom_heir/features/groups/presentation/providers/groups_provider.dart';
 import 'package:kingdom_heir/features/groups/presentation/widgets/shared/join_button.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class SuggestedGroupsSection extends ConsumerWidget {
   const SuggestedGroupsSection({super.key});
@@ -45,7 +45,7 @@ class SuggestedGroupsSection extends ConsumerWidget {
           error: (err, _) => Padding(
             padding: EdgeInsets.symmetric(horizontal: insets.lg),
             child: AppErrorWidget(
-              message: 'Couldn’t load suggestions',
+              message: AppLocalizations.of(context)!.couldntLoadSuggestions,
               onRetry: () => ref.invalidate(suggestedGroupsProvider),
             ),
           ),

@@ -309,9 +309,8 @@ class _PremiumCard extends StatelessWidget {
         ? AppColors.warmWhite.withValues(alpha: 0.85)
         : AppColors.navy.withValues(alpha: 0.78);
 
-    final eyebrowColor = accent == _CardAccent.gold
-        ? AppColors.goldDark
-        : AppColors.goldLight;
+    final eyebrowColor =
+        accent == _CardAccent.gold ? AppColors.goldDark : AppColors.goldLight;
 
     return Container(
       decoration: BoxDecoration(

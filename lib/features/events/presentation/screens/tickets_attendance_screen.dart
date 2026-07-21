@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class TicketsAttendanceScreen extends StatelessWidget {
   const TicketsAttendanceScreen({super.key});
@@ -37,7 +38,8 @@ class TicketsAttendanceScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Tickets & Attendance')),
+      appBar:
+          AppBar(title: Text(AppLocalizations.of(context)!.ticketsAttendance)),
       body: ListView.builder(
         padding: const EdgeInsets.all(AppSpacing.md),
         itemCount: tickets.length,
@@ -56,8 +58,10 @@ class TicketsAttendanceScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(t['event']!,
-                                style: theme.textTheme.titleSmall,),
+                            Text(
+                              t['event']!,
+                              style: theme.textTheme.titleSmall,
+                            ),
                             const SizedBox(height: 4),
                             Text(t['date']!, style: theme.textTheme.bodySmall),
                           ],
@@ -100,8 +104,10 @@ class TicketsAttendanceScreen extends StatelessWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Ticket Code',
-                                style: theme.textTheme.labelSmall,),
+                            Text(
+                              'Ticket Code',
+                              style: theme.textTheme.labelSmall,
+                            ),
                             Text(
                               t['code']!,
                               style: theme.textTheme.titleLarge?.copyWith(

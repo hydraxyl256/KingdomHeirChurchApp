@@ -12,6 +12,7 @@ import 'package:kingdom_heir/features/bible/domain/entities/bible_models.dart';
 import 'package:kingdom_heir/features/bible/presentation/providers/bible_engagement_provider.dart';
 import 'package:kingdom_heir/features/bible/presentation/providers/bible_provider.dart';
 import 'package:kingdom_heir/features/bible/presentation/theme/bible_reader_palette.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 /// Kingdom Heirs — Scripture Discovery / Search
 ///
@@ -66,7 +67,7 @@ class _BibleDiscoverySearchScreenState
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(readerSettingsProvider);
-    final palette  = BibleReaderPalette.of(settings.theme);
+    final palette = BibleReaderPalette.of(settings.theme);
 
     return Scaffold(
       backgroundColor: palette.background,
@@ -74,9 +75,9 @@ class _BibleDiscoverySearchScreenState
         child: Column(
           children: [
             _Header(
-              palette:    palette,
+              palette: palette,
               controller: _controller,
-              onChanged:  _search,
+              onChanged: _search,
               onClear: () {
                 _controller.clear();
                 setState(() => _searchQuery = '');
@@ -93,9 +94,9 @@ class _BibleDiscoverySearchScreenState
               child: _searchQuery.isNotEmpty
                   ? _SearchResults(palette: palette, query: _searchQuery)
                   : _IdleView(
-                      palette:        palette,
-                      quickStart:     _quickStart,
-                      onSelect:       _selectPrompt,
+                      palette: palette,
+                      quickStart: _quickStart,
+                      onSelect: _selectPrompt,
                     ),
             ),
           ],
@@ -118,11 +119,11 @@ class _Header extends StatelessWidget {
     required this.onClear,
   });
 
-  final BibleReaderPalette    palette;
+  final BibleReaderPalette palette;
   final TextEditingController controller;
-  final ValueChanged<String>  onChanged;
-  final VoidCallback          onBack;
-  final VoidCallback          onClear;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onBack;
+  final VoidCallback onClear;
 
   @override
   Widget build(BuildContext context) {
@@ -146,12 +147,12 @@ class _Header extends StatelessWidget {
                   onTap: onBack,
                   customBorder: const CircleBorder(),
                   child: SizedBox(
-                    width:  AppSpacing.iconLg + AppSpacing.sm,
+                    width: AppSpacing.iconLg + AppSpacing.sm,
                     height: AppSpacing.iconLg + AppSpacing.sm,
                     child: Icon(
                       Icons.arrow_back_ios_new_rounded,
                       color: palette.foreground,
-                      size:  AppSpacing.iconSm,
+                      size: AppSpacing.iconSm,
                     ),
                   ),
                 ),
@@ -165,17 +166,17 @@ class _Header extends StatelessWidget {
                     Text(
                       'DISCOVERY',
                       style: AppTypography.textTheme.labelSmall?.copyWith(
-                        color:        palette.accent,
+                        color: palette.accent,
                         letterSpacing: 2,
-                        fontSize:      10,
-                        fontWeight:    FontWeight.w700,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       'Search Scripture',
                       style: AppTypography.textTheme.headlineSmall?.copyWith(
-                        color:      palette.foreground,
+                        color: palette.foreground,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -187,39 +188,40 @@ class _Header extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           Container(
             decoration: BoxDecoration(
-              color:        palette.surface,
+              color: palette.surface,
               borderRadius: AppRadius.brLg,
-              border:       Border.all(color: palette.divider),
+              border: Border.all(color: palette.divider),
             ),
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.md,
-              vertical:   AppSpacing.xxs,
+              vertical: AppSpacing.xxs,
             ),
             child: Row(
               children: [
                 Icon(
                   Icons.search_rounded,
                   color: palette.foregroundMuted,
-                  size:  AppSpacing.iconSm + 2,
+                  size: AppSpacing.iconSm + 2,
                 ),
                 const SizedBox(width: AppSpacing.xs),
                 Expanded(
                   child: TextField(
                     controller: controller,
-                    autofocus:  true,
-                    onChanged:  onChanged,
+                    autofocus: true,
+                    onChanged: onChanged,
                     onSubmitted: onChanged,
                     cursorColor: palette.accent,
                     style: AppTypography.textTheme.bodyMedium?.copyWith(
                       color: palette.foreground,
                     ),
                     decoration: InputDecoration(
-                      hintText: 'e.g. John 3:16 · Romans 8 · Psalm 23',
+                      hintText:
+                          AppLocalizations.of(context)!.egJohn316Romans8Psalm,
                       hintStyle: AppTypography.textTheme.bodyMedium?.copyWith(
-                        color:      palette.foregroundMuted,
-                        fontStyle:  FontStyle.italic,
+                        color: palette.foregroundMuted,
+                        fontStyle: FontStyle.italic,
                       ),
-                      border:  InputBorder.none,
+                      border: InputBorder.none,
                       isDense: true,
                     ),
                   ),
@@ -230,7 +232,7 @@ class _Header extends StatelessWidget {
                     child: Icon(
                       Icons.clear_rounded,
                       color: palette.foregroundMuted,
-                      size:  AppSpacing.iconSm,
+                      size: AppSpacing.iconSm,
                     ),
                   ),
               ],
@@ -261,7 +263,7 @@ class _IdleView extends ConsumerWidget {
   });
 
   final BibleReaderPalette palette;
-  final List<String>       quickStart;
+  final List<String> quickStart;
   final ValueChanged<String> onSelect;
 
   @override
@@ -288,13 +290,15 @@ class _IdleView extends ConsumerWidget {
               children: recents
                   .asMap()
                   .entries
-                  .map((e) => _PromptChip(
-                        palette:  palette,
-                        label:    e.value,
-                        icon:     Icons.history_rounded,
-                        index:    e.key,
-                        onTap:    () => onSelect(e.value),
-                      ),)
+                  .map(
+                    (e) => _PromptChip(
+                      palette: palette,
+                      label: e.value,
+                      icon: Icons.history_rounded,
+                      index: e.key,
+                      onTap: () => onSelect(e.value),
+                    ),
+                  )
                   .toList(),
             ),
             const SizedBox(height: AppSpacing.lg),
@@ -331,13 +335,15 @@ class _IdleView extends ConsumerWidget {
             children: quickStart
                 .asMap()
                 .entries
-                .map((e) => _PromptChip(
-                      palette: palette,
-                      label:   e.value,
-                      icon:    Icons.menu_book_rounded,
-                      index:   e.key,
-                      onTap:   () => onSelect(e.value),
-                    ),)
+                .map(
+                  (e) => _PromptChip(
+                    palette: palette,
+                    label: e.value,
+                    icon: Icons.menu_book_rounded,
+                    index: e.key,
+                    onTap: () => onSelect(e.value),
+                  ),
+                )
                 .toList(),
           ),
         ],
@@ -350,17 +356,17 @@ class _SectionHeader extends StatelessWidget {
   const _SectionHeader({required this.palette, required this.label});
 
   final BibleReaderPalette palette;
-  final String             label;
+  final String label;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         Container(
-          width:  6,
+          width: 6,
           height: 18,
           decoration: BoxDecoration(
-            color:        palette.accent,
+            color: palette.accent,
             borderRadius: AppRadius.brFull,
           ),
         ),
@@ -368,10 +374,10 @@ class _SectionHeader extends StatelessWidget {
         Text(
           label,
           style: AppTypography.textTheme.labelSmall?.copyWith(
-            color:         palette.accent,
+            color: palette.accent,
             letterSpacing: 2,
-            fontSize:      10,
-            fontWeight:    FontWeight.w700,
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ],
@@ -389,10 +395,10 @@ class _PromptChip extends StatelessWidget {
   });
 
   final BibleReaderPalette palette;
-  final String             label;
-  final IconData           icon;
-  final int                index;
-  final VoidCallback       onTap;
+  final String label;
+  final IconData icon;
+  final int index;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -401,12 +407,12 @@ class _PromptChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
-          vertical:   AppSpacing.xs,
+          vertical: AppSpacing.xs,
         ),
         decoration: BoxDecoration(
-          color:        palette.surface,
+          color: palette.surface,
           borderRadius: AppRadius.brFull,
-          border:       Border.all(color: palette.divider),
+          border: Border.all(color: palette.divider),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -416,7 +422,7 @@ class _PromptChip extends StatelessWidget {
             Text(
               label,
               style: AppTypography.textTheme.labelMedium?.copyWith(
-                color:      palette.foreground,
+                color: palette.foreground,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -426,7 +432,7 @@ class _PromptChip extends StatelessWidget {
     )
         .animate()
         .fadeIn(
-          delay:    Duration(milliseconds: 40 * index),
+          delay: Duration(milliseconds: 40 * index),
           duration: AppMotion.standard,
         )
         .scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1));
@@ -441,7 +447,7 @@ class _SearchResults extends ConsumerWidget {
   const _SearchResults({required this.palette, required this.query});
 
   final BibleReaderPalette palette;
-  final String             query;
+  final String query;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -459,13 +465,13 @@ class _SearchResults extends ConsumerWidget {
               Icon(
                 Icons.wifi_off_rounded,
                 color: palette.foregroundMuted,
-                size:  40,
+                size: 40,
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
                 'Could not load results',
                 style: AppTypography.textTheme.titleSmall?.copyWith(
-                  color:      palette.foreground,
+                  color: palette.foreground,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -480,7 +486,7 @@ class _SearchResults extends ConsumerWidget {
               const SizedBox(height: AppSpacing.md),
               TextButton.icon(
                 onPressed: () => ref.invalidate(bibleSearchProvider(query)),
-                icon:  Icon(Icons.refresh_rounded, color: palette.accent),
+                icon: Icon(Icons.refresh_rounded, color: palette.accent),
                 label: Text(
                   'Retry',
                   style: TextStyle(color: palette.accent),
@@ -501,13 +507,13 @@ class _SearchResults extends ConsumerWidget {
                   Icon(
                     Icons.search_off_rounded,
                     color: palette.foregroundMuted,
-                    size:  40,
+                    size: 40,
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
                     'No results for "$query"',
                     style: AppTypography.textTheme.titleSmall?.copyWith(
-                      color:      palette.foreground,
+                      color: palette.foreground,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -531,15 +537,14 @@ class _SearchResults extends ConsumerWidget {
             AppSpacing.lg,
             AppSpacing.xl,
           ),
-          itemCount:        results.length,
-          separatorBuilder: (_, __) =>
-              const SizedBox(height: AppSpacing.sm),
+          itemCount: results.length,
+          separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
           itemBuilder: (context, i) {
             final r = results[i];
             return _ResultCard(
-              palette:  palette,
-              result:   r,
-              index:    i,
+              palette: palette,
+              result: r,
+              index: i,
               onTap: () {
                 // Navigate to the chapter in the reader
                 ref
@@ -564,9 +569,9 @@ class _ResultCard extends StatelessWidget {
   });
 
   final BibleReaderPalette palette;
-  final BibleSearchResult  result;
-  final int                index;
-  final VoidCallback       onTap;
+  final BibleSearchResult result;
+  final int index;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -575,9 +580,9 @@ class _ResultCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color:        palette.surface,
+          color: palette.surface,
           borderRadius: AppRadius.brLg,
-          border:       Border.all(color: palette.divider),
+          border: Border.all(color: palette.divider),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -585,10 +590,10 @@ class _ResultCard extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  width:  6,
+                  width: 6,
                   height: 16,
                   decoration: BoxDecoration(
-                    color:        palette.accent,
+                    color: palette.accent,
                     borderRadius: AppRadius.brFull,
                   ),
                 ),
@@ -597,8 +602,8 @@ class _ResultCard extends StatelessWidget {
                   child: Text(
                     result.ref.toUpperCase(),
                     style: AppTypography.textTheme.labelMedium?.copyWith(
-                      color:         palette.accent,
-                      fontWeight:    FontWeight.w800,
+                      color: palette.accent,
+                      fontWeight: FontWeight.w800,
                       letterSpacing: 1.2,
                     ),
                   ),
@@ -606,7 +611,7 @@ class _ResultCard extends StatelessWidget {
                 Icon(
                   Icons.arrow_forward_ios_rounded,
                   color: palette.foregroundMuted,
-                  size:  12,
+                  size: 12,
                 ),
               ],
             ),
@@ -615,10 +620,10 @@ class _ResultCard extends StatelessWidget {
               data: result.text,
               style: {
                 'body': Style(
-                  color:       palette.foreground,
-                  fontSize:    FontSize(15),
-                  lineHeight:  const LineHeight(1.6),
-                  margin:      Margins.zero,
+                  color: palette.foreground,
+                  fontSize: FontSize(15),
+                  lineHeight: const LineHeight(1.6),
+                  margin: Margins.zero,
                 ),
               },
             ),
@@ -627,12 +632,12 @@ class _ResultCard extends StatelessWidget {
       )
           .animate()
           .fadeIn(
-            delay:    Duration(milliseconds: 50 * index),
+            delay: Duration(milliseconds: 50 * index),
             duration: AppMotion.standard,
           )
           .slideY(
             begin: 0.06,
-            end:   0,
+            end: 0,
             curve: AppMotion.decelerate,
           ),
     );

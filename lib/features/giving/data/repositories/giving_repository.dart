@@ -115,7 +115,8 @@ class SupabaseGivingRepository implements GivingRepository {
       final total = rows.fold<double>(
         0,
         (sum, dynamic row) =>
-            sum + ((row as Map<String, dynamic>)['amount'] as num? ?? 0).toDouble(),
+            sum +
+            ((row as Map<String, dynamic>)['amount'] as num? ?? 0).toDouble(),
       );
 
       return right(total);
@@ -161,7 +162,8 @@ class SupabaseGivingRepository implements GivingRepository {
       // But we need to watch the donation ID.
       // We will return a JSON string so the provider can parse both.
       return right(
-          '{"id": "${data['donationId']}", "url": "${data['checkoutUrl']}"}',);
+        '{"id": "${data['donationId']}", "url": "${data['checkoutUrl']}"}',
+      );
     } catch (e) {
       return left('Failed to initialize transaction: $e');
     }

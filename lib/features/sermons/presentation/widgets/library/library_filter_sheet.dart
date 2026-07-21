@@ -6,12 +6,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/features/sermons/data/mock/mock_sermons_seed.dart';
 import 'package:kingdom_heir/features/sermons/presentation/providers/sermon_library_filters_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 Future<void> showLibraryFilterSheet(BuildContext context) {
   return showModalBottomSheet(
@@ -65,7 +65,7 @@ class _LibraryFilterSheet extends ConsumerWidget {
                   onPressed: () => ref
                       .read(sermonLibraryFiltersProvider.notifier)
                       .state = SermonLibraryFilters.empty,
-                  child: const Text('Reset all'),
+                  child: Text(AppLocalizations.of(context)!.resetAll),
                 ),
             ],
           ),
@@ -82,7 +82,9 @@ class _LibraryFilterSheet extends ConsumerWidget {
                 onTap: () {
                   ref.read(sermonLibraryFiltersProvider.notifier).state =
                       filters.copyWith(
-                          topic: active ? null : t, clearTopic: active,);
+                    topic: active ? null : t,
+                    clearTopic: active,
+                  );
                 },
               );
             }).toList(),
@@ -179,7 +181,7 @@ class _LibraryFilterSheet extends ConsumerWidget {
           const _SectionLabel('Library'),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: const Text('Favorites only'),
+            title: Text(AppLocalizations.of(context)!.favoritesOnly),
             value: filters.favoritesOnly,
             onChanged: (v) => ref
                 .read(sermonLibraryFiltersProvider.notifier)
@@ -187,7 +189,7 @@ class _LibraryFilterSheet extends ConsumerWidget {
           ),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: const Text('Downloaded only'),
+            title: Text(AppLocalizations.of(context)!.downloadedOnly),
             value: filters.downloadsOnly,
             onChanged: (v) => ref
                 .read(sermonLibraryFiltersProvider.notifier)
@@ -201,7 +203,7 @@ class _LibraryFilterSheet extends ConsumerWidget {
               foregroundColor: AppColors.ink,
               minimumSize: const Size.fromHeight(48),
             ),
-            child: const Text('Show results'),
+            child: Text(AppLocalizations.of(context)!.showResults),
           ),
         ],
       ),

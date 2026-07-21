@@ -88,8 +88,9 @@ class AudioPlayerService {
 
   Future<void> setSpeed(double speed) => player.setSpeed(speed);
 
-  Future<void> skipForward(
-      [Duration delta = const Duration(seconds: 30),]) async {
+  Future<void> skipForward([
+    Duration delta = const Duration(seconds: 30),
+  ]) async {
     final pos = player.position;
     final dur = player.duration ?? Duration.zero;
     final next = pos + delta;
@@ -97,8 +98,9 @@ class AudioPlayerService {
     await player.seek(clamped);
   }
 
-  Future<void> skipBackward(
-      [Duration delta = const Duration(seconds: 15),]) async {
+  Future<void> skipBackward([
+    Duration delta = const Duration(seconds: 15),
+  ]) async {
     final pos = player.position;
     final next = pos - delta;
     final clamped = next.isNegative ? Duration.zero : next;

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/features/auth/presentation/providers/auth_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 /// Change Password screen — for authenticated email/password users.
 ///
@@ -84,7 +85,8 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
       final scheme = Theme.of(context).colorScheme;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Password changed successfully.'),
+          content:
+              Text(AppLocalizations.of(context)!.passwordChangedSuccessfully),
           backgroundColor: scheme.tertiary,
           behavior: SnackBarBehavior.floating,
           shape:
@@ -125,8 +127,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
         content: Text(message),
         backgroundColor: Theme.of(context).colorScheme.error,
         behavior: SnackBarBehavior.floating,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
@@ -186,7 +187,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_rounded),
           onPressed: isLoading ? null : () => context.pop(),
-          tooltip: 'Back',
+          tooltip: AppLocalizations.of(context)!.back,
         ),
       ),
       body: SafeArea(

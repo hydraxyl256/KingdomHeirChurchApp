@@ -24,8 +24,10 @@ class ProfileNotifier extends StateNotifier<AsyncValue<Profile>> {
     );
   }
 
-  Future<String?> updateProfileInfo(
-      {required String fullName, String? phone,}) async {
+  Future<String?> updateProfileInfo({
+    required String fullName,
+    String? phone,
+  }) async {
     final updates = {
       'full_name': fullName,
       if (phone != null) 'phone': phone,

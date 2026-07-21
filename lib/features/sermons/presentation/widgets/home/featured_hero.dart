@@ -6,12 +6,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/features/sermons/domain/entities/sermon.dart';
 import 'package:kingdom_heir/features/sermons/presentation/widgets/shared/sermon_thumbnail.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class FeaturedHero extends StatelessWidget {
   const FeaturedHero({
@@ -120,7 +120,7 @@ class FeaturedHero extends StatelessWidget {
                         child: FilledButton.icon(
                           onPressed: onWatch,
                           icon: const Icon(Icons.play_arrow_rounded, size: 22),
-                          label: const Text('Watch now'),
+                          label: Text(AppLocalizations.of(context)!.watchNow),
                           style: FilledButton.styleFrom(
                             backgroundColor: AppColors.gold,
                             foregroundColor: AppColors.ink,
@@ -134,7 +134,7 @@ class FeaturedHero extends StatelessWidget {
                       OutlinedButton.icon(
                         onPressed: onWatch,
                         icon: const Icon(Icons.headphones_rounded, size: 18),
-                        label: const Text('Audio'),
+                        label: Text(AppLocalizations.of(context)!.audio),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.warmWhite,
                           side: const BorderSide(color: AppColors.warmWhite),

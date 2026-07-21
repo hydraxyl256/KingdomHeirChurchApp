@@ -7,13 +7,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/features/sermons/domain/entities/sermon_continue_item.dart';
 import 'package:kingdom_heir/features/sermons/presentation/widgets/continue_watching/continue_progress_bar.dart';
 import 'package:kingdom_heir/features/sermons/presentation/widgets/shared/sermon_thumbnail.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class ContinueCard extends StatelessWidget {
   const ContinueCard({required this.item, super.key});
@@ -23,7 +23,9 @@ class ContinueCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg, vertical: AppSpacing.xs,),
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
@@ -123,7 +125,7 @@ class ContinueCard extends StatelessWidget {
                         foregroundColor: AppColors.ink,
                       ),
                       icon: const Icon(Icons.play_arrow_rounded),
-                      label: const Text('Resume'),
+                      label: Text(AppLocalizations.of(context)!.resume),
                     ),
                   ],
                 ),

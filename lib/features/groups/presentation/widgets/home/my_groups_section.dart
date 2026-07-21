@@ -20,6 +20,7 @@ import 'package:kingdom_heir/features/groups/domain/entities/group_models.dart';
 import 'package:kingdom_heir/features/groups/presentation/providers/groups_provider.dart';
 import 'package:kingdom_heir/features/groups/presentation/widgets/shared/activity_dot.dart';
 import 'package:kingdom_heir/features/groups/presentation/widgets/shared/group_avatar.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class MyGroupsSection extends ConsumerWidget {
   const MyGroupsSection({super.key});
@@ -41,7 +42,7 @@ class MyGroupsSection extends ConsumerWidget {
         asyncMyGroups.when(
           loading: () => const _MyGroupsSkeleton(),
           error: (err, _) => AppErrorWidget(
-            message: 'Couldn’t load your groups',
+            message: AppLocalizations.of(context)!.couldntLoadYourGroups,
             onRetry: () => ref.invalidate(myGroupsCarouselProvider),
           ),
           data: (groups) {

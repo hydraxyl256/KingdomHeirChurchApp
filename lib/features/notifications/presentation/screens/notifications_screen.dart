@@ -37,10 +37,10 @@ class NotificationsScreen extends ConsumerWidget {
     final isDark = theme.brightness == Brightness.dark;
     final bg = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.white;
-    final titleColor =
-        isDark ? AppColors.warmWhite : AppColors.navy;
-    final muted =
-        isDark ? AppColors.warmWhite.withValues(alpha: 0.6) : AppColors.textSecondary;
+    final titleColor = isDark ? AppColors.warmWhite : AppColors.navy;
+    final muted = isDark
+        ? AppColors.warmWhite.withValues(alpha: 0.6)
+        : AppColors.textSecondary;
 
     final async = ref.watch(notificationsProvider);
 
@@ -104,8 +104,7 @@ class NotificationsScreen extends ConsumerWidget {
           return RefreshIndicator.adaptive(
             color: AppColors.goldDark,
             backgroundColor: cardColor,
-            onRefresh: () =>
-                ref.read(notificationsProvider.notifier).refresh(),
+            onRefresh: () => ref.read(notificationsProvider.notifier).refresh(),
             child: _NotificationsList(
               notifications: notifications,
               cardColor: cardColor,
@@ -319,8 +318,8 @@ class _NotificationCard extends ConsumerWidget {
                               notification.title,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: AppTypography.textTheme.titleMedium
-                                  ?.copyWith(
+                              style:
+                                  AppTypography.textTheme.titleMedium?.copyWith(
                                 color: titleColor,
                                 fontWeight: isUnread
                                     ? FontWeight.w800
@@ -372,9 +371,7 @@ class _NotificationCard extends ConsumerWidget {
 
   void _onTap(BuildContext context, WidgetRef ref) {
     if (!notification.isRead) {
-      ref
-          .read(notificationsProvider.notifier)
-          .markAsRead(notification.id);
+      ref.read(notificationsProvider.notifier).markAsRead(notification.id);
     }
     final data = notification.data;
     if (data == null) return;

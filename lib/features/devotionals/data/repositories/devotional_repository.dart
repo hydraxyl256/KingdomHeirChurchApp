@@ -6,8 +6,10 @@ import 'package:kingdom_heir/features/devotionals/data/services/devotional_supab
 import 'package:kingdom_heir/features/devotionals/domain/entities/devotional_models.dart';
 
 abstract class DevotionalRepository {
-  Future<Either<String, Devotional?>> getDailyDevotional();
-  Future<Either<String, List<Devotional>>> getPreviousDevotionals();
+  Future<Either<String, Devotional?>> getDailyDevotional(
+      {String languageCode = 'en',});
+  Future<Either<String, List<Devotional>>> getPreviousDevotionals(
+      {String languageCode = 'en',});
   Future<Either<String, List<DevotionalReflection>>> getReflections();
   Future<Either<String, void>> addReflection(
     String body, {
@@ -25,7 +27,8 @@ class DevotionalRepositoryImpl implements DevotionalRepository {
   final DevotionalLocalCache localCache;
 
   @override
-  Future<Either<String, Devotional?>> getDailyDevotional() async {
+  Future<Either<String, Devotional?>> getDailyDevotional(
+      {String languageCode = 'en',}) async {
     try {
       final cached = localCache.getCachedDailyDevotional();
       // If we have a cached devotional and it is for today, return it immediately for fast UI load
@@ -37,19 +40,20 @@ class DevotionalRepositoryImpl implements DevotionalRepository {
           // Fire and forget fetch to update cache in background
           unawaited(
             supabaseService.getDailyDevotional().then(
-              (res) => res.fold(
-                (l) => null,
-                (d) {
-                  if (d != null) localCache.cacheDailyDevotional(d);
-                },
-              ),
-            ),
+                  (res) => res.fold(
+                    (l) => null,
+                    (d) {
+                      if (d != null) localCache.cacheDailyDevotional(d);
+                    },
+                  ),
+                ),
           );
           return right(cached);
         }
       }
 
-      final result = await supabaseService.getDailyDevotional();
+      final result =
+          await supabaseService.getDailyDevotional(languageCode: languageCode);
       return result.fold(
         left,
         (d) {
@@ -65,18 +69,21 @@ class DevotionalRepositoryImpl implements DevotionalRepository {
   }
 
   @override
-  Future<Either<String, List<Devotional>>> getPreviousDevotionals() async {
+  Future<Either<String, List<Devotional>>> getPreviousDevotionals(
+      {String languageCode = 'en',}) async {
     try {
       final cached = localCache.getCachedPreviousDevotionals();
       if (cached != null && cached.isNotEmpty) {
         // Fire and forget
         unawaited(
-          supabaseService.getPreviousDevotionals().then(
-            (res) => res.fold(
-              (l) => null,
-              localCache.cachePreviousDevotionals,
-            ),
-          ),
+          supabaseService
+              .getPreviousDevotionals(languageCode: languageCode)
+              .then(
+                (res) => res.fold(
+                  (l) => null,
+                  localCache.cachePreviousDevotionals,
+                ),
+              ),
         );
         return right(cached);
       }

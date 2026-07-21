@@ -249,8 +249,11 @@ class AppStatCard extends StatelessWidget {
                     color: AppColors.gold.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                   ),
-                  child: Icon(icon,
-                      size: AppSpacing.iconSm, color: AppColors.gold,),
+                  child: Icon(
+                    icon,
+                    size: AppSpacing.iconSm,
+                    color: AppColors.gold,
+                  ),
                 ),
               const Spacer(),
               if (trend != null)

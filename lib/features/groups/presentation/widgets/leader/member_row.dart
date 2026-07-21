@@ -5,13 +5,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import 'package:kingdom_heir/core/responsive/insets.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/core/widgets/app_avatar.dart';
 import 'package:kingdom_heir/features/groups/domain/entities/group_member_models.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class MemberRow extends StatelessWidget {
   const MemberRow({
@@ -75,7 +75,7 @@ class MemberRow extends StatelessWidget {
           _RoleChip(role: member.role),
           if (onPromote != null || onRemove != null)
             PopupMenuButton<String>(
-              tooltip: 'Member actions',
+              tooltip: AppLocalizations.of(context)!.memberActions,
               icon: Icon(
                 Icons.more_vert_rounded,
                 color: theme.colorScheme.onSurfaceVariant,
@@ -86,29 +86,28 @@ class MemberRow extends StatelessWidget {
               },
               itemBuilder: (_) => [
                 if (onPromote != null)
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'promote',
                     child: Row(
                       children: [
-                        Icon(Icons.upgrade_rounded, size: 18),
-                        SizedBox(width: 8),
-                        Text('Promote'),
+                        const Icon(Icons.upgrade_rounded, size: 18),
+                        const SizedBox(width: 8),
+                        Text(AppLocalizations.of(context)!.promote),
                       ],
                     ),
                   ),
                 if (onRemove != null)
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'remove',
                     child: Row(
                       children: [
-                        Icon(
-                          Icons.person_remove_rounded,
-                          size: 18,
-                          color: AppColors.error,
+                        const Icon(Icons.person_remove_rounded,
+                            size: 18, color: AppColors.error,),
+                        const SizedBox(width: 8),
+                        Text(
+                          AppLocalizations.of(context)!.remove,
+                          style: const TextStyle(color: AppColors.error),
                         ),
-                        SizedBox(width: 8),
-                        Text('Remove',
-                            style: TextStyle(color: AppColors.error),),
                       ],
                     ),
                   ),

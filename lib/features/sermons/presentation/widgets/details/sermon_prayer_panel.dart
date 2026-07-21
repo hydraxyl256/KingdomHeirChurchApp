@@ -6,11 +6,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/features/sermons/presentation/providers/sermon_engagement_provider.dart';
+import 'package:kingdom_heir/l10n/app_localizations.dart';
 
 class SermonPrayerPanel extends ConsumerStatefulWidget {
   const SermonPrayerPanel({required this.sermonId, super.key});
@@ -71,8 +71,11 @@ class _SermonPrayerPanelState extends ConsumerState<SermonPrayerPanel> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.volunteer_activism_rounded,
-                      color: AppColors.gold, size: 18,),
+                  const Icon(
+                    Icons.volunteer_activism_rounded,
+                    color: AppColors.gold,
+                    size: 18,
+                  ),
                   const SizedBox(width: AppSpacing.xs),
                   Text(
                     'Prayer response',
@@ -93,15 +96,16 @@ class _SermonPrayerPanelState extends ConsumerState<SermonPrayerPanel> {
                   }
                   return const SizedBox.shrink();
                 },
-                orElse: () => const SizedBox.shrink(),
+                orElse: SizedBox.shrink,
               ),
               TextField(
                 controller: _controller,
                 minLines: 3,
                 maxLines: 6,
-                decoration: const InputDecoration(
-                  hintText: 'How is God stirring your heart to pray?',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  hintText:
+                      AppLocalizations.of(context)!.howIsGodStirringYourHeart,
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: AppSpacing.xs),
@@ -109,8 +113,9 @@ class _SermonPrayerPanelState extends ConsumerState<SermonPrayerPanel> {
                 contentPadding: EdgeInsets.zero,
                 value: _isPrivate,
                 onChanged: (v) => setState(() => _isPrivate = v),
-                title: const Text('Keep this private'),
-                subtitle: const Text('Only you will see this response.'),
+                title: Text(AppLocalizations.of(context)!.keepThisPrivate),
+                subtitle: Text(
+                    AppLocalizations.of(context)!.onlyYouWillSeeThisResponse,),
               ),
               const SizedBox(height: AppSpacing.xs),
               Row(
@@ -129,7 +134,7 @@ class _SermonPrayerPanelState extends ConsumerState<SermonPrayerPanel> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.save_rounded),
-                    label: const Text('Save prayer'),
+                    label: Text(AppLocalizations.of(context)!.savePrayer),
                   ),
                 ],
               ),
@@ -146,7 +151,7 @@ class _SermonPrayerPanelState extends ConsumerState<SermonPrayerPanel> {
                     ),
                   );
                 },
-                orElse: () => const SizedBox.shrink(),
+                orElse: SizedBox.shrink,
               ),
             ],
           ),

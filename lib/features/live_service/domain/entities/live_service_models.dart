@@ -111,9 +111,11 @@ class LiveChatMessage extends Equatable {
         replyToDisplayName: json['reply_to_display_name'] as String?,
         replyToBody: json['reply_to_body'] as String?,
         reactions: (json['reactions'] as List<dynamic>?)
-                ?.map((r) => LiveChatReaction.fromJson(
-                      r as Map<String, dynamic>,
-                    ),)
+                ?.map(
+                  (r) => LiveChatReaction.fromJson(
+                    r as Map<String, dynamic>,
+                  ),
+                )
                 .toList() ??
             [],
         isDeleted: json['is_deleted'] as bool? ?? false,
