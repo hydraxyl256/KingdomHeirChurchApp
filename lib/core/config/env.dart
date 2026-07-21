@@ -33,7 +33,7 @@ abstract final class Env {
   static const String googleWebClientId = String.fromEnvironment(
     'GOOGLE_WEB_CLIENT_ID',
     defaultValue:
-        '319503559370-jea1m3rt0ivije005lguihoid3hro8md.apps.googleusercontent.com',
+        '256630981662-t2h8g129vrdrk7vj2c39itoqnn6gehdl.apps.googleusercontent.com',
   );
 
   static const String sentryDsn = String.fromEnvironment(

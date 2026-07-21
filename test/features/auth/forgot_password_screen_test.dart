@@ -44,7 +44,7 @@ class _StubAuthRepository implements AuthRepository {
       const Left(AuthFailure());
 
   @override
-  Future<Either<Failure, Unit>> signInWithGoogle() async =>
+  Future<Either<Failure, AppUser>> signInWithGoogle() async =>
       const Left(AuthFailure());
 
   @override
