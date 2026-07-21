@@ -435,11 +435,10 @@ class _BrandWordmark extends StatelessWidget {
               color: AppColors.warmWhite,
               boxShadow: AppElevation.shadowFor(AppElevation.level3),
             ),
-            padding: EdgeInsets.all(logoSize * 0.12),
             child: ClipOval(
               child: Image.asset(
-                'assets/images/logo.jpeg',
-                fit: BoxFit.contain,
+                'assets/images/app_icon.png',
+                fit: BoxFit.cover,
                 semanticLabel: 'Kingdom Heirs',
                 errorBuilder: (_, __, ___) => _LogoFallback(size: logoSize),
               ),

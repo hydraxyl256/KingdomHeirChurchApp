@@ -176,13 +176,11 @@ class BiblePlansScreen extends ConsumerWidget {
   void _openChapter(BuildContext context, WidgetRef ref, String chapterId) {
     final parts = chapterId.split('.');
     if (parts.length != 2) return;
-    final bookId = parts[0];
+    final bookId     = parts[0];
     final chapterNum = int.tryParse(parts[1]) ?? 1;
-    ref.read(bibleNavigationProvider.notifier).update(
-          (s) => BibleNavigationState(
-            bookId: bookId,
-            chapterId: '$bookId.$chapterNum',
-          ),
+    ref.read(bibleNavigationProvider.notifier).navigate(
+          bookId:    bookId,
+          chapterId: '$bookId.$chapterNum',
         );
     context.go(RouteNames.bible);
   }

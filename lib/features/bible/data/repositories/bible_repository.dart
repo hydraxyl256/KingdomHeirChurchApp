@@ -5,26 +5,40 @@ import 'package:kingdom_heir/features/bible/data/services/bible_supabase_service
 import 'package:kingdom_heir/features/bible/domain/entities/bible_models.dart';
 
 abstract class BibleRepository {
-  // Scripture Content
-  Future<Either<String, List<BibleBook>>> getBooks(String versionId);
-  Future<Either<String, List<BibleChapter>>> getChapters(
-      String versionId, String bookId,);
-  Future<Either<String, BibleChapterContent>> getChapterContent(
-      String versionId, String chapterId,);
-  Future<Either<String, List<Map<String, String>>>> search(
-      String versionId, String query,);
+  // ── Versions ────────────────────────────────────────────────────────────────
+  Future<Either<String, List<BibleVersion>>> getVersions({
+    String language = 'eng',
+  });
 
-  // User Data
-  Future<Either<String, List<BibleBookmark>>> getBookmarks(String versionId);
+  // ── Scripture Content ────────────────────────────────────────────────────────
+  Future<Either<String, List<BibleBook>>> getBooks(int versionId);
+  Future<Either<String, List<BibleChapter>>> getChapters(
+    int versionId,
+    String bookId,
+  );
+  Future<Either<String, BibleChapterContent>> getChapterContent(
+    int versionId,
+    String chapterId,
+  );
+  Future<Either<String, List<BibleSearchResult>>> search(
+    int versionId,
+    String query,
+  );
+
+  // ── User Data ────────────────────────────────────────────────────────────────
+  Future<Either<String, List<BibleBookmark>>> getBookmarks(int versionId);
   Future<Either<String, void>> addBookmark(BibleBookmark bookmark);
   Future<Either<String, void>> removeBookmark(String bookmarkId);
 
-  Future<Either<String, List<BibleHighlight>>> getHighlights(String versionId);
+  Future<Either<String, List<BibleHighlight>>> getHighlights(int versionId);
   Future<Either<String, void>> addHighlight(BibleHighlight highlight);
   Future<Either<String, void>> removeHighlight(String highlightId);
 
   Future<Either<String, void>> updateReadingHistory(
-      String versionId, String chapterId, int progressPercent,);
+    int versionId,
+    String chapterId,
+    int progressPercent,
+  );
 }
 
 class BibleRepositoryImpl implements BibleRepository {
@@ -34,12 +48,28 @@ class BibleRepositoryImpl implements BibleRepository {
     required this.supabaseService,
   });
 
-  final BibleApiService apiService;
-  final BibleLocalCache localCache;
-  final BibleSupabaseService supabaseService;
+  final BibleApiService       apiService;
+  final BibleLocalCache       localCache;
+  final BibleSupabaseService  supabaseService;
+
+  // ── Versions ─────────────────────────────────────────────────────────────────
 
   @override
-  Future<Either<String, List<BibleBook>>> getBooks(String versionId) async {
+  Future<Either<String, List<BibleVersion>>> getVersions({
+    String language = 'eng',
+  }) async {
+    try {
+      final versions = await apiService.getBibleVersions(language: language);
+      return right(versions);
+    } catch (e) {
+      return left('Failed to load Bible versions: $e');
+    }
+  }
+
+  // ── Books ─────────────────────────────────────────────────────────────────────
+
+  @override
+  Future<Either<String, List<BibleBook>>> getBooks(int versionId) async {
     try {
       final cached = localCache.getCachedBooks(versionId);
       if (cached != null && cached.isNotEmpty) return right(cached);
@@ -52,9 +82,13 @@ class BibleRepositoryImpl implements BibleRepository {
     }
   }
 
+  // ── Chapters ──────────────────────────────────────────────────────────────────
+
   @override
   Future<Either<String, List<BibleChapter>>> getChapters(
-      String versionId, String bookId,) async {
+    int versionId,
+    String bookId,
+  ) async {
     try {
       final cached = localCache.getCachedChapters(versionId, bookId);
       if (cached != null && cached.isNotEmpty) return right(cached);
@@ -67,14 +101,19 @@ class BibleRepositoryImpl implements BibleRepository {
     }
   }
 
+  // ── Chapter Content ───────────────────────────────────────────────────────────
+
   @override
   Future<Either<String, BibleChapterContent>> getChapterContent(
-      String versionId, String chapterId,) async {
+    int versionId,
+    String chapterId,
+  ) async {
     try {
       final cached = localCache.getCachedContent(versionId, chapterId);
       if (cached != null) return right(cached);
 
-      final content = await apiService.getChapterContent(versionId, chapterId);
+      final content =
+          await apiService.getChapterContent(versionId, chapterId);
       await localCache.cacheContent(versionId, chapterId, content);
       return right(content);
     } catch (e) {
@@ -82,9 +121,13 @@ class BibleRepositoryImpl implements BibleRepository {
     }
   }
 
+  // ── Search ────────────────────────────────────────────────────────────────────
+
   @override
-  Future<Either<String, List<Map<String, String>>>> search(
-      String versionId, String query,) async {
+  Future<Either<String, List<BibleSearchResult>>> search(
+    int versionId,
+    String query,
+  ) async {
     try {
       final results = await apiService.search(versionId, query);
       return right(results);
@@ -93,8 +136,10 @@ class BibleRepositoryImpl implements BibleRepository {
     }
   }
 
+  // ── User data — delegate to Supabase ─────────────────────────────────────────
+
   @override
-  Future<Either<String, List<BibleBookmark>>> getBookmarks(String versionId) =>
+  Future<Either<String, List<BibleBookmark>>> getBookmarks(int versionId) =>
       supabaseService.getBookmarks(versionId);
 
   @override
@@ -107,7 +152,7 @@ class BibleRepositoryImpl implements BibleRepository {
 
   @override
   Future<Either<String, List<BibleHighlight>>> getHighlights(
-          String versionId,) =>
+          int versionId,) =>
       supabaseService.getHighlights(versionId);
 
   @override
@@ -120,7 +165,13 @@ class BibleRepositoryImpl implements BibleRepository {
 
   @override
   Future<Either<String, void>> updateReadingHistory(
-          String versionId, String chapterId, int progressPercent,) =>
+    int versionId,
+    String chapterId,
+    int progressPercent,
+  ) =>
       supabaseService.updateReadingHistory(
-          versionId, chapterId, progressPercent,);
+        versionId,
+        chapterId,
+        progressPercent,
+      );
 }

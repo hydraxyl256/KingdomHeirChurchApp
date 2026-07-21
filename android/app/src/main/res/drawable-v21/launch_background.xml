@@ -4,7 +4,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Dark navy background — same as AppColors.navy (#0F172A) -->
     <item android:drawable="@color/splashBackground" />
-    <!-- Centered Logo -->
+    <!-- Centered circular app icon (120dp × 120dp) -->
     <item
         android:width="120dp"
         android:height="120dp"
@@ -12,6 +12,6 @@
         <bitmap
             android:gravity="center"
             android:scaleType="fitCenter"
-            android:src="@drawable/logo" />
+            android:src="@drawable/ic_splash_logo" />
     </item>
 </layer-list>

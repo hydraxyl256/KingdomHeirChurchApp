@@ -359,6 +359,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tap “See all” to browse the latest sermons.'**
   String get noSermonsWatchedDescription;
+
+  /// Section title for devotional series
+  ///
+  /// In en, this message translates to:
+  /// **'Devotional Series'**
+  String get devotionalSeries;
+
+  /// Progress label
+  ///
+  /// In en, this message translates to:
+  /// **'Day {current} of {total}'**
+  String dayOf(int current, int total);
+
+  /// Streak label
+  ///
+  /// In en, this message translates to:
+  /// **'{count} day streak'**
+  String currentStreak(int count);
+
+  /// CTA button on day reader
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Complete'**
+  String get markComplete;
+
+  /// Amazon purchase CTA
+  ///
+  /// In en, this message translates to:
+  /// **'Buy Physical Copy on Amazon'**
+  String get buyPhysicalCopy;
+
+  /// Banner shown when translation is missing
+  ///
+  /// In en, this message translates to:
+  /// **'Available in English — translation coming soon.'**
+  String get availableInEnglish;
+
+  /// CTA to join the challenge
+  ///
+  /// In en, this message translates to:
+  /// **'Start the 90-Day Challenge'**
+  String get startChallenge;
+
+  /// CTA to continue the challenge
+  ///
+  /// In en, this message translates to:
+  /// **'Continue Day {day}'**
+  String continueDayN(int day);
+
+  /// Message after completing today's day
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day} Complete — return tomorrow'**
+  String completedToday(int day);
+
+  /// Celebration message
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve completed all 90 days!'**
+  String get allDaysComplete;
+
+  /// Admin button to trigger YouTube sync
+  ///
+  /// In en, this message translates to:
+  /// **'Sync YouTube Channel'**
+  String get syncYouTube;
+
+  /// Status label for media content
+  ///
+  /// In en, this message translates to:
+  /// **'Pending Review'**
+  String get pendingReview;
+
+  /// Admin screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Media Review Queue'**
+  String get mediaReviewQueue;
 }
 
 class _AppLocalizationsDelegate

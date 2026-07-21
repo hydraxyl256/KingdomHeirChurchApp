@@ -234,8 +234,8 @@ class _Logo extends StatelessWidget {
         padding: const EdgeInsets.all(size * 0.12),
         child: ClipOval(
           child: Image.asset(
-            'assets/images/logo.jpeg',
-            fit: BoxFit.contain,
+            'assets/images/app_icon.png',
+            fit: BoxFit.cover,
             semanticLabel: 'Kingdom Heirs logo',
             errorBuilder: (_, __, ___) => Center(
               child: Text(

@@ -23,8 +23,9 @@ abstract class AuthRepository {
     required String fullName,
   });
 
-  /// Sign in with Google OAuth.
-  Future<Either<Failure, Unit>> signInWithGoogle();
+  /// Sign in with Google (native Android ID-token flow).
+  /// Returns the authenticated [AppUser] on success.
+  Future<Either<Failure, AppUser>> signInWithGoogle();
 
   /// Sign out the current user.
   Future<Either<Failure, Unit>> signOut();

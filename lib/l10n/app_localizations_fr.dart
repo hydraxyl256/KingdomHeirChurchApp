@@ -145,4 +145,52 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get noSermonsWatchedDescription =>
       'Tap “See all” to browse the latest sermons.';
+
+  @override
+  String get devotionalSeries => 'Devotional Series';
+
+  @override
+  String dayOf(int current, int total) {
+    return 'Day $current of $total';
+  }
+
+  @override
+  String currentStreak(int count) {
+    return '$count day streak';
+  }
+
+  @override
+  String get markComplete => 'Mark as Complete';
+
+  @override
+  String get buyPhysicalCopy => 'Buy Physical Copy on Amazon';
+
+  @override
+  String get availableInEnglish =>
+      'Available in English — translation coming soon.';
+
+  @override
+  String get startChallenge => 'Start the 90-Day Challenge';
+
+  @override
+  String continueDayN(int day) {
+    return 'Continue Day $day';
+  }
+
+  @override
+  String completedToday(int day) {
+    return 'Day $day Complete — return tomorrow';
+  }
+
+  @override
+  String get allDaysComplete => 'You\'ve completed all 90 days!';
+
+  @override
+  String get syncYouTube => 'Sync YouTube Channel';
+
+  @override
+  String get pendingReview => 'Pending Review';
+
+  @override
+  String get mediaReviewQueue => 'Media Review Queue';
 }

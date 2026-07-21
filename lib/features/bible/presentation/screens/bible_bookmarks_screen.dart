@@ -311,12 +311,10 @@ class _BookmarksTab extends ConsumerWidget {
             palette: palette,
             bookmark: b,
             onTap: () {
-              // Route back to the bible reader with this chapter.
-              ref.read(bibleNavigationProvider.notifier).state =
-                  BibleNavigationState(
-                bookId: b.bookId,
-                chapterId: b.chapterId,
-              );
+              ref.read(bibleNavigationProvider.notifier).navigate(
+                    bookId:    b.bookId,
+                    chapterId: b.chapterId,
+                  );
               context.go(RouteNames.bible);
             },
           ).animate().fadeIn(

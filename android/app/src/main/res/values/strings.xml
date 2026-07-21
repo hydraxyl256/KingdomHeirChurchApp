@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Required by the google_sign_in Android plugin.
+
+  `default_web_client_id` must be the WEB OAuth 2.0 Client ID
+  (NOT the Android client ID) from Google Cloud Console.
+
+  Where to find it:
+    console.cloud.google.com
+      → APIs & Services
+      → Credentials
+      → OAuth 2.0 Client IDs
+      → Web application client
+      → Copy the "Client ID" value
+
+  This value must also match:
+    • Env.googleWebClientId  (lib/core/config/env.dart)
+    • Supabase Auth → Providers → Google → "Client ID (for Android)"
+
+  TODO: Replace the placeholder below with your real Web Client ID.
+  Format: <numbers>-<hash>.apps.googleusercontent.com
+-->
+<resources>
+    <string name="default_web_client_id">319503559370-jea1m3rt0ivije005lguihoid3hro8md.apps.googleusercontent.com</string>
+</resources>

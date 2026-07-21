@@ -11,8 +11,9 @@ import 'package:kingdom_heir/core/theme/app_typography.dart';
 /// Rendering rules (must never be changed in isolation on one screen):
 /// - Adaptive size: `MediaQuery.of(context).size.shortestSide * sizeFactor`,
 ///   clamped between [minSize] and [maxSize].
-/// - White circle background with gold shadow.
-/// - `ClipOval` → `Image.asset` with `BoxFit.contain` preserves aspect ratio.
+/// - Warm-white circle background with gold shadow.
+/// - `ClipOval` → `Image.asset` with `BoxFit.cover` fills the circle cleanly.
+/// - Asset: `assets/images/app_icon.png` (1080×1080 — square, 1:1 ratio).
 /// - Text fallback ("KH") when the asset is missing (CI environments, etc.).
 class KingdomHeirsLogo extends StatelessWidget {
   const KingdomHeirsLogo({
@@ -56,11 +57,10 @@ class KingdomHeirsLogo extends StatelessWidget {
             ),
           ],
         ),
-        padding: EdgeInsets.all(size * 0.16),
         child: ClipOval(
           child: Image.asset(
-            'assets/images/logo.jpeg',
-            fit: BoxFit.contain,
+            'assets/images/app_icon.png',
+            fit: BoxFit.cover,
             semanticLabel: 'Kingdom Heirs logo',
             errorBuilder: (_, __, ___) => _LogoFallback(size: size),
           ),

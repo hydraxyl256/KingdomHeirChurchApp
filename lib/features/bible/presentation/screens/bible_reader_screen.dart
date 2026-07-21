@@ -312,27 +312,54 @@ class _BibleReaderScreenState extends ConsumerState<BibleReaderScreen> {
     );
   }
 
+  /// Navigate to the previous chapter.
+  ///
+  /// Uses YouVersion's [BibleChapterContent.previousChapterId] when available
+  /// (cross-book boundaries handled automatically). Falls back to arithmetic
+  /// within the same book when no content has been loaded yet.
   void _goPrevChapter() {
-    final nav = ref.read(bibleNavigationProvider);
+    final content = ref.read(bibleContentProvider).valueOrNull;
+    if (content?.previousChapterId != null) {
+      ref
+          .read(bibleNavigationProvider.notifier)
+          .navigateToChapter(content!.previousChapterId!);
+      _scrollToTop();
+      return;
+    }
+    // Fallback: arithmetic within the same book
+    final nav   = ref.read(bibleNavigationProvider);
     final parts = nav.chapterId.split('.');
-    if (parts.length != 2) return;
-    final num = int.tryParse(parts[1]);
-    if (num == null || num <= 1) return;
-    ref.read(bibleNavigationProvider.notifier).update(
-          (s) => s.copyWith(chapterId: '${parts[0]}.${num - 1}'),
-        );
+    if (parts.length < 2) return;
+    final num   = int.tryParse(parts[1]);
+    if (num == null || num <= 1) return; // Already at first chapter
+    ref
+        .read(bibleNavigationProvider.notifier)
+        .navigateToChapter('${parts[0]}.${num - 1}');
     _scrollToTop();
   }
 
+  /// Navigate to the next chapter.
+  ///
+  /// Uses YouVersion's [BibleChapterContent.nextChapterId] when available
+  /// (cross-book boundaries handled automatically by the API).
   void _goNextChapter() {
-    final nav = ref.read(bibleNavigationProvider);
+    final content = ref.read(bibleContentProvider).valueOrNull;
+    if (content?.nextChapterId != null) {
+      ref
+          .read(bibleNavigationProvider.notifier)
+          .navigateToChapter(content!.nextChapterId!);
+      _scrollToTop();
+      return;
+    }
+    // Fallback: arithmetic within the same book
+    final nav   = ref.read(bibleNavigationProvider);
     final parts = nav.chapterId.split('.');
-    if (parts.length != 2) return;
-    final num = int.tryParse(parts[1]);
+    if (parts.length < 2) return;
+    final num   = int.tryParse(parts[1]);
     if (num == null) return;
-    ref.read(bibleNavigationProvider.notifier).update(
-          (s) => s.copyWith(chapterId: '${parts[0]}.${num + 1}'),
-        );
+    ref
+        .read(bibleNavigationProvider.notifier)
+        .navigateToChapter('${parts[0]}.${num + 1}');
     _scrollToTop();
   }
 
@@ -348,19 +375,19 @@ class _BibleReaderScreenState extends ConsumerState<BibleReaderScreen> {
   }
 
   void _openPicker(BibleReaderPalette palette) {
-    final nav = ref.read(bibleNavigationProvider);
+    final nav     = ref.read(bibleNavigationProvider);
     final chapter = int.tryParse(nav.chapterId.split('.').last) ?? 1;
     BibleChapterPickerSheet.show(
-      context: context,
-      palette: palette,
-      currentBookId: nav.bookId,
+      context:        context,
+      palette:        palette,
+      currentBookId:  nav.bookId,
       currentChapter: chapter,
       onPicked: (bookId, chapterNumber) {
-        ref.read(bibleNavigationProvider.notifier).update(
-              (s) => BibleNavigationState(
-                bookId: bookId,
-                chapterId: '$bookId.$chapterNumber',
-              ),
+        ref
+            .read(bibleNavigationProvider.notifier)
+            .navigate(
+              bookId:    bookId,
+              chapterId: '$bookId.$chapterNumber',
             );
         _scrollToTop();
       },

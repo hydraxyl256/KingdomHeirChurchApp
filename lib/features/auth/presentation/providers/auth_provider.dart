@@ -205,25 +205,28 @@ class AuthNotifier extends AsyncNotifier<void> {
     );
   }
 
-  /// Sign in with Google OAuth (Supabase ID-token flow).
+  /// Sign in with Google (native Android account picker → Supabase ID-token flow).
   Future<void> signInWithGoogle() async {
     state = const AsyncLoading();
     try {
-      await ref.read(authRemoteDataSourceProvider).signInWithGoogle();
+      final result = await ref.read(authRepositoryProvider).signInWithGoogle();
 
-      final user = ref.read(currentUserProvider);
-      if (user != null) {
-        unawaited(ref.read(analyticsServiceProvider).setUserId(user.id));
-        unawaited(
-          ref.read(analyticsServiceProvider).logLogin(method: 'google'),
-        );
-        unawaited(ref.read(pushNotificationServiceProvider).syncToken());
-      }
-      state = const AsyncData(null);
+      state = result.fold(
+        (failure) => AsyncError(failure, StackTrace.current),
+        (user) {
+          // Use the user returned directly from signInWithGoogle —
+          // currentUserProvider may not have propagated yet at this point.
+          unawaited(ref.read(analyticsServiceProvider).setUserId(user.id));
+          unawaited(
+            ref.read(analyticsServiceProvider).logLogin(method: 'google'),
+          );
+          unawaited(ref.read(pushNotificationServiceProvider).syncToken());
+          return const AsyncData(null);
+        },
+      );
     } on GoogleAuthCancelledException {
+      // User dismissed the picker — treat as no-op, not an error.
       state = const AsyncData(null);
-    } catch (e, st) {
-      state = AsyncError(e, st);
     }
   }
 }

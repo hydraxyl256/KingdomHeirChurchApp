@@ -1,16 +1,50 @@
+// Kingdom Heir — Premium Home Dashboard Header (REDESIGNED)
+//
+// Replaces the plain gradient/white block with a full-width immersive hero
+// that matches the visual quality of YouVersion, Hallow, Glorify, and Abide.
+//
+// Stack architecture:
+//   Layer 0 — bundled hero asset (Image.asset, BoxFit.cover, slow Ken Burns)
+//   Layer 1 — dark linear gradient overlay (bottom-heavy, ensures readability)
+//   Layer 2 — vignette radial overlay (subtle edge darkening)
+//   Layer 3 — content column (app brand, date, greeting, name, subtitle, chips)
+//
+// DashboardTopBar (sticky SliverAppBar):
+//   Left  — "Kingdom Heirs" brand mark (Playfair Display, gold)
+//   Right — Bell (Phosphor) + gold-bordered avatar
+//
+// Typography:
+//   Date      → labelSmall, gold, uppercase, 1.8 letter-spacing
+//   Greeting  → headlineMedium, white, bold
+//   Name      → headlineMedium, gold, italic, bold
+//   Subtitle  → bodySmall, #CBD5E1, italic
+//
+// Chips (glassmorphism):
+//   Streak  → PhosphorIconsBold.flame  + gold glow border
+//   Notifs  → PhosphorIconsRegular.bellRinging (shown when > 0)
+//
+// Icons: exclusively Phosphor — no Material icons, no emojis.
+
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
+import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/features/dashboard/domain/home_dashboard_models.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// DashboardTopBar — Sticky sliver app bar (avatar + title + bell)
+// DashboardTopBar — Sticky sliver app bar (brand + avatar + bell)
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Sticky top bar that scrolls under the content. Theme-adaptive surface.
+/// Sticky top bar. Shows the Kingdom Heirs brand on the left and the
+/// user avatar + notification bell on the right.
+/// "Royal Steward" / raw firstName text is intentionally absent — the brand
+/// identity replaces it so the app never displays a user name as the title.
 class DashboardTopBar extends StatelessWidget {
   const DashboardTopBar({
     required this.greeting,
@@ -35,53 +69,38 @@ class DashboardTopBar extends StatelessWidget {
       backgroundColor: cs.surface.withValues(alpha: 0.95),
       surfaceTintColor: Colors.transparent,
       titleSpacing: AppSpacing.md,
+      // ── Brand mark ────────────────────────────────────────────────────────
       title: Row(
         children: [
-          GestureDetector(
-            onTap: onAvatarTap,
-            child: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: AppColors.gold, width: 2),
-              ),
-              child: CircleAvatar(
-                radius: 18,
-                backgroundColor: AppColors.gold.withValues(alpha: 0.18),
-                backgroundImage: greeting.avatarUrl != null
-                    ? NetworkImage(greeting.avatarUrl!)
-                    : null,
-                onBackgroundImageError:
-                    greeting.avatarUrl != null ? (_, __) {} : null,
-                child: greeting.avatarUrl == null
-                    ? const Icon(Icons.person_rounded,
-                        color: AppColors.gold, size: 19,)
-                    : null,
-              ),
-            ),
+          const Icon(
+            PhosphorIconsBold.cross,
+            color: AppColors.gold,
+            size: 16,
+            semanticLabel: 'Kingdom Heirs',
           ),
-          const SizedBox(width: AppSpacing.sm),
-          Flexible(
-            child: Text(
-              greeting.firstName,
-              style: AppTypography.textTheme.titleMedium?.copyWith(
-                fontFamily: 'Playfair Display',
-                color: isDark ? AppColors.goldLight : AppColors.goldDark,
-                fontWeight: FontWeight.bold,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+          const SizedBox(width: AppSpacing.xs),
+          Text(
+            'Kingdom Heirs',
+            style: AppTypography.textTheme.titleMedium?.copyWith(
+              fontFamily: 'Playfair Display',
+              color: isDark ? AppColors.goldLight : AppColors.goldDark,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.4,
             ),
           ),
         ],
       ),
+      // ── Actions: notification bell + avatar ───────────────────────────────
       actions: [
         Stack(
           alignment: Alignment.center,
           children: [
             IconButton(
+              tooltip: 'Notifications',
               icon: Icon(
-                Icons.notifications_none_rounded,
+                PhosphorIconsRegular.bellRinging,
                 color: cs.onSurface,
+                semanticLabel: 'Notifications',
               ),
               onPressed: onNotificationTap,
             ),
@@ -89,44 +108,64 @@ class DashboardTopBar extends StatelessWidget {
               Positioned(
                 top: 10,
                 right: 10,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: AppColors.gold,
-                    shape: BoxShape.circle,
-                  ),
-                ),
+                child: _NotificationDot(
+                  count: greeting.unreadNotifications,
+                ).animate().scale(
+                      duration: const Duration(milliseconds: 350),
+                      curve: Curves.easeOutBack,
+                    ),
               ),
           ],
         ),
-        const SizedBox(width: AppSpacing.xs),
+        Padding(
+          padding: const EdgeInsets.only(right: AppSpacing.sm),
+          child: GestureDetector(
+            onTap: onAvatarTap,
+            child: Semantics(
+              label: 'View profile',
+              button: true,
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.gold, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.gold.withValues(alpha: 0.30),
+                      blurRadius: 8,
+                    ),
+                  ],
+                ),
+                child: CircleAvatar(
+                  radius: 18,
+                  backgroundColor: AppColors.gold.withValues(alpha: 0.18),
+                  backgroundImage: greeting.avatarUrl != null
+                      ? NetworkImage(greeting.avatarUrl!)
+                      : null,
+                  onBackgroundImageError:
+                      greeting.avatarUrl != null ? (_, __) {} : null,
+                  child: greeting.avatarUrl == null
+                      ? const Icon(
+                          PhosphorIconsRegular.userCircle,
+                          color: AppColors.gold,
+                          size: 20,
+                          semanticLabel: 'Profile',
+                        )
+                      : null,
+                ),
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// DashboardGreetingBanner — responsive, theme-adaptive hero banner
+// HeroHeader — public alias used by dashboard_screen.dart
 // ─────────────────────────────────────────────────────────────────────────────
-//
-// Root-cause of previous issues:
-//   • Stack + Positioned.fill with a looping animated RadialGradient had no
-//     intrinsic height — the Stack collapsed and the animated layer bled
-//     outside the banner bounds.
-//   • All text colors were hardcoded white/white54, making the banner
-//     completely unreadable in light theme.
-//   • Chips were in a SingleChildScrollView→Row with no overflow protection.
-//
-// This widget:
-//   • Uses a plain Container (no Stack/Positioned) with a theme-specific
-//     decoration → the banner sizes to its content naturally.
-//   • Defines separate semantic color sets for dark and light.
-//   • Uses Wrap for chips so they reflow on narrow screens.
-//   • Has no fixed height — padding + content drives the height.
 
-// Keep as a private alias so the call-site in dashboard_screen.dart continues
-// to use `HeroHeader(greeting: data.greeting)` with no changes.
+/// Public alias so dashboard_screen.dart requires zero changes.
 class HeroHeader extends StatelessWidget {
   const HeroHeader({required this.greeting, super.key});
 
@@ -134,221 +173,371 @@ class HeroHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      DashboardGreetingBanner(greeting: greeting);
+      _PremiumHeroBanner(greeting: greeting);
 }
 
-/// Production-quality, fully responsive greeting banner.
-class DashboardGreetingBanner extends StatelessWidget {
-  const DashboardGreetingBanner({required this.greeting, super.key});
+// ─────────────────────────────────────────────────────────────────────────────
+// _PremiumHeroBanner — Full-width immersive hero
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _PremiumHeroBanner extends StatelessWidget {
+  const _PremiumHeroBanner({required this.greeting});
 
   final DashboardGreeting greeting;
 
+  static String _cleanTagline(String raw) =>
+      raw.replaceAll(RegExp(r'[\u{1F300}-\u{1F9FF}]', unicode: true), '').trim();
+
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final today = DateFormat('EEEE, MMMM d').format(DateTime.now()).toUpperCase();
+    final today = DateFormat('EEEE • MMMM d')
+        .format(DateTime.now())
+        .toUpperCase();
+    final displayName = greeting.firstName.isNotEmpty
+        ? greeting.firstName
+        : 'Kingdom Heirs Member';
+    final tagline = _cleanTagline(greeting.tagline);
 
-    // ── Theme-specific semantic colors ────────────────────────────────────────
-    //
-    // Dark theme:  deep navy banner, warm ivory primary text, gold accents.
-    // Light theme: warm ivory/cream banner, deep navy/charcoal primary text,
-    //              rich brown-gold accent — no white-on-white issues.
+    final screenWidth = MediaQuery.of(context).size.width;
+    final bannerHeight = screenWidth < 360
+        ? 260.0
+        : screenWidth < 480
+            ? 300.0
+            : screenWidth > 700
+                ? 380.0
+                : 320.0;
 
-    final bannerDecoration = isDark
-        ? const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF0F172A), Color(0xFF1A2744)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          )
-        : BoxDecoration(
-            // Warm ivory/cream — distinct from the page background (white)
-            // so the banner reads as an intentional block.
-            color: const Color(0xFFF5F0E8),
-            border: Border(
-              bottom: BorderSide(
-                color: AppColors.gold.withValues(alpha: 0.25),
-              ),
-            ),
-          );
-
-    // Date label
-    final dateColor = isDark
-        ? AppColors.gold
-        : const Color(0xFF8B6914); // deep amber-brown, WCAG AA on cream
-
-    // "Good Afternoon," greeting line
-    final greetingColor = isDark
-        ? AppColors.warmWhite // high contrast on navy
-        : const Color(0xFF1A2744); // deep navy on cream — strong contrast
-
-    // Member name (italic gold emphasis)
-    final nameColor = isDark
-        ? AppColors.goldLight
-        : const Color(0xFF9A6C00); // rich warm gold, readable on cream
-
-    // Tagline / subtitle
-    final subtitleColor = isDark
-        ? const Color(0xFFB0BEC5) // muted blue-grey, readable on navy
-        : const Color(0xFF4A5568); // dark slate — clearly readable on cream
-
-    // Chip surface + text
-    final chipBackground = isDark
-        ? Colors.white.withValues(alpha: 0.10)
-        : const Color(0xFFE8DEC8); // pale warm tan on cream background
-    final chipBorder = isDark
-        ? Colors.white.withValues(alpha: 0.18)
-        : AppColors.gold.withValues(alpha: 0.35);
-    final chipTextColor = isDark
-        ? AppColors.warmWhite
-        : const Color(0xFF5C4500); // dark amber — readable on tan
-    final chipIconColor = isDark ? AppColors.gold : const Color(0xFF9A6C00);
-
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      decoration: bannerDecoration,
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        AppSpacing.lg,
-        AppSpacing.lg,
-        AppSpacing.xl,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
+      height: bannerHeight,
+      child: Stack(
+        fit: StackFit.expand,
         children: [
-          // ── Date ──────────────────────────────────────────────────────────
-          Text(
-            today,
-            style: AppTypography.textTheme.labelSmall?.copyWith(
-              color: dateColor,
-              letterSpacing: 1.8,
-              fontWeight: FontWeight.w600,
-            ),
-          ).animate().fadeIn(duration: 350.ms),
+          // ── Layer 0: Hero background image ───────────────────────────────
+          const _HeroImage(),
 
-          const SizedBox(height: AppSpacing.xs),
-
-          // ── "Good Afternoon," ──────────────────────────────────────────────
-          Text(
-            '${greeting.greeting},',
-            style: AppTypography.textTheme.headlineMedium?.copyWith(
-              color: greetingColor,
-              fontWeight: FontWeight.w700,
-              height: 1.15,
-              letterSpacing: -0.3,
-            ),
-          ).animate().fadeIn(delay: 80.ms, duration: 350.ms),
-
-          // ── Member name ────────────────────────────────────────────────────
-          Text(
-            greeting.firstName,
-            style: AppTypography.textTheme.headlineMedium?.copyWith(
-              color: nameColor,
-              fontStyle: FontStyle.italic,
-              fontWeight: FontWeight.w700,
-              height: 1.1,
-              letterSpacing: -0.3,
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ).animate().fadeIn(delay: 160.ms, duration: 350.ms),
-
-          const SizedBox(height: AppSpacing.sm),
-
-          // ── Tagline ────────────────────────────────────────────────────────
-          Text(
-            greeting.tagline,
-            style: AppTypography.textTheme.bodySmall?.copyWith(
-              color: subtitleColor,
-              fontStyle: FontStyle.italic,
-              height: 1.5,
-            ),
-          ).animate().fadeIn(delay: 240.ms, duration: 350.ms),
-
-          const SizedBox(height: AppSpacing.md),
-
-          // ── Chips — Wrap so they reflow on narrow screens ─────────────────
-          Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.xs,
-            children: [
-              _BannerChip(
-                icon: Icons.local_fire_department_rounded,
-                label: greeting.streakDays > 0
-                    ? '${greeting.streakDays}-Day Streak 🔥'
-                    : 'Start Your Streak',
-                background: chipBackground,
-                border: chipBorder,
-                textColor: chipTextColor,
-                iconColor: chipIconColor,
+          // ── Layer 1: Dark gradient overlay (bottom-heavy) ────────────────
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0x22000000),
+                  Color(0x88000000),
+                  Color(0xE8000000),
+                ],
+                stops: [0.0, 0.45, 1.0],
               ),
-              if (greeting.unreadNotifications > 0)
-                _BannerChip(
-                  icon: Icons.notifications_active_rounded,
-                  label: '${greeting.unreadNotifications} New',
-                  background: chipBackground,
-                  border: chipBorder,
-                  textColor: chipTextColor,
-                  iconColor: chipIconColor,
+            ),
+          ),
+
+          // ── Layer 2: Edge vignette ────────────────────────────────────────
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: RadialGradient(
+                radius: 1.1,
+                colors: [
+                  Colors.transparent,
+                  Color(0x44000000),
+                ],
+              ),
+            ),
+          ),
+
+          // ── Layer 3: Content ─────────────────────────────────────────────
+          Positioned.fill(
+            child: SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  AppSpacing.md,
+                  AppSpacing.lg,
+                  AppSpacing.xxl,
                 ),
-            ],
-          ).animate().fadeIn(delay: 300.ms, duration: 350.ms),
-        ],
-      ),
-    );
-  }
-}
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    // App identity
+                    Row(
+                      children: [
+                        const Icon(
+                          PhosphorIconsBold.cross,
+                          color: AppColors.gold,
+                          size: 13,
+                          semanticLabel: 'Kingdom Heirs',
+                        ),
+                        const SizedBox(width: AppSpacing.xs),
+                        Text(
+                          'Kingdom Heirs',
+                          style: AppTypography.textTheme.labelSmall?.copyWith(
+                            color: AppColors.gold,
+                            fontFamily: 'Playfair Display',
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1.4,
+                          ),
+                        ),
+                      ],
+                    ).animate().fadeIn(duration: 300.ms),
 
-// ─────────────────────────────────────────────────────────────────────────────
-// _BannerChip — compact pill for streak / notifications
-// ─────────────────────────────────────────────────────────────────────────────
+                    const SizedBox(height: AppSpacing.xs),
 
-class _BannerChip extends StatelessWidget {
-  const _BannerChip({
-    required this.icon,
-    required this.label,
-    required this.background,
-    required this.border,
-    required this.textColor,
-    required this.iconColor,
-  });
+                    // Date
+                    Text(
+                      today,
+                      style: AppTypography.textTheme.labelSmall?.copyWith(
+                        color: AppColors.gold,
+                        letterSpacing: 1.8,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ).animate().fadeIn(duration: 350.ms, delay: 60.ms),
 
-  final IconData icon;
-  final String label;
-  final Color background;
-  final Color border;
-  final Color textColor;
-  final Color iconColor;
+                    const SizedBox(height: AppSpacing.sm),
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.xs + 2,
-      ),
-      decoration: BoxDecoration(
-        color: background,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
-        border: Border.all(color: border),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: iconColor, size: 16),
-          const SizedBox(width: 5),
-          Text(
-            label,
-            style: AppTypography.textTheme.labelSmall?.copyWith(
-              color: textColor,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.2,
+                    // "Good Morning,"
+                    Text(
+                      '${greeting.greeting},',
+                      style: AppTypography.textTheme.headlineMedium?.copyWith(
+                        color: AppColors.warmWhite,
+                        fontWeight: FontWeight.w700,
+                        height: 1.15,
+                        letterSpacing: -0.3,
+                        shadows: [
+                          const Shadow(
+                            color: Color(0x99000000),
+                            blurRadius: 8,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                    )
+                        .animate()
+                        .fadeIn(duration: 350.ms, delay: 120.ms)
+                        .slideY(begin: 0.15, end: 0),
+
+                    // User name (gold italic)
+                    Text(
+                      displayName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.textTheme.headlineMedium?.copyWith(
+                        color: AppColors.goldLight,
+                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.w700,
+                        height: 1.1,
+                        letterSpacing: -0.2,
+                        shadows: [
+                          const Shadow(
+                            color: Color(0xAA000000),
+                            blurRadius: 12,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                    )
+                        .animate()
+                        .fadeIn(duration: 350.ms, delay: 200.ms)
+                        .slideY(begin: 0.15, end: 0),
+
+                    const SizedBox(height: AppSpacing.sm),
+
+                    // Subtitle
+                    Text(
+                      tagline,
+                      style: AppTypography.textTheme.bodySmall?.copyWith(
+                        color: const Color(0xFFCBD5E1),
+                        fontStyle: FontStyle.italic,
+                        height: 1.5,
+                        shadows: [
+                          const Shadow(
+                            color: Color(0x88000000),
+                            blurRadius: 6,
+                          ),
+                        ],
+                      ),
+                    ).animate().fadeIn(duration: 350.ms, delay: 270.ms),
+
+                    const SizedBox(height: AppSpacing.md),
+
+                    // Glassmorphism chips
+                    Wrap(
+                      spacing: AppSpacing.sm,
+                      runSpacing: AppSpacing.xs,
+                      children: [
+                        _GlassChip(
+                          icon: PhosphorIconsBold.flame,
+                          iconColor: AppColors.goldLight,
+                          label: greeting.streakDays > 0
+                              ? '${greeting.streakDays}-Day Streak'
+                              : 'Start Your Streak',
+                        ),
+                        if (greeting.unreadNotifications > 0)
+                          _GlassChip(
+                            icon: PhosphorIconsRegular.bellRinging,
+                            iconColor: AppColors.goldLight,
+                            label: '${greeting.unreadNotifications} New',
+                          ),
+                      ],
+                    )
+                        .animate()
+                        .fadeIn(duration: 350.ms, delay: 340.ms)
+                        .slideY(begin: 0.12, end: 0),
+                  ],
+                ),
+              ),
             ),
           ),
         ],
       ),
     );
   }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// _HeroImage — Ken Burns slow zoom (repeating)
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _HeroImage extends StatelessWidget {
+  const _HeroImage();
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      'assets/images/dashboard/verse_bg.jpg',
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+      errorBuilder: (_, __, ___) => const ColoredBox(
+        color: AppColors.navy,
+      ),
+    )
+        .animate(onPlay: (c) => c.repeat(reverse: true))
+        .scale(
+          begin: const Offset(1, 1),
+          end: const Offset(1.06, 1.06),
+          duration: const Duration(seconds: 12),
+          curve: Curves.easeInOut,
+        );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// _GlassChip — glassmorphism pill (streak / notifications)
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _GlassChip extends StatelessWidget {
+  const _GlassChip({
+    required this.icon,
+    required this.label,
+    this.iconColor = AppColors.gold,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color iconColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(AppRadius.full),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.xs,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(AppRadius.full),
+            border: Border.all(
+              color: AppColors.gold.withValues(alpha: 0.38),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.gold.withValues(alpha: 0.12),
+                blurRadius: 8,
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                color: iconColor,
+                size: 15,
+                semanticLabel: label,
+              ),
+              const SizedBox(width: AppSpacing.xs),
+              Text(
+                label,
+                style: AppTypography.textTheme.labelSmall?.copyWith(
+                  color: AppColors.warmWhite,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.3,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// _NotificationDot — gold badge on the bell icon
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _NotificationDot extends StatelessWidget {
+  const _NotificationDot({required this.count});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    final showCount = count < 10;
+    return Container(
+      width: showCount ? 14 : 10,
+      height: 10,
+      decoration: BoxDecoration(
+        color: AppColors.gold,
+        borderRadius: BorderRadius.circular(AppRadius.circle),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.surface,
+          width: 1.2,
+        ),
+      ),
+      alignment: Alignment.center,
+      child: showCount
+          ? Text(
+              '$count',
+              style: const TextStyle(
+                fontSize: 7,
+                fontWeight: FontWeight.w800,
+                color: AppColors.ink,
+                height: 1,
+              ),
+            )
+          : null,
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DashboardGreetingBanner — legacy alias
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Alias retained for backwards compatibility. Delegates to [_PremiumHeroBanner].
+class DashboardGreetingBanner extends StatelessWidget {
+  const DashboardGreetingBanner({required this.greeting, super.key});
+
+  final DashboardGreeting greeting;
+
+  @override
+  Widget build(BuildContext context) =>
+      _PremiumHeroBanner(greeting: greeting);
 }

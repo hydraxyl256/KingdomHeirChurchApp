@@ -1142,8 +1142,8 @@ class _BenefitChip extends StatelessWidget {
 // Shared Components
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Church logo mark — uses the official `assets/images/logo.jpeg` asset,
-/// with a graceful gold-gradient fallback (no letter placeholders).
+/// Church logo mark — uses the official `assets/images/app_icon.png` asset
+/// (1080×1080 square), which fills the circular container perfectly.
 class _ChurchLogoMark extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -1170,11 +1170,10 @@ class _ChurchLogoMark extends StatelessWidget {
                 ),
               ],
             ),
-            padding: EdgeInsets.all(logoSize * 0.16),
             child: ClipOval(
               child: Image.asset(
-                'assets/images/logo.jpeg',
-                fit: BoxFit.contain,
+                'assets/images/app_icon.png',
+                fit: BoxFit.cover,
                 semanticLabel: 'Kingdom Heirs logo',
                 errorBuilder: (_, __, ___) => const _ChurchLogoFallback(),
               ),

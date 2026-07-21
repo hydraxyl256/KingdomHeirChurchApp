@@ -241,9 +241,9 @@ class _SplashHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context);
-    final logoSize = (mq.size.shortestSide * 0.30).clamp(120.0, 160.0);
+    // 110–140dp per spec: large enough to read clearly, never oversized.
+    final logoSize = (mq.size.shortestSide * 0.28).clamp(110.0, 140.0);
     const reservedBottom = AppSpacing.huge + AppSpacing.xxxl;
-
     final logoContainer = Semantics(
       label: 'Kingdom Heirs',
       image: true,
@@ -262,11 +262,10 @@ class _SplashHero extends StatelessWidget {
             ),
           ],
         ),
-        padding: EdgeInsets.all(logoSize * 0.16),
         child: ClipOval(
           child: Image.asset(
-            'assets/images/logo.jpeg',
-            fit: BoxFit.contain,
+            'assets/images/app_icon.png',
+            fit: BoxFit.cover,
             semanticLabel: 'Kingdom Heirs logo',
             errorBuilder: (_, __, ___) => _LogoFallback(size: logoSize),
           ),
@@ -292,21 +291,25 @@ class _SplashHero extends StatelessWidget {
       ),
     );
 
+    // One-shot logo entrance: scale 0.9→1.0 + fadeIn (600ms).
+    // No repeating pulse — per spec: no bouncing, no oversized scaling.
+    final animatedLogo = reduceMotion
+        ? logoContainer
+        : logoContainer
+            .animate()
+            .scale(
+              begin: const Offset(0.9, 0.9),
+              end: const Offset(1, 1),
+              duration: 600.ms,
+              curve: Curves.easeOutCubic,
+            )
+            .fadeIn(duration: 500.ms, curve: AppMotion.decelerate);
+
     final content = Column(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        if (reduceMotion)
-          logoContainer
-        else
-          logoContainer
-              .animate(onPlay: (c) => c.repeat(reverse: true))
-              .scale(
-                begin: const Offset(1, 1),
-                end: const Offset(1.04, 1.04),
-                duration: 2500.ms,
-                curve: Curves.easeInOutSine,
-              ),
+        animatedLogo,
         const SizedBox(height: AppSpacing.xxxl),
         title,
         const SizedBox(height: AppSpacing.sm),
@@ -314,19 +317,9 @@ class _SplashHero extends StatelessWidget {
       ],
     );
 
-    if (reduceMotion) {
-      return Padding(
-        padding: const EdgeInsets.only(bottom: reservedBottom),
-        child: content,
-      );
-    }
-
     return Padding(
       padding: const EdgeInsets.only(bottom: reservedBottom),
-      child: content.animate().fadeIn(
-            duration: const Duration(milliseconds: 1500),
-            curve: AppMotion.decelerate,
-          ),
+      child: content,
     );
   }
 }

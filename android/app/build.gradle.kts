@@ -68,3 +68,13 @@ flutter {
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }
+
+// ── Crashlytics mapping-file upload ──────────────────────────────────────────
+// Disable the automatic upload task so the build succeeds without internet
+// access (firebasecrashlyticssymbols.googleapis.com unreachable → DNS error).
+// To upload the mapping file manually after a successful build, run:
+//   cd android && ./gradlew uploadCrashlyticsMappingFileRelease
+afterEvaluate {
+    tasks.matching { it.name == "uploadCrashlyticsMappingFileRelease" }
+        .configureEach { enabled = false }
+}

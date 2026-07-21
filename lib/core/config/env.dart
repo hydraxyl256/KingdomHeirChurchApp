@@ -25,6 +25,17 @@ abstract final class Env {
         '.y2buTHSDPTBNSvKWSOYZjCW764IqWDEmyrAfri7Vlog',
   );
 
+  // Google Sign-In — Web OAuth Client ID (from Google Cloud Console).
+  // Must match the client configured in Supabase Auth → Providers → Google.
+  // Obtain from: console.cloud.google.com → APIs & Services → Credentials
+  //              → Web application OAuth 2.0 Client.
+  // Injected at build time via: --dart-define=GOOGLE_WEB_CLIENT_ID=<value>
+  static const String googleWebClientId = String.fromEnvironment(
+    'GOOGLE_WEB_CLIENT_ID',
+    defaultValue:
+        '319503559370-jea1m3rt0ivije005lguihoid3hro8md.apps.googleusercontent.com',
+  );
+
   static const String sentryDsn = String.fromEnvironment(
     'SENTRY_DSN',
     defaultValue:
@@ -35,7 +46,9 @@ abstract final class Env {
   //   'STRIPE_PUBLISHABLE_KEY',
   // );
 
-  static const String apiBibleKey = String.fromEnvironment(
+  // YouVersion Platform API key — obtained from platform.youversion.com
+  // Injected at build time via: --dart-define=YOU_VERSION_KEY=<your_key>
+  static const String youVersionKey = String.fromEnvironment(
     'YOU_VERSION_KEY',
     defaultValue: '490kxH8f7HvmTZuMvG4c1Fnec6ARpWAr9gE6atPAvBnwJTNa',
   );

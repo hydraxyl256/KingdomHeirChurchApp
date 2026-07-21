@@ -51,10 +51,10 @@ class AuthRepositoryImpl implements AuthRepository {
       });
 
   @override
-  Future<Either<Failure, Unit>> signInWithGoogle() =>
+  Future<Either<Failure, AppUser>> signInWithGoogle() =>
       ErrorHandler.guard(() async {
-        await _remote.signInWithGoogle();
-        return unit;
+        final model = await _remote.signInWithGoogle();
+        return model.toEntity();
       });
 
   @override
