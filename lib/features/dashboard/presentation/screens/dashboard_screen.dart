@@ -118,6 +118,18 @@ class _HomeDashboardBody extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    // --- BINARY FINGERPRINT INJECTION ---
+                    Container(
+                      width: double.infinity,
+                      color: Colors.red,
+                      padding: const EdgeInsets.all(8),
+                      child: const Text(
+                        'FINGERPRINT: Dashboard | Version: 2026.07.22 | Commit: abc1234 | Repo: HomeDashboardRepository | Mode: ${bool.fromEnvironment('dart.vm.product') ? 'Release' : 'Debug'}',
+                        style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    // -------------------------------------
                     // ── 1. Hero ────────────────────────────────────────────
                     HeroHeader(
                       greeting: data.greeting,

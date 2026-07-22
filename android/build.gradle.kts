@@ -26,6 +26,7 @@ subprojects {
         if (project.plugins.hasPlugin("com.android.library") ||
             project.plugins.hasPlugin("com.android.application")) {
             extensions.configure<com.android.build.gradle.BaseExtension> {
+                compileSdkVersion(35)
                 compileOptions {
                     sourceCompatibility = JavaVersion.VERSION_17
                     targetCompatibility = JavaVersion.VERSION_17

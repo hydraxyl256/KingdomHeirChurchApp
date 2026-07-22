@@ -1,7 +1,7 @@
 name: kingdom_heir
 description: Kingdom Heir — A production-ready church management app.
 publish_to: "none"
-version: 1.0.2+5
+version: 1.0.3+6
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -128,4 +128,3 @@ flutter_launcher_icons:
   adaptive_icon_background: "#160B2D"
   adaptive_icon_foreground: "assets/images/app_icon.png"
   remove_alpha_ios: true
-

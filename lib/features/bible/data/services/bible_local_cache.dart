@@ -1,7 +1,6 @@
-import 'dart:convert';
-
+import 'package:kingdom_heir/core/storage/cache_keys.dart';
+import 'package:kingdom_heir/core/storage/cache_manager.dart';
 import 'package:kingdom_heir/features/bible/domain/entities/bible_models.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// SharedPreferences-backed cache for Bible content and user state.
 ///
@@ -9,17 +8,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// authoritative source of scripture.  Cached content is served when available
 /// to reduce latency; it never replaces a fresh API call on cold start.
 class BibleLocalCache {
-  BibleLocalCache(this._prefs);
-  final SharedPreferences _prefs;
+  BibleLocalCache(this._cacheManager);
+  final CacheManager _cacheManager;
 
   // ── Keys ─────────────────────────────────────────────────────────────────────
-  static const _booksPrefix = 'bible_books_v2_';
-  static const _chaptersPrefix = 'bible_chapters_v2_';
-  static const _contentPrefix = 'bible_content_v2_';
-  static const _lastVersionKey = 'bible_last_version_id';
-  static const _lastBookKey = 'bible_last_book_id';
-  static const _lastChapterKey = 'bible_last_chapter_id';
-  static const _recentSearchesKey = 'bible_recent_searches_v1';
   static const _maxRecentSearches = 10;
 
   // ── Books ─────────────────────────────────────────────────────────────────────
@@ -36,14 +28,23 @@ class BibleLocalCache {
           },
         )
         .toList();
-    await _prefs.setString('$_booksPrefix$versionId', jsonEncode(jsonList));
+    await _cacheManager.write(
+      key: CacheKeys.bibleBooks(versionId),
+      payload: jsonList,
+      feature: 'bible',
+      repository: 'BibleLocalCache',
+    );
   }
 
   List<BibleBook>? getCachedBooks(int versionId) {
-    final str = _prefs.getString('$_booksPrefix$versionId');
-    if (str == null) return null;
+    final cached = _cacheManager.read(
+      key: CacheKeys.bibleBooks(versionId),
+      feature: 'bible',
+      repository: 'BibleLocalCache',
+    );
+    if (cached == null) return null;
     try {
-      final list = jsonDecode(str) as List<dynamic>;
+      final list = cached as List<dynamic>;
       return list
           .map((e) => BibleBook.fromJson(e as Map<String, dynamic>))
           .toList();
@@ -70,17 +71,23 @@ class BibleLocalCache {
           },
         )
         .toList();
-    await _prefs.setString(
-      '$_chaptersPrefix${versionId}_$bookId',
-      jsonEncode(jsonList),
+    await _cacheManager.write(
+      key: CacheKeys.bibleChapters(versionId, bookId),
+      payload: jsonList,
+      feature: 'bible',
+      repository: 'BibleLocalCache',
     );
   }
 
   List<BibleChapter>? getCachedChapters(int versionId, String bookId) {
-    final str = _prefs.getString('$_chaptersPrefix${versionId}_$bookId');
-    if (str == null) return null;
+    final cached = _cacheManager.read(
+      key: CacheKeys.bibleChapters(versionId, bookId),
+      feature: 'bible',
+      repository: 'BibleLocalCache',
+    );
+    if (cached == null) return null;
     try {
-      final list = jsonDecode(str) as List<dynamic>;
+      final list = cached as List<dynamic>;
       return list
           .map((e) => BibleChapter.fromJson(e as Map<String, dynamic>))
           .toList();
@@ -106,17 +113,23 @@ class BibleLocalCache {
       'nextChapterId': content.nextChapterId,
       'previousChapterId': content.previousChapterId,
     };
-    await _prefs.setString(
-      '$_contentPrefix${versionId}_$chapterId',
-      jsonEncode(map),
+    await _cacheManager.write(
+      key: CacheKeys.bibleContent(versionId, chapterId),
+      payload: map,
+      feature: 'bible',
+      repository: 'BibleLocalCache',
     );
   }
 
   BibleChapterContent? getCachedContent(int versionId, String chapterId) {
-    final str = _prefs.getString('$_contentPrefix${versionId}_$chapterId');
-    if (str == null) return null;
+    final cached = _cacheManager.read(
+      key: CacheKeys.bibleContent(versionId, chapterId),
+      feature: 'bible',
+      repository: 'BibleLocalCache',
+    );
+    if (cached == null) return null;
     try {
-      final map = jsonDecode(str) as Map<String, dynamic>;
+      final map = cached as Map<String, dynamic>;
       return BibleChapterContent.fromJson(map);
     } catch (_) {
       return null;
@@ -126,10 +139,21 @@ class BibleLocalCache {
   // ── Last Selected Version ─────────────────────────────────────────────────────
 
   Future<void> saveLastVersion(int versionId) async {
-    await _prefs.setInt(_lastVersionKey, versionId);
+    await _cacheManager.write(
+      key: CacheKeys.bibleLastVersion,
+      payload: versionId,
+      feature: 'bible',
+      repository: 'BibleLocalCache',
+    );
   }
 
-  int? getLastVersion() => _prefs.getInt(_lastVersionKey);
+  int? getLastVersion() {
+    return _cacheManager.read(
+      key: CacheKeys.bibleLastVersion,
+      feature: 'bible',
+      repository: 'BibleLocalCache',
+    ) as int?;
+  }
 
   // ── Last Reading Position ─────────────────────────────────────────────────────
 
@@ -137,13 +161,32 @@ class BibleLocalCache {
     required String bookId,
     required String chapterId,
   }) async {
-    await _prefs.setString(_lastBookKey, bookId);
-    await _prefs.setString(_lastChapterKey, chapterId);
+    await _cacheManager.write(
+      key: CacheKeys.bibleLastBook,
+      payload: bookId,
+      feature: 'bible',
+      repository: 'BibleLocalCache',
+    );
+    await _cacheManager.write(
+      key: CacheKeys.bibleLastChapter,
+      payload: chapterId,
+      feature: 'bible',
+      repository: 'BibleLocalCache',
+    );
   }
 
   ({String bookId, String chapterId})? getLastPosition() {
-    final book = _prefs.getString(_lastBookKey);
-    final chapter = _prefs.getString(_lastChapterKey);
+    final book = _cacheManager.read(
+      key: CacheKeys.bibleLastBook,
+      feature: 'bible',
+      repository: 'BibleLocalCache',
+    ) as String?;
+    final chapter = _cacheManager.read(
+      key: CacheKeys.bibleLastChapter,
+      feature: 'bible',
+      repository: 'BibleLocalCache',
+    ) as String?;
+    
     if (book == null || chapter == null) return null;
     return (bookId: book, chapterId: chapter);
   }
@@ -156,20 +199,34 @@ class BibleLocalCache {
     final updated = [query, ...current.where((s) => s != query)]
         .take(_maxRecentSearches)
         .toList();
-    await _prefs.setString(_recentSearchesKey, jsonEncode(updated));
+        
+    await _cacheManager.write(
+      key: CacheKeys.bibleRecentSearches,
+      payload: updated,
+      feature: 'bible',
+      repository: 'BibleLocalCache',
+    );
   }
 
   List<String> getRecentSearches() {
-    final str = _prefs.getString(_recentSearchesKey);
-    if (str == null) return const [];
+    final cached = _cacheManager.read(
+      key: CacheKeys.bibleRecentSearches,
+      feature: 'bible',
+      repository: 'BibleLocalCache',
+    );
+    if (cached == null) return const [];
     try {
-      return (jsonDecode(str) as List<dynamic>).cast<String>();
+      return (cached as List<dynamic>).cast<String>();
     } catch (_) {
       return const [];
     }
   }
 
   Future<void> clearRecentSearches() async {
-    await _prefs.remove(_recentSearchesKey);
+    await _cacheManager.invalidate(
+      CacheKeys.bibleRecentSearches,
+      feature: 'bible',
+      repository: 'BibleLocalCache',
+    );
   }
 }

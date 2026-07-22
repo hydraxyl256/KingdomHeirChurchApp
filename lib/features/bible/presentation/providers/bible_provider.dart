@@ -12,7 +12,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 // ─────────────────────────────────────────────────────────────────────────────
 
 final bibleLocalCacheProvider = Provider<BibleLocalCache>((ref) {
-  return BibleLocalCache(ref.watch(sharedPreferencesProvider));
+  return BibleLocalCache(ref.watch(cacheManagerProvider));
 });
 
 final bibleRepositoryProvider = Provider<BibleRepository>((ref) {

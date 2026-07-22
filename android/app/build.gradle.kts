@@ -20,7 +20,7 @@ plugins {
 
 android {
     namespace = "com.kingdomheir.kingdom_heir"
-    compileSdk = 35
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

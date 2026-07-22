@@ -1,42 +1,86 @@
-import 'dart:convert';
+import 'dart:async';
+import 'dart:io';
 import 'package:fpdart/fpdart.dart';
+import 'package:kingdom_heir/core/logging/structured_logger.dart';
+import 'package:kingdom_heir/core/storage/cache_keys.dart';
+import 'package:kingdom_heir/core/storage/cache_manager.dart';
 import 'package:kingdom_heir/features/groups/domain/entities/group_announcement_models.dart';
 import 'package:kingdom_heir/features/groups/domain/entities/group_event_models.dart';
 import 'package:kingdom_heir/features/groups/domain/entities/group_member_models.dart';
 import 'package:kingdom_heir/features/groups/domain/entities/group_models.dart';
 import 'package:kingdom_heir/features/groups/domain/entities/group_prayer_models.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class GroupsSupabaseService {
-  GroupsSupabaseService(this._client, this._prefs);
+  GroupsSupabaseService(this._client, this._cacheManager);
   final SupabaseClient _client;
-  final SharedPreferences _prefs;
+  final CacheManager _cacheManager;
 
   Future<Either<String, T>> _guardData<T>(
-    String label,
+    String cacheKey,
+    Duration ttl,
     Future<dynamic> Function() fetchJson,
     T Function(dynamic) parseJson,
     T emptyState,
   ) async {
-    final cacheKey = 'groups_cache_$label';
+    StructuredLogger.networkRequestStarted(
+      feature: 'groups',
+      repository: 'GroupsSupabaseService',
+      datasource: 'supabase',
+    );
+    final stopwatch = Stopwatch()..start();
+
     try {
       final data = await fetchJson();
-      final cachePayload = {
-        'data': data,
-        'cached_at': DateTime.now().toIso8601String(),
-      };
-      await _prefs.setString(cacheKey, jsonEncode(cachePayload));
+      stopwatch.stop();
+
+      StructuredLogger.networkRequestCompleted(
+        feature: 'groups',
+        repository: 'GroupsSupabaseService',
+        datasource: 'supabase',
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
+
+      await _cacheManager.write(
+        key: cacheKey,
+        payload: data,
+        feature: 'groups',
+        repository: 'GroupsSupabaseService',
+        ttl: ttl,
+      );
+
       return right(parseJson(data));
     } catch (e) {
-      final cachedString = _prefs.getString(cacheKey);
-      if (cachedString != null) {
+      stopwatch.stop();
+      
+      final isNetworkError = e is SocketException || e is TimeoutException || e.toString().toLowerCase().contains('network') || e.toString().toLowerCase().contains('socket');
+      
+      if (!isNetworkError) {
+        StructuredLogger.parsingFailed(
+          feature: 'groups',
+          repository: 'GroupsSupabaseService',
+          error: e.toString(),
+        );
+        rethrow;
+      }
+
+      StructuredLogger.networkRequestFailed(
+        feature: 'groups',
+        repository: 'GroupsSupabaseService',
+        datasource: 'supabase',
+        durationMs: stopwatch.elapsedMilliseconds,
+        errorType: e.runtimeType.toString(),
+      );
+
+      final cached = _cacheManager.read(
+        key: cacheKey,
+        feature: 'groups',
+        repository: 'GroupsSupabaseService',
+      );
+
+      if (cached != null) {
         try {
-          final cached = jsonDecode(cachedString) as Map<String, dynamic>;
-          final data = cached['data'];
-          if (data != null) {
-            return right(parseJson(data));
-          }
+          return right(parseJson(cached));
         } catch (_) {}
       }
       return right(emptyState);
@@ -48,7 +92,8 @@ class GroupsSupabaseService {
   // ─────────────────────────────────────────────────────────────────
 
   Future<Either<String, List<CommunityGroup>>> getGroups() => _guardData<List<CommunityGroup>>(
-        'getGroups',
+        CacheKeys.groupsList,
+        const Duration(minutes: 30),
         () async {
           return await _client.from('groups').select('''
             *,
@@ -149,54 +194,29 @@ class GroupsSupabaseService {
   // ─────────────────────────────────────────────────────────────────
 
   Future<Either<String, GroupDetail>> getGroupDetail(String groupId) async {
-    final cacheKey = 'groups_cache_detail_$groupId';
-    try {
-      final response = await _client.from('groups').select('''
+    return _guardData<GroupDetail>(
+      CacheKeys.groupDetail(groupId),
+      const Duration(minutes: 30),
+      () async {
+        final response = await _client.from('groups').select('''
             *,
             group_categories(name),
             group_members(*, profiles(*))
           ''').eq('id', groupId).maybeSingle();
-
-      if (response != null) {
-        final cachePayload = {
-          'data': response,
-          'cached_at': DateTime.now().toIso8601String(),
-        };
-        await _prefs.setString(cacheKey, jsonEncode(cachePayload));
-
+        if (response == null) {
+          throw Exception('Group not found');
+        }
+        return response;
+      },
+      (dynamic data) {
         final group = CommunityGroup.fromJson(
-          (response as Map).cast<String, dynamic>(),
+          (data as Map).cast<String, dynamic>(),
           currentUserId: _client.auth.currentUser?.id,
         );
-        return right(
-          GroupDetail(
-            group: group,
-          ),
-        );
-      }
-
-      return left('Group not found');
-    } catch (_) {
-      final cachedString = _prefs.getString(cacheKey);
-      if (cachedString != null) {
-        try {
-          final cached = jsonDecode(cachedString) as Map<String, dynamic>;
-          final data = cached['data'];
-          if (data != null) {
-            final group = CommunityGroup.fromJson(
-              (data as Map).cast<String, dynamic>(),
-              currentUserId: _client.auth.currentUser?.id,
-            );
-            return right(
-              GroupDetail(
-                group: group,
-              ),
-            );
-          }
-        } catch (_) {}
-      }
-      return left('Group not found offline');
-    }
+        return GroupDetail(group: group);
+      },
+      const GroupDetail(group: CommunityGroup(id: '0', name: 'Unknown', description: 'Unknown', isPrivate: false)),
+    );
   }
 
   // ─────────────────────────────────────────────────────────────────

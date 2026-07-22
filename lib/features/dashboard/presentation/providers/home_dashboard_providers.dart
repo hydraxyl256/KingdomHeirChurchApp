@@ -14,7 +14,7 @@ import 'package:kingdom_heir/features/dashboard/domain/home_dashboard_models.dar
 // ── Repository DI ────────────────────────────────────────────────────────────
 
 final homeDashboardRepositoryProvider = Provider<HomeDashboardRepository>(
-  (ref) => HomeDashboardRepository(ref.watch(sharedPreferencesProvider)),
+  (ref) => HomeDashboardRepository(ref.watch(cacheManagerProvider)),
 );
 
 // ── Per-section providers (independent loading + skeletons) ────────────────

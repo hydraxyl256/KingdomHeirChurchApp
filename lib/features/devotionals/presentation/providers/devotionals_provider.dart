@@ -11,7 +11,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 final devotionalRepositoryProvider = Provider<DevotionalRepository>((ref) {
   return DevotionalRepositoryImpl(
-    supabaseService: DevotionalSupabaseService(Supabase.instance.client),
+    supabaseService: DevotionalSupabaseService(
+      Supabase.instance.client,
+      ref.watch(cacheManagerProvider),
+    ),
     localCache: DevotionalLocalCache(ref.watch(sharedPreferencesProvider)),
   );
 });

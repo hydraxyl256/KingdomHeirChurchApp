@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kingdom_heir/core/config/app_config.dart';
+import 'package:kingdom_heir/core/storage/cache_manager.dart';
 import 'package:kingdom_heir/core/storage/local_storage_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -24,6 +25,13 @@ final supabaseClientProvider = Provider<SupabaseClient>((ref) {
 final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
   throw UnimplementedError(
     'sharedPreferencesProvider must be overridden in bootstrap',
+  );
+});
+
+/// Provides [CacheManager].
+final cacheManagerProvider = Provider<CacheManager>((ref) {
+  throw UnimplementedError(
+    'cacheManagerProvider must be overridden in bootstrap',
   );
 });
 

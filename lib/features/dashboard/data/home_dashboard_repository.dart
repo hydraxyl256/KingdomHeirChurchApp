@@ -5,12 +5,13 @@
 
 // ignore_for_file: avoid_dynamic_calls, inference_failure_on_function_invocation
 
-import 'dart:convert';
-
+import 'dart:async';
+import 'dart:io';
 import 'package:kingdom_heir/core/error/failure.dart';
+import 'package:kingdom_heir/core/logging/structured_logger.dart';
+import 'package:kingdom_heir/core/storage/cache_keys.dart';
+import 'package:kingdom_heir/core/storage/cache_manager.dart';
 import 'package:kingdom_heir/features/dashboard/domain/home_dashboard_models.dart';
-import 'package:logger/logger.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Outcome of a save-back write
@@ -22,18 +23,18 @@ class DashboardWriteResult {
 
 class HomeDashboardRepository {
   HomeDashboardRepository(
-    this._prefs, {
+    this._cacheManager, {
     SupabaseClient? client,
   }) : _client = client ?? Supabase.instance.client;
 
   final SupabaseClient _client;
-  final SharedPreferences _prefs;
-  final Logger _log = Logger(printer: PrettyPrinter(methodCount: 0));
+  final CacheManager _cacheManager;
 
   // ── Greeting ─────────────────────────────────────────────────────────────
 
   Future<DashboardGreeting> fetchGreeting() => _guardData<DashboardGreeting>(
-        'fetchGreeting',
+        CacheKeys.dashboardGreeting,
+        const Duration(minutes: 30),
         () async {
           final uid = _userId;
           if (uid == null) throw Exception('No user');
@@ -61,7 +62,8 @@ class HomeDashboardRepository {
   // ── Scripture ────────────────────────────────────────────────────────────
 
   Future<List<ScriptureCard>> fetchScriptureRoster() => _guardData<List<ScriptureCard>>(
-        'fetchScriptureRoster',
+        CacheKeys.dashboardScripture,
+        const Duration(minutes: 30),
         () async {
           return await _client.rpc<dynamic>('get_dashboard_scripture');
         },
@@ -96,7 +98,8 @@ class HomeDashboardRepository {
   // ── Continue Your Journey ────────────────────────────────────────────────
 
   Future<List<ContinueCard>> fetchContinueCards() => _guardData<List<ContinueCard>>(
-        'fetchContinueCards',
+        CacheKeys.dashboardRecentSermon, // Or continue cards key
+        const Duration(minutes: 30),
         () async {
           final uid = _userId;
           if (uid == null) throw Exception('No user');
@@ -127,7 +130,8 @@ class HomeDashboardRepository {
   // ── Live / Next Service ──────────────────────────────────────────────────
 
   Future<ServiceStatus> fetchServiceStatus() => _guardData<ServiceStatus>(
-        'fetchServiceStatus',
+        CacheKeys.dashboardServiceStatus,
+        const Duration(minutes: 30),
         () async {
           return await _client.rpc<dynamic>('get_dashboard_service').maybeSingle();
         },
@@ -153,7 +157,8 @@ class HomeDashboardRepository {
   // ── Daily Journey ────────────────────────────────────────────────────────
 
   Future<DailyJourney> fetchDailyJourney() => _guardData<DailyJourney>(
-        'fetchDailyJourney',
+        CacheKeys.dashboardActiveSeries, // Or daily journey
+        const Duration(minutes: 30),
         () async {
           final uid = _userId;
           if (uid == null) throw Exception('No user');
@@ -208,7 +213,6 @@ class HomeDashboardRepository {
       );
       return const DashboardWriteResult(success: true);
     } catch (e) {
-      _log.w('toggleJourneyTask failed', error: e);
       return DashboardWriteResult(success: false, error: e);
     }
   }
@@ -216,7 +220,8 @@ class HomeDashboardRepository {
   // ── Church Today ─────────────────────────────────────────────────────────
 
   Future<List<TodayEvent>> fetchTodayEvents() => _guardData<List<TodayEvent>>(
-        'fetchTodayEvents',
+        CacheKeys.dashboardFeaturedEvent,
+        const Duration(minutes: 30),
         () async {
           return await _client.rpc<dynamic>('get_dashboard_events');
         },
@@ -245,7 +250,8 @@ class HomeDashboardRepository {
   // ── Prayer Corner ────────────────────────────────────────────────────────
 
   Future<PrayerCorner> fetchPrayerCorner() => _guardData<PrayerCorner>(
-        'fetchPrayerCorner',
+        CacheKeys.dashboardPrayerCorner,
+        const Duration(minutes: 30),
         () async {
           return await _client.rpc<dynamic>(
             'get_dashboard_prayer',
@@ -280,7 +286,6 @@ class HomeDashboardRepository {
       );
       return result as int?;
     } catch (e) {
-      _log.w('incrementPrayerCount failed', error: e);
       return null;
     }
   }
@@ -288,7 +293,8 @@ class HomeDashboardRepository {
   // ── Community Highlight ──────────────────────────────────────────────────
 
   Future<CommunityHighlight> fetchCommunityHighlight() => _guardData<CommunityHighlight>(
-        'fetchCommunityHighlight',
+        CacheKeys.dashboardAnnouncements,
+        const Duration(minutes: 30),
         () async {
           final uid = _userId;
           if (uid == null) throw Exception('No user');
@@ -314,7 +320,8 @@ class HomeDashboardRepository {
   // ── Continue Watching ────────────────────────────────────────────────────
 
   Future<List<WatchCard>> fetchWatchCards() => _guardData<List<WatchCard>>(
-        'fetchWatchCards',
+        'cache_dashboard_watch_cards',
+        const Duration(minutes: 30),
         () async {
           final uid = _userId;
           if (uid == null) throw Exception('No user');
@@ -366,7 +373,6 @@ class HomeDashboardRepository {
       );
       return const DashboardWriteResult(success: true);
     } catch (e) {
-      _log.w('updateWatchProgress failed', error: e);
       return DashboardWriteResult(success: false, error: e);
     }
   }
@@ -409,30 +415,73 @@ class HomeDashboardRepository {
   }
 
   Future<T> _guardData<T>(
-    String label,
+    String cacheKey,
+    Duration ttl,
     Future<dynamic> Function() fetchJson,
     T Function(dynamic) parseJson,
     T Function() emptyState,
   ) async {
-    final cacheKey = 'dashboard_cache_$label';
+    StructuredLogger.networkRequestStarted(
+      feature: 'dashboard',
+      repository: 'HomeDashboardRepository',
+      datasource: 'supabase_rpc',
+    );
+    final stopwatch = Stopwatch()..start();
+
     try {
       final data = await fetchJson();
-      final cachePayload = {
-        'data': data,
-        'cached_at': DateTime.now().toIso8601String(),
-      };
-      await _prefs.setString(cacheKey, jsonEncode(cachePayload));
+      stopwatch.stop();
+
+      StructuredLogger.networkRequestCompleted(
+        feature: 'dashboard',
+        repository: 'HomeDashboardRepository',
+        datasource: 'supabase_rpc',
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
+
+      // Rule 1: Always overwrite cache on success, even if empty/null.
+      await _cacheManager.write(
+        key: cacheKey,
+        payload: data,
+        feature: 'dashboard',
+        repository: 'HomeDashboardRepository',
+        ttl: ttl,
+      );
+
       return parseJson(data);
-    } catch (e, st) {
-      _log.w('HomeDashboardRepository.$label live fetch failed; using offline fallback', error: e, stackTrace: st);
-      final cachedString = _prefs.getString(cacheKey);
-      if (cachedString != null) {
+    } catch (e) {
+      stopwatch.stop();
+      
+      final isNetworkError = e is SocketException || e is TimeoutException || e.toString().toLowerCase().contains('network') || e.toString().toLowerCase().contains('socket');
+      
+      if (!isNetworkError) {
+        // Rule 5: Non-recoverable failures (e.g. parsing, logic) must THROW.
+        StructuredLogger.parsingFailed(
+          feature: 'dashboard',
+          repository: 'HomeDashboardRepository',
+          error: e.toString(),
+        );
+        rethrow;
+      }
+
+      StructuredLogger.networkRequestFailed(
+        feature: 'dashboard',
+        repository: 'HomeDashboardRepository',
+        datasource: 'supabase_rpc',
+        durationMs: stopwatch.elapsedMilliseconds,
+        errorType: e.runtimeType.toString(),
+      );
+
+      // Rule 4: Recoverable failures fallback to cache
+      final cached = _cacheManager.read(
+        key: cacheKey,
+        feature: 'dashboard',
+        repository: 'HomeDashboardRepository',
+      );
+
+      if (cached != null) {
         try {
-          final cached = jsonDecode(cachedString) as Map<String, dynamic>;
-          final data = cached['data'];
-          if (data != null) {
-            return parseJson(data);
-          }
+          return parseJson(cached);
         } catch (_) {}
       }
       return emptyState();

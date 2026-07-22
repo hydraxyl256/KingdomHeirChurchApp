@@ -9,6 +9,7 @@ import 'package:kingdom_heir/core/config/app_config.dart';
 import 'package:kingdom_heir/core/config/env.dart';
 import 'package:kingdom_heir/core/di/providers.dart';
 import 'package:kingdom_heir/core/notifications/push_notification_service.dart';
+import 'package:kingdom_heir/core/storage/cache_manager.dart';
 import 'package:kingdom_heir/firebase_options.dart';
 import 'package:logger/logger.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -27,6 +28,10 @@ Future<ProviderContainer> bootstrap() async {
 
   // 3. Load local storage
   final prefs = await SharedPreferences.getInstance();
+
+  // 3.1 Initialize CacheManager & migrate schema
+  final cacheManager = CacheManager(prefs);
+  await cacheManager.initializeAndMigrate();
 
   // 4. Initialise Supabase
   await Supabase.initialize(
@@ -82,6 +87,7 @@ Future<ProviderContainer> bootstrap() async {
     overrides: [
       appConfigProvider.overrideWithValue(config),
       sharedPreferencesProvider.overrideWithValue(prefs),
+      cacheManagerProvider.overrideWithValue(cacheManager),
     ],
   );
 

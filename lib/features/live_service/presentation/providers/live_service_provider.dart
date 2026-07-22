@@ -6,9 +6,9 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kingdom_heir/core/di/providers.dart';
 import 'package:kingdom_heir/features/live_service/data/repositories/live_service_repository.dart';
 import 'package:kingdom_heir/features/live_service/domain/entities/live_service_models.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -101,11 +101,21 @@ class LiveChatNotifier extends AsyncNotifier<void> {
       await _db.from('live_chat_messages').insert(msg.toInsertJson(serviceId));
     } catch (_) {
       // Offline queue: store locally and retry on reconnect
-      final prefs = await SharedPreferences.getInstance();
-      final queue = prefs.getStringList('chat_offline_queue') ?? [];
-      await prefs.setStringList(
-        'chat_offline_queue',
-        queue..add('$serviceId|${msg.body}'),
+      final cacheManager = ref.read(cacheManagerProvider);
+      final queue = (cacheManager.read(
+        key: 'chat_offline_queue',
+        feature: 'live_service',
+        repository: 'LiveChatNotifier',
+      ) as List<dynamic>?)?.cast<String>() ?? [];
+      
+      // ignore: cascade_invocations
+      queue.add('$serviceId|${msg.body}');
+      
+      await cacheManager.write(
+        key: 'chat_offline_queue',
+        payload: queue,
+        feature: 'live_service',
+        repository: 'LiveChatNotifier',
       );
     }
   }
@@ -200,9 +210,19 @@ class SermonNotesNotifier
   }
 
   Future<void> _loadFromPrefs(String sermonId) async {
-    final prefs = await SharedPreferences.getInstance();
-    final body = prefs.getString('$_prefixKey$sermonId') ?? '';
-    final scriptureRef = prefs.getString('${_prefixKey}scripture_$sermonId');
+    final cacheManager = ref.read(cacheManagerProvider);
+    final body = cacheManager.read(
+      key: '$_prefixKey$sermonId',
+      feature: 'live_service',
+      repository: 'SermonNotesNotifier',
+    ) as String? ?? '';
+    
+    final scriptureRef = cacheManager.read(
+      key: '${_prefixKey}scripture_$sermonId',
+      feature: 'live_service',
+      repository: 'SermonNotesNotifier',
+    ) as String?;
+    
     if (body.isNotEmpty) {
       state = SermonNote(
         id: sermonId,
@@ -231,10 +251,20 @@ class SermonNotesNotifier
     state = note;
 
     // Local persist
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('$_prefixKey$sermonId', body);
+    final cacheManager = ref.read(cacheManagerProvider);
+    await cacheManager.write(
+      key: '$_prefixKey$sermonId',
+      payload: body,
+      feature: 'live_service',
+      repository: 'SermonNotesNotifier',
+    );
     if (scriptureRef != null) {
-      await prefs.setString('${_prefixKey}scripture_$sermonId', scriptureRef);
+      await cacheManager.write(
+        key: '${_prefixKey}scripture_$sermonId',
+        payload: scriptureRef,
+        feature: 'live_service',
+        repository: 'SermonNotesNotifier',
+      );
     }
 
     // Background Supabase sync
@@ -271,9 +301,17 @@ class SermonNotesNotifier
 
   Future<void> clearNote(String sermonId) async {
     state = null;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('$_prefixKey$sermonId');
-    await prefs.remove('${_prefixKey}scripture_$sermonId');
+    final cacheManager = ref.read(cacheManagerProvider);
+    await cacheManager.invalidate(
+      '$_prefixKey$sermonId',
+      feature: 'live_service',
+      repository: 'SermonNotesNotifier',
+    );
+    await cacheManager.invalidate(
+      '${_prefixKey}scripture_$sermonId',
+      feature: 'live_service',
+      repository: 'SermonNotesNotifier',
+    );
   }
 }
 

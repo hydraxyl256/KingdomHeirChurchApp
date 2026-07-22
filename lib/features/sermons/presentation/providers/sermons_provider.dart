@@ -11,8 +11,8 @@ import 'package:kingdom_heir/features/sermons/domain/repositories/sermons_reposi
 // ─── Repository ─────────────────────────────────────────────────────
 
 final sermonsRepositoryProvider = Provider<SermonsRepository>((ref) {
-  final prefs = ref.watch(sharedPreferencesProvider);
-  return SermonsRepositoryImpl(ref.watch(supabaseClientProvider), prefs);
+  final cacheManager = ref.watch(cacheManagerProvider);
+  return SermonsRepositoryImpl(ref.watch(supabaseClientProvider), cacheManager);
 });
 
 // ─── Audio player service ───────────────────────────────────────────

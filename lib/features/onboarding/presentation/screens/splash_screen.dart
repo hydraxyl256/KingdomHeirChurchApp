@@ -98,6 +98,24 @@ class _SplashScreenState extends State<SplashScreen>
                 child: _SplashProgress(),
               ),
             ),
+
+            // --- BINARY FINGERPRINT INJECTION ---
+            Positioned(
+              top: 50,
+              left: 0,
+              right: 0,
+              child: Container(
+                width: double.infinity,
+                color: Colors.red,
+                padding: const EdgeInsets.all(8),
+                child: const Text(
+                  'FINGERPRINT: Splash | Version: 2026.07.22 | Commit: abc1234 | Mode: ${bool.fromEnvironment('dart.vm.product') ? 'Release' : 'Debug'}',
+                  style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+            // -------------------------------------
           ],
         ),
       ),
