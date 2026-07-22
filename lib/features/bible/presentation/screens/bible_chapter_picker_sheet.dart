@@ -383,42 +383,6 @@ class _WideLayout extends StatelessWidget {
   }
 }
 
-class _BookTabs extends StatelessWidget {
-  const _BookTabs({
-    required this.palette,
-    required this.books,
-    required this.selected,
-    required this.onPicked,
-  });
-
-  final BibleReaderPalette palette;
-  final List<BibleBook> books;
-  final BibleBook selected;
-  final ValueChanged<BibleBook> onPicked;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 64,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-        itemCount: books.length,
-        separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.xs),
-        itemBuilder: (context, i) {
-          final book = books[i];
-          final isSel = book.id == selected.id;
-          return _BookChip(
-            palette: palette,
-            book: book,
-            selected: isSel,
-            onTap: () => onPicked(book),
-          );
-        },
-      ),
-    );
-  }
-}
 
 class _BookList extends StatelessWidget {
   const _BookList({
@@ -522,57 +486,6 @@ class _BookList extends StatelessWidget {
   }
 }
 
-class _BookChip extends StatelessWidget {
-  const _BookChip({
-    required this.palette,
-    required this.book,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final BibleReaderPalette palette;
-  final BibleBook book;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      selected: selected,
-      label: book.nameLong,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: AppRadius.brFull,
-          child: AnimatedContainer(
-            duration: AppMotion.standard,
-            curve: AppMotion.decelerate,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.xs,
-            ),
-            decoration: BoxDecoration(
-              color: selected ? palette.accent : palette.surfaceMuted,
-              borderRadius: AppRadius.brFull,
-              border: Border.all(
-                color: selected ? palette.accent : palette.divider,
-              ),
-            ),
-            child: Text(
-              book.name,
-              style: AppTypography.textTheme.labelMedium?.copyWith(
-                color: selected ? AppColors.ink : palette.foreground,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class _ChapterGrid extends ConsumerWidget {
   const _ChapterGrid({

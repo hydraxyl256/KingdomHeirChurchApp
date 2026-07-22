@@ -37,8 +37,6 @@ Future<ProviderContainer> bootstrap() async {
 
   // 5. Initialise Firebase
   try {
-    // TODO(kingdom-heir): Replace with Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform)
-    // after running `flutterfire configure`
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );

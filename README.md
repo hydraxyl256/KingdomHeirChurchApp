@@ -1,139 +1,124 @@
-# Kingdom Heir Church App
+# Kingdom Heirs Church App
 
-A production-ready Flutter church management application built with Clean Architecture, Riverpod, and Supabase.
+A modern, production-grade Flutter application built for the Kingdom Heirs Church. Designed to cultivate a digital sanctuary, this app delivers seamless access to sermons, live streams, devotionals, bible reading, community groups, and giving—all backed by a scalable, serverless backend.
 
----
+## Overview
+The Kingdom Heirs Church App bridges the gap between Sunday worship and daily spiritual growth. Engineered with performance and offline-first capabilities in mind, it provides the congregation with a reliable, elegant, and secure platform to engage with ministry content globally.
 
-## 🚀 Getting Started
+## Features
+- **Sermons & Media:** Audio and video playback with offline downloads and background listening.
+- **Automated Live Streaming:** Real-time detection and broadcasting of YouTube Live events directly to the app.
+- **Bible Reader:** Fast, offline-capable scripture reader with dynamic font scaling and multi-version support.
+- **Community Groups:** Discover, join, and interact with church small groups and ministries.
+- **Prayer Wall:** Submit, moderate, and engage with community prayer requests.
+- **Giving:** Secure integration for tithes, offerings, and campaign tracking.
+- **Testimonies:** Share and read stories of faith from the congregation.
+- **Push Notifications:** Stay updated on events, live streams, and ministry announcements.
 
-### Prerequisites
-- Flutter 3.x (stable)
-- Dart 3.x
-- Supabase project (create at [supabase.com](https://supabase.com))
-- Stripe account (for giving features)
+## Architecture
+The application strictly adheres to a **Feature-First Modular Architecture**:
+- **Presentation:** UI and state management separated flawlessly using `Riverpod`.
+- **Domain:** Pure business logic and entity modeling agnostic of external dependencies.
+- **Data:** Repository implementations interfacing with local caching (`SharedPreferences`) and remote data (`Supabase`).
+- **Routing:** Handled systematically via `GoRouter` for deep-linking and dynamic navigation.
 
-### 1. Clone & Setup
+## Tech Stack
 
+| Technology | Purpose |
+|------------|---------|
+| **Flutter / Dart** | Cross-platform client framework. |
+| **Riverpod** | Reactive, compile-safe state management and dependency injection. |
+| **GoRouter** | Declarative routing and deep linking. |
+| **Supabase** | PostgreSQL Database, Authentication, and Edge Functions. |
+| **pg_cron & pg_net** | Automated database scheduling and secure internal webhooks. |
+| **Firebase** | Analytics, Crashlytics, and Cloud Messaging (FCM). |
+| **Sentry** | Advanced error tracking and performance monitoring. |
+| **YouTube Data API** | Automated media catalog and live stream synchronization. |
+
+## Project Structure
+```text
+lib/
+├── bootstrap.dart       # App initialization, config, and dependency injection
+├── core/                # System-wide utilities, theme, and networking
+├── features/            # Feature modules (sermons, live, groups, bible, etc.)
+│   └── [feature]/
+│       ├── data/        # Repositories, DTOs, and API services
+│       ├── domain/      # Entities and abstract interfaces
+│       └── presentation/# Providers, Screens, and Widgets
+└── main.dart            # Application entry point
+```
+
+## Backend Architecture
+The backend is entirely serverless, powered by **Supabase**.
+- **PostgreSQL:** Highly relational data modeling with strict Row Level Security (RLS).
+- **Authentication:** JWT-based sessions mapped securely to PostgreSQL roles.
+- **Edge Functions:** Deno-based microservices managing third-party synchronization (YouTube).
+- **Storage:** Managed asset and media hosting.
+
+## Media Architecture
+Video and audio content is automatically aggregated from the Kingdom Heirs YouTube channel. The `sync-youtube-content` Edge Function routinely imports new uploads, stores the metadata in the `media_content` table, and serves it to the Flutter application seamlessly, minimizing manual content entry.
+
+## Live Streaming Architecture
+Live services require zero manual configuration. The `sync-youtube-live` Edge Function, triggered every 10 minutes by a secure `pg_cron` job, utilizes the YouTube Data API to detect active broadcasts and updates the database. The Flutter client consumes this in real-time.
+
+## Local Development Setup
+
+### Requirements
+- Flutter SDK (latest stable)
+- Supabase CLI
+- Firebase CLI (for `flutterfire`)
+
+### Environment Setup
+Create a `.env` file in the project root:
+```env
+SUPABASE_URL=your_supabase_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+## Running The Application
 ```bash
-git clone <your-repo>
-cd "Kingdom Heir church app"
+# Fetch dependencies
 flutter pub get
+
+# Run the app
+flutter run
 ```
 
-### 2. Configure Environment
-
-Copy the templates and fill in your credentials:
-
+## Building Production
 ```bash
-# dart_defines/ are gitignored — add your values directly
+flutter build appbundle --release
 ```
 
-Edit `dart_defines/dev.json`:
-```json
-{
-  "SUPABASE_URL": "https://YOUR_PROJECT.supabase.co",
-  "SUPABASE_ANON_KEY": "YOUR_ANON_KEY",
-  ...
-}
-```
-
-> ⚠️ **Never commit** `dart_defines/*.json` — they are gitignored.
-
-### 3. Run (Development)
-
+## Database Setup
+To deploy the database schema locally or to a new environment:
 ```bash
-flutter run --dart-define-from-file=dart_defines/dev.json -t lib/main_dev.dart
+supabase start
+supabase db push
 ```
 
-Or use the Makefile shortcut:
-```bash
-make run-dev
-```
+## Environment Variables
+Edge Functions require the following secrets in your Supabase Vault or Deno environment:
+- `YOUTUBE_API_KEY`: API key for YouTube Data API v3.
+- `YOUTUBE_CHANNEL_ID`: The target YouTube channel ID.
+- `SYNC_INTERNAL_SECRET`: A secure passphrase for cron authentication.
+- `SUPABASE_SERVICE_ROLE_KEY`: Service role key for RLS bypass.
 
----
+## Deployment Process
+1. Push all database migrations via `supabase db push`.
+2. Deploy Edge Functions via `supabase functions deploy`.
+3. Build the Flutter app bundle.
+4. Deploy to Google Play Console and Apple App Store Connect.
 
-## 📁 Architecture
+## Monitoring
+Production health is monitored comprehensively:
+- **Firebase Analytics:** User engagement and retention.
+- **Firebase Crashlytics:** Fatal native and Dart crash reporting.
+- **Sentry:** Real-time performance profiling and non-fatal error tracking.
 
-- **Clean Architecture** — Domain / Data / Presentation layers per feature
-- **Feature-first folders** — Each feature is self-contained
-- **Riverpod** — Compile-safe state management with `AsyncValue` for all async states
-- **GoRouter** — Declarative navigation with auth/onboarding/role guards
+## Contribution Guidelines
+1. Fork and branch from `main`.
+2. Ensure `flutter analyze` runs without errors.
+3. Keep logic contained within its respective feature folder.
 
-See the full architecture in [`implementation_plan.md`](./implementation_plan.md).
-
----
-
-## 🏗️ Build Flavors
-
-| Flavor | Command |
-|---|---|
-| Dev | `make run-dev` |
-| Staging | `make run-staging` |
-| Production APK | `make build-android-prod` |
-| Production IPA | `make build-ios-prod` |
-
----
-
-## ⚡ Code Generation
-
-After adding new Freezed models or Riverpod generators:
-
-```bash
-make generate
-```
-
----
-
-## 🧪 Testing
-
-```bash
-make test          # all tests with coverage
-make test-unit     # unit tests only
-make test-widget   # widget tests only
-make analyze       # static analysis
-```
-
----
-
-## 🔒 Security
-
-- Supabase RLS enforced on every table
-- Stripe handles all payment processing (PCI DSS compliant)
-- Tokens stored in OS Keychain/Keystore via `flutter_secure_storage`
-- Production builds obfuscated (`--obfuscate --split-debug-info`)
-
----
-
-## 📦 Key Packages
-
-| Package | Purpose |
-|---|---|
-| `supabase_flutter` | Backend (Auth, DB, Realtime, Storage) |
-| `flutter_riverpod` | State management |
-| `go_router` | Navigation |
-| `freezed` | Immutable data models |
-| `fpdart` | Functional error handling (`Either`) |
-| `flutter_animate` | Micro-animations |
-| `just_audio` + `audio_service` | Podcast player |
-| `flutter_stripe` | Payments |
-| `sentry_flutter` | Crash reporting |
-
----
-
-## 📱 Supported Platforms
-
-- Android (API 21+)
-- iOS 12+
-
----
-
-## 🎨 Design System
-
-- **Brand Colors**: Royal Purple (`#6B35A3`) + Warm Gold (`#D4AF37`)
-- **Typography**: Inter (Google Fonts)
-- **Spacing**: 8pt grid
-- **Theme**: Full Material 3 with light + dark mode
-
----
-
-*Built with ❤️ for Kingdom Heir Church*
+## License
+Proprietary software. All rights reserved. Kingdom Heirs Church.

@@ -690,7 +690,7 @@ class _Loading extends StatelessWidget {
                       const SizedBox(height: 8),
                       Container(
                         height: 16,
-                        width: index % 2 == 0 ? 200 : 150,
+                        width: index.isEven ? 200 : 150,
                         decoration: BoxDecoration(
                           color: palette.surfaceMuted,
                           borderRadius: AppRadius.brSm,

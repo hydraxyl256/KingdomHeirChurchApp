@@ -122,6 +122,7 @@ class BibleRepositoryImpl implements BibleRepository {
       // Fire and forget: if there's a next chapter, fetch and cache it in the background
       final nextChapterId = content.nextChapterId;
       if (nextChapterId != null && localCache.getCachedContent(versionId, nextChapterId) == null) {
+        // ignore: unawaited_futures
         Future.microtask(() async {
           try {
             final nextContent = await apiService.getChapterContent(versionId, nextChapterId);

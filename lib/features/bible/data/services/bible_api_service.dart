@@ -98,7 +98,7 @@ class BibleApiService {
       // Exponential backoff
       if (attempt <= _maxRetries) {
         final delayMs = math.pow(2, attempt) * 500;
-        await Future.delayed(Duration(milliseconds: delayMs.toInt()));
+        await Future<void>.delayed(Duration(milliseconds: delayMs.toInt()));
       }
     }
 
