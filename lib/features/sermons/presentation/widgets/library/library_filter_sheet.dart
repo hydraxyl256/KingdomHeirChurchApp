@@ -9,7 +9,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
-import 'package:kingdom_heir/features/sermons/data/mock/mock_sermons_seed.dart';
 import 'package:kingdom_heir/features/sermons/presentation/providers/sermon_library_filters_provider.dart';
 import 'package:kingdom_heir/l10n/app_localizations.dart';
 
@@ -31,10 +30,8 @@ class _LibraryFilterSheet extends ConsumerWidget {
     final filters = ref.watch(sermonLibraryFiltersProvider);
     final topics = ref.watch(availableTopicsProvider);
     final ministries = ref.watch(availableMinistriesProvider);
-    final speakers = MockSermonSeed.allSpeakers.map((s) => s.name).toList()
-      ..sort();
-    final series = MockSermonSeed.allSeries.map((s) => s.title).toList()
-      ..sort();
+    final speakers = ref.watch(availableSpeakersProvider);
+    final series = ref.watch(availableSeriesProvider);
 
     return DraggableScrollableSheet(
       expand: false,

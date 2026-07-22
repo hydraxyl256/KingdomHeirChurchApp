@@ -73,15 +73,39 @@ class DashboardTopBar extends StatelessWidget {
       // ── Brand mark ────────────────────────────────────────────────────────
       title: Row(
         children: [
-          const Icon(
-            PhosphorIconsBold.cross,
-            color: AppColors.gold,
-            size: 16,
-            semanticLabel: 'Kingdom Heirs',
+          GestureDetector(
+            onTap: onAvatarTap,
+            child: Semantics(
+              label: 'View profile',
+              button: true,
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.gold, width: 2),
+                ),
+                child: CircleAvatar(
+                  radius: 16,
+                  backgroundColor: AppColors.gold.withValues(alpha: 0.18),
+                  backgroundImage: greeting.avatarUrl != null
+                      ? NetworkImage(greeting.avatarUrl!)
+                      : null,
+                  onBackgroundImageError:
+                      greeting.avatarUrl != null ? (_, __) {} : null,
+                  child: greeting.avatarUrl == null
+                      ? const Icon(
+                          PhosphorIconsRegular.userCircle,
+                          color: AppColors.gold,
+                          size: 20,
+                          semanticLabel: 'Profile',
+                        )
+                      : null,
+                ),
+              ),
+            ),
           ),
-          const SizedBox(width: AppSpacing.xs),
+          const SizedBox(width: AppSpacing.sm),
           Text(
-            'Kingdom Heirs',
+            'Kingdom Heir',
             style: AppTypography.textTheme.titleMedium?.copyWith(
               fontFamily: 'Playfair Display',
               color: isDark ? AppColors.goldLight : AppColors.goldDark,
@@ -118,45 +142,7 @@ class DashboardTopBar extends StatelessWidget {
               ),
           ],
         ),
-        Padding(
-          padding: const EdgeInsets.only(right: AppSpacing.sm),
-          child: GestureDetector(
-            onTap: onAvatarTap,
-            child: Semantics(
-              label: 'View profile',
-              button: true,
-              child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.gold, width: 2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.gold.withValues(alpha: 0.30),
-                      blurRadius: 8,
-                    ),
-                  ],
-                ),
-                child: CircleAvatar(
-                  radius: 18,
-                  backgroundColor: AppColors.gold.withValues(alpha: 0.18),
-                  backgroundImage: greeting.avatarUrl != null
-                      ? NetworkImage(greeting.avatarUrl!)
-                      : null,
-                  onBackgroundImageError:
-                      greeting.avatarUrl != null ? (_, __) {} : null,
-                  child: greeting.avatarUrl == null
-                      ? const Icon(
-                          PhosphorIconsRegular.userCircle,
-                          color: AppColors.gold,
-                          size: 20,
-                          semanticLabel: 'Profile',
-                        )
-                      : null,
-                ),
-              ),
-            ),
-          ),
-        ),
+        const SizedBox(width: AppSpacing.sm),
       ],
     );
   }
@@ -192,7 +178,7 @@ class _PremiumHeroBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final today =
-        DateFormat('EEEE • MMMM d').format(DateTime.now()).toUpperCase();
+        DateFormat('EEEE, MMMM d').format(DateTime.now()).toUpperCase();
     final displayName = greeting.firstName.isNotEmpty
         ? greeting.firstName
         : 'Kingdom Heirs Member';
@@ -260,30 +246,6 @@ class _PremiumHeroBanner extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    // App identity
-                    Row(
-                      children: [
-                        const Icon(
-                          PhosphorIconsBold.cross,
-                          color: AppColors.gold,
-                          size: 13,
-                          semanticLabel: 'Kingdom Heirs',
-                        ),
-                        const SizedBox(width: AppSpacing.xs),
-                        Text(
-                          'Kingdom Heirs',
-                          style: AppTypography.textTheme.labelSmall?.copyWith(
-                            color: AppColors.gold,
-                            fontFamily: 'Playfair Display',
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1.4,
-                          ),
-                        ),
-                      ],
-                    ).animate().fadeIn(duration: 300.ms),
-
-                    const SizedBox(height: AppSpacing.xs),
-
                     // Date
                     Text(
                       today,
@@ -323,8 +285,7 @@ class _PremiumHeroBanner extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: AppTypography.textTheme.headlineMedium?.copyWith(
-                        color: AppColors.goldLight,
-                        fontStyle: FontStyle.italic,
+                        color: AppColors.gold,
                         fontWeight: FontWeight.w700,
                         height: 1.1,
                         letterSpacing: -0.2,
@@ -344,19 +305,30 @@ class _PremiumHeroBanner extends StatelessWidget {
                     const SizedBox(height: AppSpacing.sm),
 
                     // Subtitle
-                    Text(
-                      tagline,
-                      style: AppTypography.textTheme.bodySmall?.copyWith(
-                        color: const Color(0xFFCBD5E1),
-                        fontStyle: FontStyle.italic,
-                        height: 1.5,
-                        shadows: [
-                          const Shadow(
-                            color: Color(0x88000000),
-                            blurRadius: 6,
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            tagline,
+                            style: AppTypography.textTheme.bodyMedium?.copyWith(
+                              color: AppColors.warmWhite,
+                              fontStyle: FontStyle.italic,
+                              shadows: [
+                                const Shadow(
+                                  color: Color(0x88000000),
+                                  blurRadius: 6,
+                                ),
+                              ],
+                            ),
                           ),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(width: AppSpacing.xs),
+                        const Icon(
+                          PhosphorIconsFill.fire,
+                          color: AppColors.gold,
+                          size: 16,
+                        ),
+                      ],
                     ).animate().fadeIn(duration: 350.ms, delay: 270.ms),
 
                     const SizedBox(height: AppSpacing.md),
@@ -367,7 +339,8 @@ class _PremiumHeroBanner extends StatelessWidget {
                       runSpacing: AppSpacing.xs,
                       children: [
                         _GlassChip(
-                          icon: PhosphorIconsBold.flame,
+                          icon: PhosphorIconsFill.fire,
+                          trailingIcon: PhosphorIconsFill.fire,
                           iconColor: AppColors.goldLight,
                           label: greeting.streakDays > 0
                               ? '${greeting.streakDays}-Day Streak'
@@ -375,7 +348,7 @@ class _PremiumHeroBanner extends StatelessWidget {
                         ),
                         if (greeting.unreadNotifications > 0)
                           _GlassChip(
-                            icon: PhosphorIconsRegular.bellRinging,
+                            icon: PhosphorIconsFill.bell,
                             iconColor: AppColors.goldLight,
                             label: '${greeting.unreadNotifications} New',
                           ),
@@ -405,7 +378,7 @@ class _HeroImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Image.asset(
-      'assets/images/dashboard/verse_bg.jpg',
+      'assets/images/dashboard/sunrise_cross_bg.png',
       fit: BoxFit.cover,
       width: double.infinity,
       height: double.infinity,
@@ -429,10 +402,12 @@ class _GlassChip extends StatelessWidget {
   const _GlassChip({
     required this.icon,
     required this.label,
+    this.trailingIcon,
     this.iconColor = AppColors.gold,
   });
 
   final IconData icon;
+  final IconData? trailingIcon;
   final String label;
   final Color iconColor;
 
@@ -478,6 +453,14 @@ class _GlassChip extends StatelessWidget {
                   letterSpacing: 0.3,
                 ),
               ),
+              if (trailingIcon != null) ...[
+                const SizedBox(width: AppSpacing.xs),
+                Icon(
+                  trailingIcon,
+                  color: iconColor,
+                  size: 15,
+                ),
+              ],
             ],
           ),
         ),

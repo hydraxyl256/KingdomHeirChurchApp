@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/widgets/app_error_widget.dart';
-import 'package:kingdom_heir/features/sermons/data/mock/mock_sermons_seed.dart';
 import 'package:kingdom_heir/features/sermons/domain/entities/sermon.dart';
 import 'package:kingdom_heir/features/sermons/presentation/providers/sermon_continue_provider.dart';
 import 'package:kingdom_heir/features/sermons/presentation/providers/sermons_provider.dart';
@@ -111,7 +110,8 @@ class _SermonPlayerScreenState extends ConsumerState<SermonPlayerScreen> {
                   ref.invalidate(sermonDetailProvider(widget.sermonId)),
             );
           }
-          final related = MockSermonSeed.allSermons
+          final allSermons = ref.watch(sermonsListProvider).valueOrNull ?? [];
+          final related = allSermons
               .where((s) => s.id != sermon.id)
               .take(6)
               .toList();

@@ -1,11 +1,14 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/theme/elevation.dart';
+import 'package:kingdom_heir/core/theme/radius.dart';
 import 'package:kingdom_heir/features/dashboard/domain/home_dashboard_models.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class ScriptureHeroCard extends StatelessWidget {
   const ScriptureHeroCard({
@@ -34,10 +37,10 @@ class ScriptureHeroCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
       child: AspectRatio(
-        aspectRatio: 4 / 5,
+        aspectRatio: 4 / 4.5,
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(32),
+            borderRadius: BorderRadius.circular(AppRadius.xxl),
             boxShadow: AppElevation.shadowFor(AppElevation.level2),
           ),
           clipBehavior: Clip.antiAlias,
@@ -45,26 +48,24 @@ class ScriptureHeroCard extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               // Background Image
-              if (scripture.backgroundUrl != null)
-                Image.asset(
-                  scripture.backgroundUrl!,
-                  fit: BoxFit.cover,
-                )
-              else
-                Container(color: AppColors.surfaceVariantLight),
+              Image.asset(
+                scripture.backgroundUrl ?? 'assets/images/dashboard/verse_of_the_day_bg.png',
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const ColoredBox(color: AppColors.navy),
+              ),
 
-              // Gradient Overlay
+              // Gradient Overlay (Darkened for readability)
               Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
                     colors: [
-                      AppColors.surfaceLight.withValues(alpha: 0.9),
-                      AppColors.surfaceLight.withValues(alpha: 0.4),
+                      Colors.black.withValues(alpha: 0.85),
+                      Colors.black.withValues(alpha: 0.35),
                       Colors.transparent,
                     ],
-                    stops: const [0.0, 0.5, 1.0],
+                    stops: const [0.0, 0.65, 1.0],
                   ),
                 ),
               ),
@@ -76,98 +77,98 @@ class ScriptureHeroCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    // VERSE OF THE DAY Pill
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.md,
-                        vertical: AppSpacing.xs,
+                        vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.gold.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(999),
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(AppRadius.full),
                         border: Border.all(
-                          color: AppColors.gold.withValues(alpha: 0.3),
+                          color: AppColors.gold.withValues(alpha: 0.8),
                         ),
                       ),
                       child: Text(
                         'VERSE OF THE DAY',
                         style: AppTypography.textTheme.labelSmall?.copyWith(
-                          color: AppColors.goldDark,
+                          color: AppColors.gold,
                           letterSpacing: 1.5,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ).animate().fadeIn(delay: 200.ms, duration: 400.ms),
-                    const SizedBox(height: AppSpacing.md),
+                    const SizedBox(height: AppSpacing.lg),
+                    
+                    // Verse Text
                     Text(
                       '"${scripture.verseText}"',
                       style: AppTypography.textTheme.headlineMedium?.copyWith(
-                        color: AppColors.textPrimary,
-                        fontFamily: 'Playfair Display',
-                        height: 1.3,
+                        color: AppColors.warmWhite,
+                        height: 1.35,
                         fontWeight: FontWeight.w600,
+                        shadows: [
+                          const Shadow(
+                            color: Color(0x66000000),
+                            blurRadius: 8,
+                          ),
+                        ],
                       ),
                     ).animate().fadeIn(delay: 300.ms, duration: 500.ms),
+                    
                     const SizedBox(height: AppSpacing.md),
+                    
+                    // Reference
+                    Text(
+                      scripture.reference,
+                      style: AppTypography.textTheme.titleMedium?.copyWith(
+                        color: AppColors.gold,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ).animate().fadeIn(delay: 400.ms, duration: 500.ms),
+                    
+                    const SizedBox(height: AppSpacing.xl),
+                    
+                    // Buttons Row
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              scripture.reference,
-                              style:
-                                  AppTypography.textTheme.titleMedium?.copyWith(
-                                color: AppColors.goldDark,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              scripture.translation,
-                              style:
-                                  AppTypography.textTheme.labelMedium?.copyWith(
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                          ],
-                        ),
-                        // Listen Button
+                        // Read Full Chapter Button
                         InkWell(
-                          onTap: onAudio,
-                          borderRadius: BorderRadius.circular(999),
+                          onTap: onReflect, // Or appropriate action
+                          borderRadius: BorderRadius.circular(AppRadius.full),
                           child: ClipRRect(
-                            borderRadius: BorderRadius.circular(999),
+                            borderRadius: BorderRadius.circular(AppRadius.full),
                             child: BackdropFilter(
-                              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: AppSpacing.md,
-                                  vertical: AppSpacing.sm,
+                                  horizontal: AppSpacing.lg,
+                                  vertical: AppSpacing.md,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.surfaceLight
-                                      .withValues(alpha: 0.5),
+                                  color: Colors.white.withValues(alpha: 0.15),
                                   border: Border.all(
-                                    color: AppColors.dividerLight,
+                                    color: Colors.white.withValues(alpha: 0.2),
                                   ),
-                                  borderRadius: BorderRadius.circular(999),
+                                  borderRadius: BorderRadius.circular(AppRadius.full),
                                 ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     const Icon(
-                                      Icons.play_arrow_rounded,
-                                      size: 20,
-                                      color: AppColors.goldDark,
+                                      PhosphorIconsRegular.bookOpen,
+                                      size: 18,
+                                      color: AppColors.warmWhite,
                                     ),
-                                    const SizedBox(width: AppSpacing.xs),
+                                    const SizedBox(width: AppSpacing.sm),
                                     Text(
-                                      'Listen',
-                                      style: AppTypography.textTheme.labelLarge
-                                          ?.copyWith(
-                                        color: AppColors.textPrimary,
+                                      'Read Full Chapter',
+                                      style: AppTypography.textTheme.labelMedium?.copyWith(
+                                        color: AppColors.warmWhite,
                                         fontWeight: FontWeight.w600,
+                                        letterSpacing: 0.2,
                                       ),
                                     ),
                                   ],
@@ -175,9 +176,9 @@ class ScriptureHeroCard extends StatelessWidget {
                               ),
                             ),
                           ),
-                        ),
+                        ).animate().fadeIn(delay: 500.ms, duration: 500.ms),
                       ],
-                    ).animate().fadeIn(delay: 400.ms, duration: 500.ms),
+                    ),
                   ],
                 ),
               ),

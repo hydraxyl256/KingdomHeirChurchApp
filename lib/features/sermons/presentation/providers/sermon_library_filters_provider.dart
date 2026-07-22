@@ -5,7 +5,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:kingdom_heir/features/sermons/data/mock/mock_sermons_seed.dart';
+
 import 'package:kingdom_heir/features/sermons/data/mock/reflection_prompts.dart';
 import 'package:kingdom_heir/features/sermons/domain/entities/sermon.dart';
 import 'package:kingdom_heir/features/sermons/presentation/providers/sermons_provider.dart';
@@ -113,23 +113,54 @@ final sermonLibraryFiltersProvider =
 
 /// All topics known to the seed. Drives the topic-chips bar.
 final availableTopicsProvider = Provider<List<String>>((ref) {
-  // Union of seed topics + the static reflection prompts list.
-  final fromSeed = <String>{};
-  for (final s in MockSermonSeed.allSermons) {
-    fromSeed.addAll(s.topics);
+  final base = ref.watch(sermonsListProvider);
+  final fromData = <String>{};
+  
+  if (base.hasValue && base.value != null) {
+    for (final s in base.value!) {
+      fromData.addAll(s.topics);
+    }
   }
+
   final combined = <String>[
     ...ReflectionPrompts.topics,
-    ...fromSeed.where((t) => !ReflectionPrompts.topics.contains(t)),
+    ...fromData.where((t) => !ReflectionPrompts.topics.contains(t)),
   ];
   return combined;
 });
 
 /// All ministries known to the seed.
 final availableMinistriesProvider = Provider<List<String>>((ref) {
+  final base = ref.watch(sermonsListProvider);
   final out = <String>{};
-  for (final s in MockSermonSeed.allSermons) {
-    if (s.ministry != null) out.add(s.ministry!);
+  if (base.hasValue && base.value != null) {
+    for (final s in base.value!) {
+      if (s.ministry != null) out.add(s.ministry!);
+    }
+  }
+  return out.toList()..sort();
+});
+
+/// All speakers dynamically derived from production data.
+final availableSpeakersProvider = Provider<List<String>>((ref) {
+  final base = ref.watch(sermonsListProvider);
+  final out = <String>{};
+  if (base.hasValue && base.value != null) {
+    for (final s in base.value!) {
+      if (s.speakerName.isNotEmpty) out.add(s.speakerName);
+    }
+  }
+  return out.toList()..sort();
+});
+
+/// All series dynamically derived from production data.
+final availableSeriesProvider = Provider<List<String>>((ref) {
+  final base = ref.watch(sermonsListProvider);
+  final out = <String>{};
+  if (base.hasValue && base.value != null) {
+    for (final s in base.value!) {
+      if (s.seriesName.isNotEmpty) out.add(s.seriesName);
+    }
   }
   return out.toList()..sort();
 });

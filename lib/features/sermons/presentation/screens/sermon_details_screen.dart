@@ -13,7 +13,6 @@ import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
 import 'package:kingdom_heir/core/widgets/app_error_widget.dart';
-import 'package:kingdom_heir/features/sermons/data/mock/mock_sermons_seed.dart';
 import 'package:kingdom_heir/features/sermons/domain/entities/sermon.dart';
 import 'package:kingdom_heir/features/sermons/presentation/providers/sermons_provider.dart';
 import 'package:kingdom_heir/features/sermons/presentation/widgets/details/sermon_discussion_prompts.dart';
@@ -62,7 +61,8 @@ class _DetailsBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final related = _relatedFor(sermon);
+    final allSermons = ref.watch(sermonsListProvider).valueOrNull ?? [];
+    final related = _relatedFor(sermon, allSermons);
     final seriesEpisodesAsync =
         ref.watch(sermonSeriesEpisodesProvider(sermon.seriesName));
     final seriesName = seriesEpisodesAsync.value != null &&
@@ -138,8 +138,7 @@ class _DetailsBody extends ConsumerWidget {
     );
   }
 
-  List<Sermon> _relatedFor(Sermon s) {
-    final all = MockSermonSeed.allSermons;
+  List<Sermon> _relatedFor(Sermon s, List<Sermon> all) {
     final sameSeries = all
         .where(
           (x) => x.id != s.id && x.seriesName == s.seriesName,

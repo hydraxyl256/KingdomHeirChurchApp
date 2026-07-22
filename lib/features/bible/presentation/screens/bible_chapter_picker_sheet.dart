@@ -304,15 +304,21 @@ class _NarrowLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Better UX on narrow screens: Book list on top half, Chapters on bottom half
     return Column(
       children: [
-        _BookTabs(
-          palette: palette,
-          books: books,
-          selected: selected,
-          onPicked: onBookPicked,
-        ),
         Expanded(
+          flex: 4,
+          child: _BookList(
+            palette: palette,
+            books: books,
+            selected: selected,
+            onPicked: onBookPicked,
+          ),
+        ),
+        Divider(height: 1, thickness: 1, color: palette.divider),
+        Expanded(
+          flex: 6,
           child: _ChapterGrid(
             palette: palette,
             book: selected,
@@ -429,14 +435,43 @@ class _BookList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
-      itemCount: books.length,
-      itemBuilder: (context, i) {
-        final book = books[i];
-        final isSel = book.id == selected.id;
-        return Material(
-          color: Colors.transparent,
+    final otBooks = books.take(39).toList();
+    final ntBooks = books.skip(39).toList();
+
+    return CustomScrollView(
+      slivers: [
+        _buildSectionHeader(context, 'Old Testament'),
+        _buildBookList(otBooks),
+        _buildSectionHeader(context, 'New Testament'),
+        _buildBookList(ntBooks),
+      ],
+    );
+  }
+
+  Widget _buildSectionHeader(BuildContext context, String title) {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.xs),
+        child: Text(
+          title.toUpperCase(),
+          style: AppTypography.textTheme.labelSmall?.copyWith(
+            color: palette.accent,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.5,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBookList(List<BibleBook> sectionBooks) {
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (context, i) {
+          final book = sectionBooks[i];
+          final isSel = book.id == selected.id;
+          return Material(
+            color: Colors.transparent,
           child: InkWell(
             onTap: () => onPicked(book),
             child: Container(
@@ -480,7 +515,9 @@ class _BookList extends StatelessWidget {
             ),
           ),
         );
-      },
+        },
+        childCount: sectionBooks.length,
+      ),
     );
   }
 }

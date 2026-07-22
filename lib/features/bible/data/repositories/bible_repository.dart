@@ -109,11 +109,29 @@ class BibleRepositoryImpl implements BibleRepository {
     String chapterId,
   ) async {
     try {
+      BibleChapterContent content;
       final cached = localCache.getCachedContent(versionId, chapterId);
-      if (cached != null) return right(cached);
+      if (cached != null) {
+        content = cached;
+      } else {
+        content = await apiService.getChapterContent(versionId, chapterId);
+        await localCache.cacheContent(versionId, chapterId, content);
+      }
 
-      final content = await apiService.getChapterContent(versionId, chapterId);
-      await localCache.cacheContent(versionId, chapterId, content);
+      // ── Prefetch Next Chapter ────────────────────────────────────────────────
+      // Fire and forget: if there's a next chapter, fetch and cache it in the background
+      final nextChapterId = content.nextChapterId;
+      if (nextChapterId != null && localCache.getCachedContent(versionId, nextChapterId) == null) {
+        Future.microtask(() async {
+          try {
+            final nextContent = await apiService.getChapterContent(versionId, nextChapterId);
+            await localCache.cacheContent(versionId, nextChapterId, nextContent);
+          } catch (_) {
+            // Ignore prefetch failures
+          }
+        });
+      }
+
       return right(content);
     } catch (e) {
       return left('Failed to get chapter content: $e');

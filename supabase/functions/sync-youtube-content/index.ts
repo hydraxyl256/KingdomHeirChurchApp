@@ -8,6 +8,7 @@
 // Secrets required (set via: supabase secrets set KEY=value):
 //   YOUTUBE_API_KEY      — YouTube Data API v3 key
 //   YOUTUBE_CHANNEL_ID   — UCxxxxxx channel ID
+//   SYNC_INTERNAL_SECRET — Secret for cron invocations
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -56,6 +57,7 @@ interface SyncSummary {
   videosFound: number;
   videosCreated: number;
   videosUpdated: number;
+  newlyArchivedCount: number;
   errorMessage?: string;
   durationMs: number;
 }
@@ -218,14 +220,26 @@ serve(async (req: Request) => {
   const userClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!);
 
   // ── Auth check ──────────────────────────────────────────────────────────────
-  try {
-    await verifyAdmin(userClient, req.headers.get('Authorization'));
-  } catch (e) {
-    return new Response(
-      JSON.stringify({ error: (e as Error).message }),
-      { status: 403, headers: { 'Content-Type': 'application/json' } }
-    );
+  const authHeader = req.headers.get('Authorization');
+  const syncInternalSecret = Deno.env.get('SYNC_INTERNAL_SECRET');
+  
+  const isInternalCron = !!(authHeader && syncInternalSecret && authHeader === `Bearer ${syncInternalSecret}`);
+
+  if (!isInternalCron) {
+    try {
+      await verifyAdmin(userClient, authHeader);
+    } catch (e) {
+      return new Response(
+        JSON.stringify({ error: (e as Error).message }),
+        { status: 403, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
   }
+
+  console.log(JSON.stringify({
+    event: "youtube_sync_started",
+    timestamp: new Date().toISOString()
+  }));
 
   // ── Insert initial sync run record ──────────────────────────────────────────
   let syncRunId: string | null = null;
@@ -244,6 +258,7 @@ serve(async (req: Request) => {
     videosFound: 0,
     videosCreated: 0,
     videosUpdated: 0,
+    newlyArchivedCount: 0,
     durationMs: 0,
   };
 
@@ -257,6 +272,12 @@ serve(async (req: Request) => {
       .map(item => item?.snippet?.resourceId?.videoId)
       .filter(Boolean) as string[];
 
+    console.log(JSON.stringify({
+      event: "youtube_playlist_loaded",
+      playlist_id: playlistId,
+      videos_found: videoIds.length
+    }));
+
     summary.videosFound = videoIds.length;
 
     if (videoIds.length === 0) {
@@ -265,6 +286,7 @@ serve(async (req: Request) => {
 
     // 3. Fetch full video details (snippet + contentDetails + status)
     const videoDetails = await fetchVideoDetails(apiKey, videoIds);
+    const syncedYoutubeIds: string[] = [];
 
     // 4. Upsert each video into media_content
     for (const video of videoDetails) {
@@ -315,28 +337,70 @@ serve(async (req: Request) => {
           })
           .eq('youtube_video_id', videoId);
 
-        if (!updateErr) summary.videosUpdated++;
+        if (!updateErr) {
+          summary.videosUpdated++;
+          syncedYoutubeIds.push(videoId);
+        }
       } else {
         // INSERT new record as pending_review
         const { error: insertErr } = await supabase
           .from('media_content')
           .insert(insertPayload);
 
-        if (!insertErr) summary.videosCreated++;
+        if (!insertErr) {
+          summary.videosCreated++;
+          syncedYoutubeIds.push(videoId);
+        }
       }
     }
 
-    // 5. Finalize sync run
+    // 5. Reconciliation Phase
+    if (syncedYoutubeIds.length > 0) {
+      const { data: dbVideos, error: dbErr } = await supabase
+        .from('media_content')
+        .select('youtube_video_id')
+        .neq('status', 'archived');
+        
+      if (!dbErr && dbVideos) {
+        const dbIds = dbVideos.map(v => v.youtube_video_id).filter(id => id != null);
+        const orphanedIds = dbIds.filter(id => !syncedYoutubeIds.includes(id));
+
+        if (orphanedIds.length > 0) {
+          const { error: archiveErr } = await supabase
+            .from('media_content')
+            .update({ status: 'archived', updated_at: new Date().toISOString() })
+            .in('youtube_video_id', orphanedIds);
+          
+          if (!archiveErr) {
+            summary.newlyArchivedCount = orphanedIds.length;
+            console.log(`Archived ${orphanedIds.length} videos no longer available on YouTube`);
+          }
+        }
+      }
+    }
+
+    // 6. Finalize sync run
     summary.durationMs = Date.now() - startedAt.getTime();
     if (syncRunId) {
       await supabase.from('media_sync_runs').update({
-        status:          'completed',
-        completed_at:    new Date().toISOString(),
-        videos_found:    summary.videosFound,
-        videos_created:  summary.videosCreated,
-        videos_updated:  summary.videosUpdated,
+        status:               'completed',
+        completed_at:         new Date().toISOString(),
+        videos_found:         summary.videosFound,
+        videos_created:       summary.videosCreated,
+        videos_updated:       summary.videosUpdated,
+        newly_archived_count: summary.newlyArchivedCount,
       }).eq('id', syncRunId);
     }
+
+    console.log(JSON.stringify({
+      event: "youtube_sync_completed",
+      videos_found: summary.videosFound,
+      videos_created: summary.videosCreated,
+      videos_updated: summary.videosUpdated,
+      videos_archived: summary.newlyArchivedCount,
+      duration_ms: summary.durationMs,
+      timestamp: new Date().toISOString()
+    }));
 
     return new Response(
       JSON.stringify({ success: true, summary }),
@@ -351,14 +415,22 @@ serve(async (req: Request) => {
 
     if (syncRunId) {
       await supabase.from('media_sync_runs').update({
-        status:          'failed',
-        completed_at:    new Date().toISOString(),
-        videos_found:    summary.videosFound,
-        videos_created:  summary.videosCreated,
-        videos_updated:  summary.videosUpdated,
-        error_message:   message,
+        status:               'failed',
+        completed_at:         new Date().toISOString(),
+        videos_found:         summary.videosFound,
+        videos_created:       summary.videosCreated,
+        videos_updated:       summary.videosUpdated,
+        newly_archived_count: summary.newlyArchivedCount,
+        error_message:        message,
       }).eq('id', syncRunId);
     }
+
+    console.log(JSON.stringify({
+      event: "youtube_sync_failed",
+      error: message,
+      duration_ms: summary.durationMs,
+      timestamp: new Date().toISOString()
+    }));
 
     return new Response(
       JSON.stringify({ success: false, summary }),

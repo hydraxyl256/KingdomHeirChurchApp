@@ -8,9 +8,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/widgets/app_error_widget.dart';
-import 'package:kingdom_heir/features/sermons/data/mock/mock_sermons_seed.dart';
 import 'package:kingdom_heir/features/sermons/domain/entities/sermon_download.dart';
 import 'package:kingdom_heir/features/sermons/presentation/providers/sermon_downloads_provider.dart';
+import 'package:kingdom_heir/features/sermons/presentation/providers/sermons_provider.dart';
 import 'package:kingdom_heir/features/sermons/presentation/widgets/downloads/download_storage_indicator.dart';
 import 'package:kingdom_heir/features/sermons/presentation/widgets/downloads/download_tile.dart';
 import 'package:kingdom_heir/features/sermons/presentation/widgets/shared/sermons_empty_state.dart';
@@ -25,6 +25,7 @@ class SermonDownloadsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final downloadsAsync = ref.watch(downloadsListProvider);
+    final sermonsList = ref.watch(sermonsListProvider).valueOrNull ?? [];
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
@@ -58,7 +59,7 @@ class SermonDownloadsScreen extends ConsumerWidget {
                   delegate: SliverChildBuilderDelegate(
                     (context, i) {
                       final d = list[i];
-                      final sermon = MockSermonSeed.findSermon(d.sermonId);
+                      final sermon = sermonsList.where((s) => s.id == d.sermonId).firstOrNull;
                       return DownloadTile(
                         download: d,
                         sermon: sermon,

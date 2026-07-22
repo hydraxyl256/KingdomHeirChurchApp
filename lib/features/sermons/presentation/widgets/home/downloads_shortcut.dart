@@ -4,16 +4,17 @@
 // CTA. Hidden entirely when the user has no downloads.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
-import 'package:kingdom_heir/features/sermons/data/mock/mock_sermons_seed.dart';
 import 'package:kingdom_heir/features/sermons/domain/entities/sermon_download.dart';
+import 'package:kingdom_heir/features/sermons/presentation/providers/sermons_provider.dart';
 import 'package:kingdom_heir/l10n/app_localizations.dart';
 
-class DownloadsShortcut extends StatelessWidget {
+class DownloadsShortcut extends ConsumerWidget {
   const DownloadsShortcut({
     required this.downloads,
     super.key,
@@ -22,8 +23,10 @@ class DownloadsShortcut extends StatelessWidget {
   final List<SermonDownload> downloads;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (downloads.isEmpty) return const SizedBox.shrink();
+    
+    final sermonsList = ref.watch(sermonsListProvider).valueOrNull ?? [];
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -70,7 +73,7 @@ class DownloadsShortcut extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.xs),
             ...downloads.map((d) {
-              final sermon = MockSermonSeed.findSermon(d.sermonId);
+              final sermon = sermonsList.where((s) => s.id == d.sermonId).firstOrNull;
               return Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.xs),
                 child: Row(

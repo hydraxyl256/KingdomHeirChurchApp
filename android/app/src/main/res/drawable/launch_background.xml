@@ -1,17 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Native Android splash shown while Flutter engine initialises.
-     Background matches the Flutter SplashScreen so there is no visible flash. -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Dark navy background — same as AppColors.navy (#0F172A) -->
-    <item android:drawable="@color/splashBackground" />
-    <!-- Centered circular app icon (120dp × 120dp) -->
-    <item
-        android:width="120dp"
-        android:height="120dp"
-        android:gravity="center">
-        <bitmap
-            android:gravity="center"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_splash_logo" />
+    <item>
+        <bitmap android:gravity="fill" android:src="@drawable/background"/>
+    </item>
+    <item>
+        <bitmap android:gravity="center" android:src="@drawable/splash"/>
     </item>
 </layer-list>

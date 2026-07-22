@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer' as developer;
+import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:http/http.dart' as http;
 import 'package:kingdom_heir/core/config/env.dart';
@@ -18,7 +21,8 @@ class BibleApiService {
   final String _apiKey;
 
   static const _baseUrl = 'https://api.youversion.com/v1';
-  static const _timeout = Duration(seconds: 15);
+  static const _timeout = Duration(seconds: 10);
+  static const int _maxRetries = 3;
 
   // Default English YouVersion Bible ID (KJV = 1, NIV = 111, ESV = 59)
   // This is used only as a fallback; the user's chosen version overrides it.
@@ -33,52 +37,80 @@ class BibleApiService {
 
   Future<Map<String, dynamic>> _get(String path) async {
     final uri = Uri.parse('$_baseUrl$path');
-    try {
-      final response = await http.get(uri, headers: _headers).timeout(_timeout);
+    var attempt = 0;
 
-      if (response.statusCode == 401 || response.statusCode == 403) {
-        throw BibleApiException(
-          'Authentication failed. Check your YouVersion API key.',
-          statusCode: response.statusCode,
+    while (attempt <= _maxRetries) {
+      attempt++;
+      final sw = Stopwatch()..start();
+      try {
+        final response = await http.get(uri, headers: _headers).timeout(_timeout);
+        sw.stop();
+
+        developer.log(
+          'GET $path',
+          name: 'BibleApi',
+          error: 'Status: ${response.statusCode} | Time: ${sw.elapsedMilliseconds}ms | Attempt: $attempt',
         );
-      }
-      if (response.statusCode == 404) {
-        throw BibleApiException(
-          'Content not found: $path',
-          statusCode: 404,
-        );
-      }
-      if (response.statusCode == 429) {
-        throw const BibleApiException(
-          'Rate limit reached. Please wait a moment and try again.',
-          statusCode: 429,
-        );
-      }
-      if (response.statusCode != 200) {
-        throw BibleApiException(
-          'API error ${response.statusCode} for $path',
-          statusCode: response.statusCode,
-        );
+
+        if (response.statusCode == 401 || response.statusCode == 403) {
+          throw BibleApiException(
+            'Unable to load Scripture. Please try again in a few moments.',
+            statusCode: response.statusCode,
+          );
+        }
+        if (response.statusCode == 404) {
+          throw BibleApiException('Content not found: $path', statusCode: 404);
+        }
+        if (response.statusCode == 429) {
+          throw const BibleApiException(
+            'Rate limit reached. Please wait a moment and try again.',
+            statusCode: 429,
+          );
+        }
+        if (response.statusCode != 200 && response.statusCode != 201) {
+          throw BibleApiException(
+            'API error ${response.statusCode} for $path',
+            statusCode: response.statusCode,
+          );
+        }
+
+        return jsonDecode(response.body) as Map<String, dynamic>;
+      } on SocketException {
+        if (attempt > _maxRetries) {
+          throw const BibleApiException(
+            'No internet connection. Please check your network and try again.',
+          );
+        }
+      } on TimeoutException {
+        if (attempt > _maxRetries) {
+          throw const BibleApiException(
+            'Connection is taking longer than expected. Tap Retry.',
+          );
+        }
+      } on BibleApiException {
+        rethrow;
+      } catch (e) {
+        if (attempt > _maxRetries) {
+          throw BibleApiException('Network error: $e');
+        }
       }
 
-      return jsonDecode(response.body) as Map<String, dynamic>;
-    } on TimeoutException {
-      throw const BibleApiException(
-        'Request timed out. Please check your internet connection.',
-      );
-    } on BibleApiException {
-      rethrow;
-    } catch (e) {
-      throw BibleApiException('Network error: $e');
+      // Exponential backoff
+      if (attempt <= _maxRetries) {
+        final delayMs = math.pow(2, attempt) * 500;
+        await Future.delayed(Duration(milliseconds: delayMs.toInt()));
+      }
     }
+
+    throw const BibleApiException('Request failed after retries.');
   }
 
   // ── Versions ────────────────────────────────────────────────────────────────
 
   /// Returns available Bible versions filtered to English by default.
   Future<List<BibleVersion>> getBibleVersions({String language = 'eng'}) async {
-    // YouVersion: GET /bibles?language_tag=eng
-    final json = await _get('/bibles?language_tag=$language');
+    // YouVersion: GET /bibles?language_ranges[]=eng
+    final json = await _get('/bibles?language_ranges[]=$language');
     final data = json['data'] as List<dynamic>? ?? [];
     return data
         .map((e) => BibleVersion.fromJson(e as Map<String, dynamic>))
@@ -140,9 +172,17 @@ class BibleApiService {
     final q = query.trim();
     if (q.isEmpty) return const [];
 
-    // 1. Try to resolve to a USFM reference
+    // 1. Check if query matches book names locally
+    final books = _matchBooks(q);
+    if (books.isNotEmpty) return books;
+
+    // 2. Try to resolve to a USFM reference
     final usfm = _resolveQueryToUsfm(q);
-    if (usfm == null) return const [];
+    if (usfm == null) {
+      // Return empty list if no book or reference matched.
+      // The UI will show a premium fallback message.
+      return const [];
+    }
 
     try {
       final content = await getChapterContent(versionId, usfm);
@@ -152,6 +192,31 @@ class BibleApiService {
     } catch (_) {
       return const [];
     }
+  }
+
+  // ── Search Book Matcher ──────────────────────────────────────────────────
+  static List<BibleSearchResult> _matchBooks(String query) {
+    final lower = query.toLowerCase().trim();
+    final results = <BibleSearchResult>[];
+
+    for (final entry in _usfmBookNames.entries) {
+      // Exact or partial match (e.g. "John" -> John, 1 John, 2 John)
+      if (entry.value.toLowerCase().contains(lower)) {
+        // "3 John" shouldn't match "3" unless the user types "3 john".
+        // A simple contain is okay, but if query is short and numeric it's bad.
+        // Let's only match if query is > 2 chars or starts with query.
+        if (lower.length > 2 || entry.value.toLowerCase().startsWith(lower)) {
+          results.add(
+            BibleSearchResult(
+              ref: entry.value,
+              text: 'Book of the Bible',
+              chapterId: '${entry.key}.1',
+            ),
+          );
+        }
+      }
+    }
+    return results;
   }
 
   // ── Internal Helpers ────────────────────────────────────────────────────────

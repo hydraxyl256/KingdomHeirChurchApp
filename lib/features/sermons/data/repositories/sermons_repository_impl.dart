@@ -1,5 +1,7 @@
+import 'dart:convert';
+
 import 'package:fpdart/fpdart.dart';
-import 'package:kingdom_heir/features/sermons/data/mock/mock_sermons_seed.dart';
+import 'package:kingdom_heir/features/media/domain/entities/media_content_model.dart';
 import 'package:kingdom_heir/features/sermons/domain/entities/sermon.dart';
 import 'package:kingdom_heir/features/sermons/domain/entities/sermon_continue_item.dart';
 import 'package:kingdom_heir/features/sermons/domain/entities/sermon_download.dart';
@@ -25,30 +27,11 @@ class SermonsRepositoryImpl implements SermonsRepository {
   static const String _kNotesPrefix = 'sermon_notes_v1::';
   static const String _kReflectionsPrefix = 'sermon_reflections_v1::';
   static const String _kPrayerPrefix = 'sermon_prayer_v1::';
+  static const String _kSermonsCache = 'sermons_cache_v2';
 
-  // ─── Primary source: media_content (YouTube catalog) ─────────────────
+  // ─── Cache mechanism ───────────────────────────────────────────────
 
-  @override
-  Future<Either<String, List<Sermon>>> getSermons(
-      {String languageCode = 'en',}) async {
-    // 1. Try the new localized RPC
-    try {
-      final response = await _supabase.rpc<List<dynamic>>(
-          'get_sermons_localized',
-          params: {'p_lang': languageCode},);
-
-      if (response.isNotEmpty) {
-        return right(
-          response
-              .map((json) => Sermon.fromJson(json as Map<String, dynamic>))
-              .toList(),
-        );
-      }
-    } catch (_) {
-      // Fall through
-    }
-
-    // 2. Try the new YouTube media catalog first
+  Future<List<Sermon>> _getAllProductionSermons() async {
     try {
       final response = await _supabase
           .from('media_content')
@@ -58,33 +41,40 @@ class SermonsRepositoryImpl implements SermonsRepository {
           .order('published_at', ascending: false);
 
       if (response.isNotEmpty) {
-        return right(
-          response.map(Sermon.fromMediaContent).toList(),
-        );
+        await _prefs.setString(_kSermonsCache, jsonEncode(response));
+        return response
+            .map((json) => MediaContentModel.fromJson(json).toSermon())
+            .toList();
       }
-    } catch (_) {
-      // media_content table not yet migrated — fall through
+    } catch (_) {}
+
+    // Offline Fallback to SharedPreferences
+    final cached = _prefs.getString(_kSermonsCache);
+    if (cached != null && cached.isNotEmpty) {
+      try {
+        final decoded = jsonDecode(cached) as List<dynamic>;
+        return decoded
+            .map((json) => MediaContentModel.fromJson(json as Map<String, dynamic>).toSermon())
+            .toList();
+      } catch (_) {}
     }
+    return [];
+  }
 
-    // 2. Fall back to the legacy sermons table
-    try {
-      final response = await _supabase
-          .from('sermons')
-          .select('*, sermon_series(title)')
-          .eq('status', 'published')
-          .order('preached_on', ascending: false);
-
-      if (response.isNotEmpty) {
-        return right(
-          response.map(Sermon.fromJson).toList(),
-        );
-      }
-    } catch (_) {
-      // Legacy table also unavailable — fall through to mock
+  Future<Sermon?> _findSermon(String id) async {
+    final all = await _getAllProductionSermons();
+    for (final s in all) {
+      if (s.id == id) return s;
     }
+    return null;
+  }
 
-    // 3. Mock seed (development / CI only)
-    return right(MockSermonSeed.allSermons);
+  // ─── Primary source: media_content (YouTube catalog) ─────────────────
+
+  @override
+  Future<Either<String, List<Sermon>>> getSermons({String languageCode = 'en'}) async {
+    final all = await _getAllProductionSermons();
+    return right(all);
   }
 
   /// Returns only featured media_content sermons (is_featured = true).
@@ -94,29 +84,26 @@ class SermonsRepositoryImpl implements SermonsRepository {
           .from('media_content')
           .select()
           .eq('status', 'published')
-          .eq('content_type', 'sermon')
+          .not('youtube_video_id', 'is', null)
           .eq('is_featured', true)
           .order('sort_order', ascending: true);
 
       return right(
         (response as List<dynamic>)
-            .map(
-                (json) => Sermon.fromMediaContent(json as Map<String, dynamic>),)
+            .map((json) => MediaContentModel.fromJson(json as Map<String, dynamic>).toSermon())
             .toList(),
       );
     } catch (_) {
-      return right(const []);
+      final all = await _getAllProductionSermons();
+      return right(all.where((s) => s.trendingScore >= 100).toList());
     }
   }
 
   @override
   Future<Either<String, void>> incrementViewCount(String sermonId) async {
     try {
-      await _supabase
-          .rpc<void>('increment_sermon_views', params: {'s_id': sermonId});
-    } catch (_) {
-      // Silent — analytics only.
-    }
+      await _supabase.rpc<void>('increment_sermon_views', params: {'s_id': sermonId});
+    } catch (_) {}
     return right(null);
   }
 
@@ -136,9 +123,7 @@ class SermonsRepositoryImpl implements SermonsRepository {
         'is_completed': isCompleted,
         'updated_at': DateTime.now().toIso8601String(),
       });
-    } catch (_) {
-      // Silent.
-    }
+    } catch (_) {}
     return right(null);
   }
 
@@ -146,29 +131,84 @@ class SermonsRepositoryImpl implements SermonsRepository {
 
   @override
   Future<Either<String, List<SermonSeries>>> getSeries() async {
-    return right(MockSermonSeed.allSeries);
+    final all = await _getAllProductionSermons();
+    final map = <String, SermonSeries>{};
+    for (final s in all) {
+      if (s.seriesName.isEmpty) continue;
+      if (!map.containsKey(s.seriesName)) {
+        map[s.seriesName] = SermonSeries(
+          id: s.seriesName,
+          title: s.seriesName,
+          description: '',
+          pastorName: s.speakerName,
+          startedOn: s.publishedAt,
+          episodeCount: 1,
+          coverGradient: const [],
+          scriptureAnchor: s.scriptures.isNotEmpty ? s.scriptures.first.label : '',
+        );
+      } else {
+        final existing = map[s.seriesName]!;
+        map[s.seriesName] = SermonSeries(
+          id: existing.id,
+          title: existing.title,
+          description: existing.description,
+          pastorName: existing.pastorName,
+          startedOn: existing.startedOn,
+          episodeCount: existing.episodeCount + 1,
+          coverGradient: existing.coverGradient,
+          scriptureAnchor: existing.scriptureAnchor,
+          completedCount: existing.completedCount,
+        );
+      }
+    }
+    return right(map.values.toList());
   }
 
   @override
   Future<Either<String, SermonSeries>> getSeriesById(String seriesId) async {
-    final match = MockSermonSeed.allSeries
-        .where((s) => s.id == seriesId)
-        .cast<SermonSeries?>()
-        .firstWhere((_) => true, orElse: () => null);
-    if (match == null) {
-      return const Left('Series not found');
+    final seriesEither = await getSeries();
+    final list = seriesEither.getOrElse((_) => []);
+    for (final s in list) {
+      if (s.id == seriesId) return right(s);
     }
-    return right(match);
+    return const Left('Series not found');
   }
 
   @override
   Future<Either<String, List<SermonSpeaker>>> getSpeakers() async {
-    return right(MockSermonSeed.allSpeakers);
+    final all = await _getAllProductionSermons();
+    final map = <String, SermonSpeaker>{};
+    for (final s in all) {
+      if (s.speakerName.isEmpty) continue;
+      if (!map.containsKey(s.speakerName)) {
+        map[s.speakerName] = SermonSpeaker(
+          id: s.speakerName,
+          name: s.speakerName,
+          role: 'Speaker',
+          bio: '',
+          sermonCount: 1,
+        );
+      } else {
+        final existing = map[s.speakerName]!;
+        map[s.speakerName] = SermonSpeaker(
+          id: existing.id,
+          name: existing.name,
+          role: existing.role,
+          bio: existing.bio,
+          sermonCount: existing.sermonCount + 1,
+          languages: existing.languages,
+          yearsInMinistry: existing.yearsInMinistry,
+        );
+      }
+    }
+    return right(map.values.toList());
   }
 
   @override
   Future<Either<String, SermonSpeaker?>> getSpeakerByName(String name) async {
-    for (final s in MockSermonSeed.allSpeakers) {
+    final speakersEither = await getSpeakers();
+    final list = speakersEither.getOrElse((_) => []);
+    for (final s in list) {
       if (s.name == name) return right(s);
     }
     return right(null);
@@ -176,12 +216,8 @@ class SermonsRepositoryImpl implements SermonsRepository {
 
   @override
   Future<Either<String, List<Sermon>>> getBySeries(String seriesId) async {
-    final series = MockSermonSeed.allSeries
-        .where((s) => s.id == seriesId)
-        .cast<SermonSeries?>()
-        .firstWhere((_) => true, orElse: () => null);
-    if (series == null) return const Left('Series not found');
-    return right(MockSermonSeed.sermonsBySeries(series.title));
+    final all = await _getAllProductionSermons();
+    return right(all.where((s) => s.seriesName == seriesId).toList());
   }
 
   // ─── Continue watching ─────────────────────────────────────────────
@@ -189,11 +225,8 @@ class SermonsRepositoryImpl implements SermonsRepository {
   @override
   Future<Either<String, List<SermonContinueItem>>> getContinueWatching() async {
     final raw = _prefs.getString(_kContinue);
-    if (raw == null || raw.isEmpty) {
-      return right(MockSermonSeed.seedContinueWatching);
-    }
+    if (raw == null || raw.isEmpty) return right([]);
     try {
-      // Format: "sermonId:pos:total:isoDate,..."
       final items = <SermonContinueItem>[];
       for (final entry in raw.split(',')) {
         if (entry.isEmpty) continue;
@@ -203,7 +236,7 @@ class SermonsRepositoryImpl implements SermonsRepository {
         final pos = int.tryParse(parts[1]) ?? 0;
         final total = int.tryParse(parts[2]) ?? 0;
         final date = DateTime.tryParse(parts[3]) ?? DateTime.now();
-        final sermon = MockSermonSeed.findSermon(sermonId);
+        final sermon = await _findSermon(sermonId);
         if (sermon != null) {
           items.add(
             SermonContinueItem(
@@ -216,16 +249,9 @@ class SermonsRepositoryImpl implements SermonsRepository {
           );
         }
       }
-      // Merge in any seed items that aren't already in the persisted list.
-      final persistedIds = items.map((i) => i.sermon.id).toSet();
-      for (final seedItem in MockSermonSeed.seedContinueWatching) {
-        if (!persistedIds.contains(seedItem.sermon.id)) {
-          items.add(seedItem);
-        }
-      }
       return right(items);
     } catch (_) {
-      return right(MockSermonSeed.seedContinueWatching);
+      return right([]);
     }
   }
 
@@ -235,7 +261,7 @@ class SermonsRepositoryImpl implements SermonsRepository {
     required int positionSeconds,
     required bool isCompleted,
   }) async {
-    final sermon = MockSermonSeed.findSermon(sermonId);
+    final sermon = await _findSermon(sermonId);
     if (sermon == null) return const Left('Sermon not found');
 
     final items = await getContinueWatching();
@@ -254,10 +280,7 @@ class SermonsRepositoryImpl implements SermonsRepository {
         ),
       );
     final encoded = list
-        .map(
-          (i) =>
-              '${i.sermon.id}:${i.positionSeconds}:${i.totalSeconds}:${i.lastWatchedAt.toIso8601String()}',
-        )
+        .map((i) => '${i.sermon.id}:${i.positionSeconds}:${i.totalSeconds}:${i.lastWatchedAt.toIso8601String()}')
         .join(',');
     await _prefs.setString(_kContinue, encoded);
     return right(null);
@@ -268,9 +291,7 @@ class SermonsRepositoryImpl implements SermonsRepository {
   @override
   Future<Either<String, List<SermonDownload>>> getDownloads() async {
     final raw = _prefs.getString(_kDownloads);
-    if (raw == null || raw.isEmpty) {
-      return right(MockSermonSeed.seedDownloads);
-    }
+    if (raw == null || raw.isEmpty) return right([]);
     try {
       final items = <SermonDownload>[];
       for (final entry in raw.split('|')) {
@@ -289,7 +310,7 @@ class SermonsRepositoryImpl implements SermonsRepository {
       }
       return right(items);
     } catch (_) {
-      return right(MockSermonSeed.seedDownloads);
+      return right([]);
     }
   }
 
@@ -315,10 +336,7 @@ class SermonsRepositoryImpl implements SermonsRepository {
         ),
       );
     final encoded = list
-        .map(
-          (d) =>
-              '${d.sermonId};${d.localPath};${d.downloadedAt.toIso8601String()};${d.sizeBytes};${d.completed ? 1 : 0}',
-        )
+        .map((d) => '${d.sermonId};${d.localPath};${d.downloadedAt.toIso8601String()};${d.sizeBytes};${d.completed ? 1 : 0}')
         .join('|');
     await _prefs.setString(_kDownloads, encoded);
     return right(null);
@@ -331,10 +349,7 @@ class SermonsRepositoryImpl implements SermonsRepository {
       ...items.getOrElse((_) => <SermonDownload>[]),
     ]..removeWhere((d) => d.sermonId == sermonId);
     final encoded = list
-        .map(
-          (d) =>
-              '${d.sermonId};${d.localPath};${d.downloadedAt.toIso8601String()};${d.sizeBytes};${d.completed ? 1 : 0}',
-        )
+        .map((d) => '${d.sermonId};${d.localPath};${d.downloadedAt.toIso8601String()};${d.sizeBytes};${d.completed ? 1 : 0}')
         .join('|');
     await _prefs.setString(_kDownloads, encoded);
     return right(null);
@@ -358,22 +373,13 @@ class SermonsRepositoryImpl implements SermonsRepository {
               sermonId: parts[1],
               body: parts[2],
               createdAt: DateTime.tryParse(parts[3]) ?? DateTime.now(),
-              timestampSeconds:
-                  parts.length >= 5 ? int.tryParse(parts[4]) : null,
+              timestampSeconds: parts.length >= 5 ? int.tryParse(parts[4]) : null,
             ),
           );
         }
-      } catch (_) {/* ignore */}
+      } catch (_) {}
     }
-    // Merge in seed notes for this sermon that aren't already present.
-    final fromSeed =
-        MockSermonSeed.seedNotes.where((n) => n.sermonId == sermonId).toList();
-    final userIds = fromUser.map((n) => n.id).toSet();
-    final merged = <SermonNote>[
-      ...fromUser,
-      ...fromSeed.where((n) => !userIds.contains(n.id)),
-    ]..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    return right(merged);
+    return right(fromUser..sort((a, b) => b.createdAt.compareTo(a.createdAt)));
   }
 
   @override
@@ -386,10 +392,7 @@ class SermonsRepositoryImpl implements SermonsRepository {
       ..insert(0, note)
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
     final encoded = list
-        .map(
-          (n) =>
-              '${n.id};${n.sermonId};${_escape(n.body)};${n.createdAt.toIso8601String()};${n.timestampSeconds ?? ''}',
-        )
+        .map((n) => '${n.id};${n.sermonId};${_escape(n.body)};${n.createdAt.toIso8601String()};${n.timestampSeconds ?? ''}')
         .join('|');
     await _prefs.setString('$_kNotesPrefix${note.sermonId}', encoded);
     return right(null);
@@ -397,14 +400,11 @@ class SermonsRepositoryImpl implements SermonsRepository {
 
   @override
   Future<Either<String, void>> deleteNote(String noteId) async {
-    // Walk all per-sermon note keys and remove the matching id.
     for (final key in _prefs.getKeys()) {
       if (!key.startsWith(_kNotesPrefix)) continue;
       final raw = _prefs.getString(key);
       if (raw == null) continue;
-      final ids = raw
-          .split('|')
-          .where((e) => e.isNotEmpty && !e.startsWith('$noteId;'));
+      final ids = raw.split('|').where((e) => e.isNotEmpty && !e.startsWith('$noteId;'));
       await _prefs.setString(key, ids.join('|'));
     }
     return right(null);
@@ -413,9 +413,7 @@ class SermonsRepositoryImpl implements SermonsRepository {
   // ─── Engagement — reflections ──────────────────────────────────────
 
   @override
-  Future<Either<String, List<SermonReflection>>> getReflections(
-    String sermonId,
-  ) async {
+  Future<Either<String, List<SermonReflection>>> getReflections(String sermonId) async {
     final raw = _prefs.getString('$_kReflectionsPrefix$sermonId');
     final fromUser = <SermonReflection>[];
     if (raw != null && raw.isNotEmpty) {
@@ -434,23 +432,13 @@ class SermonsRepositoryImpl implements SermonsRepository {
             ),
           );
         }
-      } catch (_) {/* ignore */}
+      } catch (_) {}
     }
-    final fromSeed = MockSermonSeed.seedReflections
-        .where((r) => r.sermonId == sermonId)
-        .toList();
-    final userIds = fromUser.map((r) => r.id).toSet();
-    final merged = <SermonReflection>[
-      ...fromUser,
-      ...fromSeed.where((r) => !userIds.contains(r.id)),
-    ]..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    return right(merged);
+    return right(fromUser..sort((a, b) => b.createdAt.compareTo(a.createdAt)));
   }
 
   @override
-  Future<Either<String, void>> saveReflection(
-    SermonReflection reflection,
-  ) async {
+  Future<Either<String, void>> saveReflection(SermonReflection reflection) async {
     final currentEither = await getReflections(reflection.sermonId);
     final list = <SermonReflection>[
       ...currentEither.getOrElse((_) => <SermonReflection>[]),
@@ -459,24 +447,16 @@ class SermonsRepositoryImpl implements SermonsRepository {
       ..insert(0, reflection)
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
     final encoded = list
-        .map(
-          (r) =>
-              '${r.id};${r.sermonId};${_escape(r.question)};${_escape(r.answer)};${r.createdAt.toIso8601String()}',
-        )
+        .map((r) => '${r.id};${r.sermonId};${_escape(r.question)};${_escape(r.answer)};${r.createdAt.toIso8601String()}')
         .join('|');
-    await _prefs.setString(
-      '$_kReflectionsPrefix${reflection.sermonId}',
-      encoded,
-    );
+    await _prefs.setString('$_kReflectionsPrefix${reflection.sermonId}', encoded);
     return right(null);
   }
 
   // ─── Engagement — prayer ───────────────────────────────────────────
 
   @override
-  Future<Either<String, SermonPrayerResponse?>> getPrayerResponse(
-    String sermonId,
-  ) async {
+  Future<Either<String, SermonPrayerResponse?>> getPrayerResponse(String sermonId) async {
     final raw = _prefs.getString('$_kPrayerPrefix$sermonId');
     if (raw != null && raw.isNotEmpty) {
       try {
@@ -492,20 +472,14 @@ class SermonsRepositoryImpl implements SermonsRepository {
             ),
           );
         }
-      } catch (_) {/* ignore */}
-    }
-    for (final p in MockSermonSeed.seedPrayerResponses) {
-      if (p.sermonId == sermonId) return right(p);
+      } catch (_) {}
     }
     return right(null);
   }
 
   @override
-  Future<Either<String, void>> savePrayerResponse(
-    SermonPrayerResponse response,
-  ) async {
-    final encoded =
-        '${response.id};${response.sermonId};${_escape(response.body)};${response.createdAt.toIso8601String()};${response.isPrivate ? 1 : 0}';
+  Future<Either<String, void>> savePrayerResponse(SermonPrayerResponse response) async {
+    final encoded = '${response.id};${response.sermonId};${_escape(response.body)};${response.createdAt.toIso8601String()};${response.isPrivate ? 1 : 0}';
     await _prefs.setString('$_kPrayerPrefix${response.sermonId}', encoded);
     return right(null);
   }
@@ -514,53 +488,29 @@ class SermonsRepositoryImpl implements SermonsRepository {
 
   @override
   Future<Either<String, List<Sermon>>> getTrending() async {
-    final list = List<Sermon>.from(MockSermonSeed.allSermons)
-      ..sort((a, b) => b.trendingScore.compareTo(a.trendingScore));
+    final list = await _getAllProductionSermons();
+    list.sort((a, b) => b.viewCount.compareTo(a.viewCount));
     return right(list.take(8).toList());
   }
 
   @override
   Future<Either<String, List<Sermon>>> getMostViewed() async {
-    final list = List<Sermon>.from(MockSermonSeed.allSermons)
-      ..sort((a, b) => b.viewCount.compareTo(a.viewCount));
+    final list = await _getAllProductionSermons();
+    list.sort((a, b) => b.viewCount.compareTo(a.viewCount));
     return right(list.take(8).toList());
   }
 
   @override
   Future<Either<String, List<Sermon>>> getRecentlyAdded() async {
-    final list = List<Sermon>.from(MockSermonSeed.allSermons)
-      ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    final list = await _getAllProductionSermons();
+    list.sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
     return right(list.take(8).toList());
   }
 
   @override
   Future<Either<String, List<Sermon>>> getRecommended() async {
-    // Heuristic: sermons whose topics overlap with the most-recently
-    // watched sermon in the seed continue list.
-    final reference = MockSermonSeed.seedContinueWatching.isEmpty
-        ? null
-        : MockSermonSeed.seedContinueWatching.first.sermon;
-    if (reference == null) {
-      return right(MockSermonSeed.allSermons.take(6).toList());
-    }
-    final scored = <(Sermon, int)>[];
-    for (final s in MockSermonSeed.allSermons) {
-      if (s.id == reference.id) continue;
-      final overlap = s.topics.toSet().intersection(reference.topics.toSet());
-      if (overlap.isNotEmpty) {
-        scored.add((s, overlap.length));
-      }
-    }
-    scored.sort((a, b) => b.$2.compareTo(a.$2));
-    final top = scored.map((e) => e.$1).take(6).toList();
-    if (top.length < 6) {
-      // Pad with the highest-viewed sermons.
-      final pad = MockSermonSeed.allSermons
-          .where((s) => !top.any((t) => t.id == s.id))
-          .take(6 - top.length);
-      top.addAll(pad);
-    }
-    return right(top);
+    final list = await _getAllProductionSermons();
+    return right(list.take(6).toList());
   }
 
   @override
@@ -568,9 +518,8 @@ class SermonsRepositoryImpl implements SermonsRepository {
     String speakerName, {
     int limit = 10,
   }) async {
-    return right(
-      MockSermonSeed.sermonsBySpeaker(speakerName).take(limit).toList(),
-    );
+    final list = await _getAllProductionSermons();
+    return right(list.where((s) => s.speakerName == speakerName).take(limit).toList());
   }
 
   @override
@@ -578,11 +527,11 @@ class SermonsRepositoryImpl implements SermonsRepository {
     String book,
     int chapter,
   ) async {
+    final all = await _getAllProductionSermons();
     final out = <Sermon>[];
-    for (final s in MockSermonSeed.allSermons) {
+    for (final s in all) {
       for (final ref in s.scriptures) {
-        if (ref.book.toLowerCase() == book.toLowerCase() &&
-            ref.chapter == chapter) {
+        if (ref.book.toLowerCase() == book.toLowerCase() && ref.chapter == chapter) {
           out.add(s);
           break;
         }
@@ -593,58 +542,23 @@ class SermonsRepositoryImpl implements SermonsRepository {
 
   @override
   Future<Either<String, List<Sermon>>> getByTopic(String topic) async {
-    return right(MockSermonSeed.sermonsByTopic(topic));
+    final all = await _getAllProductionSermons();
+    return right(all.where((s) => s.topics.contains(topic)).toList());
   }
 
   @override
   Future<Either<String, Sermon?>> getSermonById(String id) async {
-    return right(MockSermonSeed.findSermon(id));
+    return right(await _findSermon(id));
   }
 
   // ─── Resources ─────────────────────────────────────────────────────
 
   @override
-  Future<Either<String, List<SermonResource>>> getResources(
-    String sermonId,
-  ) async {
-    // Seed a small fixture per sermon — alternating PDFs and links.
-    final sermon = MockSermonSeed.findSermon(sermonId);
-    if (sermon == null) return right(<SermonResource>[]);
-    final id = int.tryParse(sermonId.replaceAll(RegExp(r'\D'), '')) ?? 0;
-    final hasPdf = id.isEven;
-    return right(<SermonResource>[
-      SermonResource(
-        id: '$sermonId-res-1',
-        title: 'Study Guide — ${sermon.seriesName}',
-        kind: hasPdf ? SermonResourceKind.pdf : SermonResourceKind.link,
-        url: hasPdf
-            ? 'https://example.com/$sermonId/guide.pdf'
-            : 'https://example.com/$sermonId/guide',
-        sizeBytes: hasPdf ? 350000 : null,
-      ),
-      if (sermon.scriptures.isNotEmpty)
-        SermonResource(
-          id: '$sermonId-res-2',
-          title: 'Scripture Sheet — ${sermon.primaryScripture}',
-          kind: SermonResourceKind.pdf,
-          url: 'https://example.com/$sermonId/scripture.pdf',
-          sizeBytes: 180000,
-        ),
-      if (sermon.hasAudio)
-        SermonResource(
-          id: '$sermonId-res-3',
-          title: 'Audio clip — first 60s',
-          kind: SermonResourceKind.audio,
-          url: '${sermon.audioUrl ?? ''}#t=0,60',
-          sizeBytes: 900000,
-        ),
-    ]);
+  Future<Either<String, List<SermonResource>>> getResources(String sermonId) async {
+    return right([]); // Production resources not yet implemented via Supabase
   }
 
   // ─── Helpers ───────────────────────────────────────────────────────
 
-  /// Escape `;` and `|` characters so we can round-trip free text in
-  /// the compact `;`-delimited / `|`-delimited preference format.
-  String _escape(String input) =>
-      input.replaceAll(r'\;', r'\\;').replaceAll(r'\|', r'\\|');
+  String _escape(String input) => input.replaceAll(r'\;', r'\\;').replaceAll(r'\|', r'\\|');
 }

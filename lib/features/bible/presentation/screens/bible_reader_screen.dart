@@ -657,29 +657,61 @@ class _Loading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return Padding(
+      padding: const EdgeInsets.all(AppSpacing.xl),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: 36,
-            height: 36,
-            child: CircularProgressIndicator(
-              strokeWidth: 2.5,
-              color: palette.accent,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: List.generate(8, (index) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.md),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 20,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    color: palette.surfaceMuted,
+                    borderRadius: AppRadius.brSm,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        height: 16,
+                        decoration: BoxDecoration(
+                          color: palette.surfaceMuted,
+                          borderRadius: AppRadius.brSm,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        height: 16,
+                        width: index % 2 == 0 ? 200 : 150,
+                        decoration: BoxDecoration(
+                          color: palette.surfaceMuted,
+                          borderRadius: AppRadius.brSm,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            'Opening the scroll…',
-            style: AppTypography.textTheme.bodySmall?.copyWith(
-              color: palette.foregroundMuted,
-              fontStyle: FontStyle.italic,
-            ),
-          ),
-        ],
+          );
+        }),
       ),
-    );
+    )
+        .animate(onPlay: (controller) => controller.repeat(reverse: true))
+        .fade(
+          begin: 0.4,
+          end: 0.8,
+          duration: const Duration(milliseconds: 1000),
+          curve: Curves.easeInOut,
+        );
   }
 }
 
