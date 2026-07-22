@@ -1,49 +1,76 @@
+import 'dart:convert';
 import 'package:fpdart/fpdart.dart';
-import 'package:kingdom_heir/features/groups/data/mock/mock_groups_seed.dart';
 import 'package:kingdom_heir/features/groups/domain/entities/group_announcement_models.dart';
 import 'package:kingdom_heir/features/groups/domain/entities/group_event_models.dart';
 import 'package:kingdom_heir/features/groups/domain/entities/group_member_models.dart';
 import 'package:kingdom_heir/features/groups/domain/entities/group_models.dart';
 import 'package:kingdom_heir/features/groups/domain/entities/group_prayer_models.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-/// Wraps the Supabase client. New methods fall back to [MockGroupsSeed]
-/// fixtures when the underlying table doesn't exist yet (so the UI works
-/// end-to-end without a backend).
 class GroupsSupabaseService {
-  GroupsSupabaseService(this._client);
+  GroupsSupabaseService(this._client, this._prefs);
   final SupabaseClient _client;
+  final SharedPreferences _prefs;
+
+  Future<Either<String, T>> _guardData<T>(
+    String label,
+    Future<dynamic> Function() fetchJson,
+    T Function(dynamic) parseJson,
+    T emptyState,
+  ) async {
+    final cacheKey = 'groups_cache_$label';
+    try {
+      final data = await fetchJson();
+      final cachePayload = {
+        'data': data,
+        'cached_at': DateTime.now().toIso8601String(),
+      };
+      await _prefs.setString(cacheKey, jsonEncode(cachePayload));
+      return right(parseJson(data));
+    } catch (e) {
+      final cachedString = _prefs.getString(cacheKey);
+      if (cachedString != null) {
+        try {
+          final cached = jsonDecode(cachedString) as Map<String, dynamic>;
+          final data = cached['data'];
+          if (data != null) {
+            return right(parseJson(data));
+          }
+        } catch (_) {}
+      }
+      return right(emptyState);
+    }
+  }
 
   // ─────────────────────────────────────────────────────────────────
   // Existing — preserved unchanged
   // ─────────────────────────────────────────────────────────────────
 
-  Future<Either<String, List<CommunityGroup>>> getGroups() async {
-    try {
-      final user = _client.auth.currentUser;
-      final userId = user?.id;
-
-      final response = await _client.from('groups').select('''
-        *,
-        group_categories(name),
-        member_count:group_members(count),
-        group_members(*)
-      ''').order('created_at');
-
-      final list = (response as List<dynamic>)
-          .map(
-            (json) => CommunityGroup.fromJson(
-              json as Map<String, dynamic>,
-              currentUserId: userId,
-            ),
-          )
-          .toList();
-
-      return right(list);
-    } catch (e) {
-      return left(e.toString());
-    }
-  }
+  Future<Either<String, List<CommunityGroup>>> getGroups() => _guardData<List<CommunityGroup>>(
+        'getGroups',
+        () async {
+          return await _client.from('groups').select('''
+            *,
+            group_categories(name),
+            member_count:group_members(count),
+            group_members(*)
+          ''').order('created_at');
+        },
+        (dynamic rows) {
+          final user = _client.auth.currentUser;
+          final userId = user?.id;
+          return (rows as List<dynamic>)
+              .map(
+                (json) => CommunityGroup.fromJson(
+                  json as Map<String, dynamic>,
+                  currentUserId: userId,
+                ),
+              )
+              .toList();
+        },
+        const [],
+      );
 
   Future<Either<String, void>> joinGroup(
     String groupId, {
@@ -122,8 +149,8 @@ class GroupsSupabaseService {
   // ─────────────────────────────────────────────────────────────────
 
   Future<Either<String, GroupDetail>> getGroupDetail(String groupId) async {
+    final cacheKey = 'groups_cache_detail_$groupId';
     try {
-      // Try real Supabase first.
       final response = await _client.from('groups').select('''
             *,
             group_categories(name),
@@ -131,6 +158,12 @@ class GroupsSupabaseService {
           ''').eq('id', groupId).maybeSingle();
 
       if (response != null) {
+        final cachePayload = {
+          'data': response,
+          'cached_at': DateTime.now().toIso8601String(),
+        };
+        await _prefs.setString(cacheKey, jsonEncode(cachePayload));
+
         final group = CommunityGroup.fromJson(
           (response as Map).cast<String, dynamic>(),
           currentUserId: _client.auth.currentUser?.id,
@@ -138,145 +171,92 @@ class GroupsSupabaseService {
         return right(
           GroupDetail(
             group: group,
-            leader: MockGroupsSeed.leaderFor(groupId),
-            mission: MockGroupsSeed.missionFor(groupId),
-            activity: MockGroupsSeed.activityFor(groupId),
-            members: MockGroupsSeed.sampleMembers(groupId),
-            events: MockGroupsSeed.sampleEvents(groupId),
-            prayerRequests: MockGroupsSeed.samplePrayer(groupId),
-            announcements: MockGroupsSeed.sampleAnnouncements(groupId),
-            discussion: MockGroupsSeed.sampleDiscussion(groupId),
           ),
         );
       }
 
       return left('Group not found');
     } catch (_) {
-      // Table not yet wired → fall back to seed fixtures.
-      final group = MockGroupsSeed.groups.firstWhere(
-        (g) => g.id == groupId,
-        orElse: () => MockGroupsSeed.groups.first,
-      );
-      return right(
-        GroupDetail(
-          group: group,
-          leader: MockGroupsSeed.leaderFor(groupId),
-          mission: MockGroupsSeed.missionFor(groupId),
-          activity: MockGroupsSeed.activityFor(groupId),
-          members: MockGroupsSeed.sampleMembers(groupId),
-          events: MockGroupsSeed.sampleEvents(groupId),
-          prayerRequests: MockGroupsSeed.samplePrayer(groupId),
-          announcements: MockGroupsSeed.sampleAnnouncements(groupId),
-          discussion: MockGroupsSeed.sampleDiscussion(groupId),
-        ),
-      );
+      final cachedString = _prefs.getString(cacheKey);
+      if (cachedString != null) {
+        try {
+          final cached = jsonDecode(cachedString) as Map<String, dynamic>;
+          final data = cached['data'];
+          if (data != null) {
+            final group = CommunityGroup.fromJson(
+              (data as Map).cast<String, dynamic>(),
+              currentUserId: _client.auth.currentUser?.id,
+            );
+            return right(
+              GroupDetail(
+                group: group,
+              ),
+            );
+          }
+        } catch (_) {}
+      }
+      return left('Group not found offline');
     }
   }
 
   // ─────────────────────────────────────────────────────────────────
-  // Per-section feeds — always mock-backed for now (eventually real)
+  // Per-section feeds — returning empty collections until tables exist
   // ─────────────────────────────────────────────────────────────────
 
   Future<Either<String, List<GroupEvent>>> getGroupEvents(
     String groupId,
   ) async {
-    return right(MockGroupsSeed.sampleEvents(groupId));
+    return right(const []);
   }
 
   Future<Either<String, List<GroupPrayerRequest>>> getGroupPrayer(
     String groupId,
   ) async {
-    return right(MockGroupsSeed.samplePrayer(groupId));
+    return right(const []);
   }
 
   Future<Either<String, List<GroupAnnouncement>>> getGroupAnnouncements(
     String groupId,
   ) async {
-    return right(MockGroupsSeed.sampleAnnouncements(groupId));
+    return right(const []);
   }
 
   Future<Either<String, List<GroupMember>>> getGroupMembers(
     String groupId,
   ) async {
-    return right(MockGroupsSeed.sampleMembers(groupId));
+    return right(const []);
   }
 
   Future<Either<String, List<GroupDiscussionPost>>> getGroupDiscussion(
     String groupId,
   ) async {
-    return right(MockGroupsSeed.sampleDiscussion(groupId));
+    return right(const []);
   }
 
   // ─────────────────────────────────────────────────────────────────
-  // Home aggregated feeds
+  // Home aggregated feeds — returning empty collections
   // ─────────────────────────────────────────────────────────────────
 
   Future<Either<String, List<GroupEvent>>> getUpcomingMeetingsForUser() async {
-    final myGroups = await _myGroups();
-    if (myGroups.isEmpty) return right(const []);
-
-    final events = <GroupEvent>[];
-    for (final g in myGroups) {
-      events.addAll(MockGroupsSeed.sampleEvents(g.id));
-    }
-    events.sort((a, b) => a.startsAt.compareTo(b.startsAt));
-    return right(events.take(6).toList());
+    return right(const []);
   }
 
   Future<Either<String, List<GroupPrayerRequest>>>
       getPrayerFeedForUser() async {
-    final myGroups = await _myGroups();
-    if (myGroups.isEmpty) return right(const []);
-
-    final all = <GroupPrayerRequest>[];
-    for (final g in myGroups) {
-      all.addAll(MockGroupsSeed.samplePrayer(g.id));
-    }
-    all.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    return right(all.take(5).toList());
+    return right(const []);
   }
 
   Future<Either<String, List<GroupAnnouncement>>>
       getAnnouncementsFeedForUser() async {
-    final myGroups = await _myGroups();
-    if (myGroups.isEmpty) return right(const []);
-
-    final all = <GroupAnnouncement>[];
-    for (final g in myGroups) {
-      all.addAll(MockGroupsSeed.sampleAnnouncements(g.id));
-    }
-    all.sort((a, b) {
-      if (a.pinned != b.pinned) return a.pinned ? -1 : 1;
-      return b.createdAt.compareTo(a.createdAt);
-    });
-    return right(all.take(5).toList());
+    return right(const []);
   }
 
   Future<Either<String, List<CommunityGroup>>> getSuggestedGroups() async {
-    return right(MockGroupsSeed.suggestedGroups);
+    return right(const []);
   }
 
   Future<Either<String, List<CommunityGroup>>> getRecentlyActiveGroups() async {
-    try {
-      final groups = await getGroups();
-      return groups.fold(
-        (err) => right(<CommunityGroup>[]),
-        (list) {
-          final mine = list.where((g) => g.isMember).toList()
-            ..sort((a, b) {
-              final ad = a.lastMessageAt;
-              final bd = b.lastMessageAt;
-              if (ad == null && bd == null) return 0;
-              if (ad == null) return 1;
-              if (bd == null) return -1;
-              return bd.compareTo(ad);
-            });
-          return right(mine.take(4).toList());
-        },
-      );
-    } catch (_) {
-      return right(const []);
-    }
+    return right(const []);
   }
 
   // ─────────────────────────────────────────────────────────────────
@@ -299,7 +279,6 @@ class GroupsSupabaseService {
       });
       return right(null);
     } catch (_) {
-      // Stub success when table isn't present.
       return right(null);
     }
   }
@@ -404,64 +383,14 @@ class GroupsSupabaseService {
   Future<Either<String, List<PendingJoinRequest>>> getPendingRequests(
     String groupId,
   ) async {
-    // Stub: 2 pending requests for the upper-room group.
-    if (groupId == 'g-upper-room') {
-      return right([
-        PendingJoinRequest(
-          id: 'pr-1',
-          userId: 'u-new-1',
-          displayName: 'Esther Njeri',
-          requestedAt: DateTime.now().subtract(const Duration(hours: 6)),
-          note:
-              'Heard about this group from my cousin. Hungry for prayer community.',
-        ),
-        PendingJoinRequest(
-          id: 'pr-2',
-          userId: 'u-new-2',
-          displayName: 'Mark Otieno',
-          requestedAt: DateTime.now().subtract(const Duration(days: 1)),
-          note: 'New to the city — looking for a prayer family.',
-        ),
-      ]);
-    }
     return right(const []);
   }
 
   Future<Either<String, int>> getLeaderWeeklyEngagement(String groupId) async {
-    return right(72); // 72% engagement
+    return right(0);
   }
 
   Future<Either<String, double>> getLeaderAvgAttendance(String groupId) async {
-    return right(0.68); // 68% avg attendance
-  }
-
-  // ─────────────────────────────────────────────────────────────────
-  // Helpers
-  // ─────────────────────────────────────────────────────────────────
-
-  Future<List<CommunityGroup>> _myGroups() async {
-    try {
-      final user = _client.auth.currentUser;
-      final userId = user?.id;
-      final response = await _client.from('groups').select('''
-        *,
-        group_categories(name),
-        member_count:group_members(count),
-        group_members(*)
-      ''').order('created_at');
-
-      final list = (response as List<dynamic>)
-          .map(
-            (json) => CommunityGroup.fromJson(
-              json as Map<String, dynamic>,
-              currentUserId: userId,
-            ),
-          )
-          .toList();
-      return list.where((g) => g.isMember).toList();
-    } catch (_) {
-      // Fallback: assume user is a member of the seed "upper room".
-      return MockGroupsSeed.groups.where((g) => g.isMember).toList();
-    }
+    return right(0);
   }
 }

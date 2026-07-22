@@ -6,7 +6,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 
-import 'package:kingdom_heir/features/sermons/data/mock/reflection_prompts.dart';
 import 'package:kingdom_heir/features/sermons/domain/entities/sermon.dart';
 import 'package:kingdom_heir/features/sermons/presentation/providers/sermons_provider.dart';
 
@@ -122,10 +121,7 @@ final availableTopicsProvider = Provider<List<String>>((ref) {
     }
   }
 
-  final combined = <String>[
-    ...ReflectionPrompts.topics,
-    ...fromData.where((t) => !ReflectionPrompts.topics.contains(t)),
-  ];
+  final combined = fromData.toList();
   return combined;
 });
 

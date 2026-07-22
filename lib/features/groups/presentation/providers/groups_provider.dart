@@ -13,7 +13,10 @@ import 'package:kingdom_heir/features/groups/domain/entities/group_prayer_models
 // ─────────────────────────────────────────────────────────────────────
 
 final groupsSupabaseServiceProvider = Provider<GroupsSupabaseService>((ref) {
-  return GroupsSupabaseService(ref.watch(supabaseClientProvider));
+  return GroupsSupabaseService(
+    ref.watch(supabaseClientProvider),
+    ref.watch(sharedPreferencesProvider),
+  );
 });
 
 final groupsRepositoryProvider = Provider<GroupsRepository>((ref) {

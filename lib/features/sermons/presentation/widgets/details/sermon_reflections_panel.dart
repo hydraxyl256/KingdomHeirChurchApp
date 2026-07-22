@@ -10,7 +10,6 @@ import 'package:intl/intl.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
-import 'package:kingdom_heir/features/sermons/data/mock/reflection_prompts.dart';
 import 'package:kingdom_heir/features/sermons/domain/entities/sermon.dart';
 import 'package:kingdom_heir/features/sermons/domain/entities/sermon_reflection.dart';
 import 'package:kingdom_heir/features/sermons/presentation/providers/sermon_engagement_provider.dart';
@@ -42,9 +41,11 @@ class _SermonReflectionsPanelState
     if (answer.isEmpty) return;
     setState(() => _saving = true);
     try {
-      final topic =
-          widget.sermon.topics.isNotEmpty ? widget.sermon.topics.first : null;
-      final prompts = ReflectionPrompts.forTopic(topic);
+      const prompts = [
+        'What stood out to you in this message?',
+        'How can you apply this to your life?',
+        'Was there anything you disagreed with or questioned?',
+      ];
       final question = prompts[_promptIndex % prompts.length];
       await ref.read(reflectionsControllerProvider).saveReflection(
             sermonId: widget.sermon.id,
@@ -62,9 +63,11 @@ class _SermonReflectionsPanelState
   Widget build(BuildContext context) {
     final reflectionsAsync =
         ref.watch(reflectionsBySermonProvider(widget.sermon.id));
-    final topic =
-        widget.sermon.topics.isNotEmpty ? widget.sermon.topics.first : null;
-    final prompts = ReflectionPrompts.forTopic(topic);
+    const prompts = [
+      'What stood out to you in this message?',
+      'How can you apply this to your life?',
+      'Was there anything you disagreed with or questioned?',
+    ];
     final currentPrompt = prompts[_promptIndex % prompts.length];
 
     return SliverToBoxAdapter(

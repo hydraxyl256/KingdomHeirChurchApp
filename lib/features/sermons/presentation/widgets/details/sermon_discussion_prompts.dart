@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
-import 'package:kingdom_heir/features/sermons/data/mock/reflection_prompts.dart';
 import 'package:kingdom_heir/features/sermons/domain/entities/sermon.dart';
 
 class SermonDiscussionPrompts extends StatelessWidget {
@@ -17,8 +16,11 @@ class SermonDiscussionPrompts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final topic = sermon.topics.isNotEmpty ? sermon.topics.first : null;
-    final prompts = ReflectionPrompts.forTopic(topic).take(3).toList();
+    const prompts = [
+      'What stood out to you in this message?',
+      'How can you apply this to your life?',
+      'Was there anything you disagreed with or questioned?',
+    ];
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(

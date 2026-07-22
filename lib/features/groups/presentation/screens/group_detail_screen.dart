@@ -65,7 +65,7 @@ class GroupDetailScreen extends ConsumerWidget {
               SliverList(
                 delegate: SliverChildListDelegate([
                   GroupCover(group: detail.group),
-                  if (detail.mission.statement.isNotEmpty)
+                  if (detail.mission?.statement.isNotEmpty ?? false)
                     Padding(
                       padding: EdgeInsets.fromLTRB(
                         insets.lg,
@@ -74,14 +74,14 @@ class GroupDetailScreen extends ConsumerWidget {
                         0,
                       ),
                       child: Text(
-                        detail.mission.statement,
+                        detail.mission!.statement,
                         style: Theme.of(context)
                             .textTheme
                             .bodyLarge
                             ?.copyWith(height: 1.45),
                       ),
                     ),
-                  if (detail.mission.scripture != null)
+                  if (detail.mission?.scripture != null)
                     Padding(
                       padding: EdgeInsets.fromLTRB(
                         insets.lg,
@@ -90,7 +90,7 @@ class GroupDetailScreen extends ConsumerWidget {
                         0,
                       ),
                       child: Text(
-                        '📖 ${detail.mission.scripture}',
+                        '📖 ${detail.mission!.scripture}',
                         style:
                             Theme.of(context).textTheme.labelMedium?.copyWith(
                                   color: AppColors.goldDark,
@@ -99,7 +99,8 @@ class GroupDetailScreen extends ConsumerWidget {
                                 ),
                       ),
                     ),
-                  LeaderCard(leader: detail.leader, group: detail.group),
+                  if (detail.leader != null)
+                    LeaderCard(leader: detail.leader!, group: detail.group),
                   ScheduleCard(groupId: groupId),
                   MembersStrip(groupId: groupId),
                   PrayerWallSection(groupId: groupId),

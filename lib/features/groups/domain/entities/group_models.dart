@@ -388,9 +388,9 @@ class GroupActivity extends Equatable {
 class GroupDetail extends Equatable {
   const GroupDetail({
     required this.group,
-    required this.leader,
-    required this.mission,
-    required this.activity,
+    this.leader,
+    this.mission,
+    this.activity,
     this.members = const [],
     this.events = const [],
     this.prayerRequests = const [],
@@ -399,9 +399,9 @@ class GroupDetail extends Equatable {
   });
 
   final CommunityGroup group;
-  final GroupLeaderProfile leader;
-  final GroupMission mission;
-  final GroupActivity activity;
+  final GroupLeaderProfile? leader;
+  final GroupMission? mission;
+  final GroupActivity? activity;
   final List<GroupMember> members;
   final List<GroupEvent> events;
   final List<GroupPrayerRequest> prayerRequests;

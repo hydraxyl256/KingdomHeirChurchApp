@@ -7,13 +7,14 @@
 // the meta aggregator for the initial RefreshIndicator state.
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kingdom_heir/core/di/providers.dart';
 import 'package:kingdom_heir/features/dashboard/data/home_dashboard_repository.dart';
 import 'package:kingdom_heir/features/dashboard/domain/home_dashboard_models.dart';
 
 // ── Repository DI ────────────────────────────────────────────────────────────
 
 final homeDashboardRepositoryProvider = Provider<HomeDashboardRepository>(
-  (ref) => HomeDashboardRepository(),
+  (ref) => HomeDashboardRepository(ref.watch(sharedPreferencesProvider)),
 );
 
 // ── Per-section providers (independent loading + skeletons) ────────────────
