@@ -48,9 +48,24 @@ abstract final class Env {
 
   // YouVersion Platform API key — obtained from platform.youversion.com
   // Injected at build time via: --dart-define=YOU_VERSION_KEY=<your_key>
+  //
+  // **Default is intentionally empty.** The previous default was a
+  // hard-coded key that api.youversion.com has been rejecting with
+  // 403 Forbidden — every chapter open in production failed until
+  // the user rebuilt with a real key. An empty default means the
+  // app still builds (handy for CI), but every Bible request fails
+  // loud with the 403 → `Unable to load this chapter` UI instead of
+  // silently rendering broken pages. See BIBLE_API_AUDIT.md.
   static const String youVersionKey = String.fromEnvironment(
     'YOU_VERSION_KEY',
-    defaultValue: '490kxH8f7HvmTZuMvG4c1Fnec6ARpWAr9gE6atPAvBnwJTNa',
+  );
+
+  static const String biblePreferredVersionIds = String.fromEnvironment(
+    'BIBLE_PREFERRED_VERSION_IDS',
+  );
+
+  static const int bibleFallbackVersionId = int.fromEnvironment(
+    'BIBLE_FALLBACK_VERSION_ID',
   );
 
   // NOTE: In production, secret keys should be kept in your Supabase backend (.env)

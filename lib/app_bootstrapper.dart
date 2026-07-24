@@ -22,9 +22,9 @@ class _AppBootstrapperState extends State<AppBootstrapper> {
   }
 
   Future<void> _init() async {
-    // 1. Minimum 2.4s splash duration
+    // Keep the native-to-Flutter entrance visible without delaying startup.
     final splashTimer =
-        Future<void>.delayed(const Duration(milliseconds: 2400));
+        Future<void>.delayed(const Duration(milliseconds: 1100));
 
     // 2. Heavy initialization (Supabase, Firebase, SharedPreferences, etc.)
     final containerFuture = bootstrap();
@@ -44,18 +44,21 @@ class _AppBootstrapperState extends State<AppBootstrapper> {
   @override
   Widget build(BuildContext context) {
     // If fully initialized and splash animation is done, swap to the real app
-    if (_container != null && _minSplashDurationElapsed) {
-      return UncontrolledProviderScope(
-        container: _container!,
-        child: const KingdomHeirApp(),
-      );
-    }
-
-    // Otherwise, show the Splash Screen natively (without GoRouter or Riverpod)
-    // We wrap it in a MaterialApp to provide Theme and Directionality.
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 240),
+      switchInCurve: Curves.easeOut,
+      switchOutCurve: Curves.easeIn,
+      child: _container != null && _minSplashDurationElapsed
+          ? UncontrolledProviderScope(
+              key: const ValueKey('application'),
+              container: _container!,
+              child: const KingdomHeirApp(),
+            )
+          : const MaterialApp(
+              key: ValueKey('splash'),
+              debugShowCheckedModeBanner: false,
+              home: SplashScreen(),
+            ),
     );
   }
 }

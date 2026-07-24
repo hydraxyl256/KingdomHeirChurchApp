@@ -1,4 +1,6 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:kingdom_heir/core/error/error_handler.dart';
+import 'package:kingdom_heir/core/error/failure.dart';
 import 'package:kingdom_heir/features/bible/data/services/bible_api_service.dart';
 import 'package:kingdom_heir/features/bible/data/services/bible_local_cache.dart';
 import 'package:kingdom_heir/features/bible/data/services/bible_supabase_service.dart';
@@ -61,8 +63,8 @@ class BibleRepositoryImpl implements BibleRepository {
     try {
       final versions = await apiService.getBibleVersions(language: language);
       return right(versions);
-    } catch (e) {
-      return left('Failed to load Bible versions: $e');
+    } catch (e, st) {
+      return _handleFailure(e, st, 'Failed to load Bible versions');
     }
   }
 
@@ -77,8 +79,8 @@ class BibleRepositoryImpl implements BibleRepository {
       final books = await apiService.getBooks(versionId);
       await localCache.cacheBooks(versionId, books);
       return right(books);
-    } catch (e) {
-      return left('Failed to get books: $e');
+    } catch (e, st) {
+      return _handleFailure(e, st, 'Failed to load books');
     }
   }
 
@@ -96,8 +98,8 @@ class BibleRepositoryImpl implements BibleRepository {
       final chapters = await apiService.getChapters(versionId, bookId);
       await localCache.cacheChapters(versionId, bookId, chapters);
       return right(chapters);
-    } catch (e) {
-      return left('Failed to get chapters: $e');
+    } catch (e, st) {
+      return _handleFailure(e, st, 'Failed to load chapters');
     }
   }
 
@@ -134,8 +136,8 @@ class BibleRepositoryImpl implements BibleRepository {
       }
 
       return right(content);
-    } catch (e) {
-      return left('Failed to get chapter content: $e');
+    } catch (e, st) {
+      return _handleFailure(e, st, 'Failed to load chapter content');
     }
   }
 
@@ -149,8 +151,8 @@ class BibleRepositoryImpl implements BibleRepository {
     try {
       final results = await apiService.search(versionId, query);
       return right(results);
-    } catch (e) {
-      return left('Search failed: $e');
+    } catch (e, st) {
+      return _handleFailure(e, st, 'Search failed');
     }
   }
 
@@ -193,4 +195,56 @@ class BibleRepositoryImpl implements BibleRepository {
         chapterId,
         progressPercent,
       );
+
+  // ── Failure handling ────────────────────────────────────────────────────────
+
+  /// Maps any thrown error to a `left(failure.message)` and forwards
+  /// the raw exception to Sentry / Crashlytics via [ErrorHandler].
+  ///
+  /// **Never** interpolates `$e` into the left side — that is what
+  /// previously leaked `BibleApiException(403): …` to the user. The
+  /// UI only ever sees the friendly message from [Failure.toString].
+  static Either<String, T> _handleFailure<T>(
+    Object error,
+    StackTrace stack,
+    String contextLabel,
+  ) {
+    // Forward to Sentry + Crashlytics so observability sees the
+    // *real* reason (status code, technicalDetails, stack). The UI
+    // does not.
+    ErrorHandler.handle(error, stack);
+
+    // Pick a user-friendly Failure. The map is order-sensitive: the
+    // Bible-specific exception comes first so we keep its curated
+    // message instead of the generic `Object.toString`.
+    final failure = _mapError(error);
+    return left(failure.message);
+  }
+
+  static Failure _mapError(Object error) {
+    if (error is BibleApiException) {
+      switch (error.kind) {
+        case BibleApiErrorKind.auth:
+          return const AuthFailure(
+            message: 'Unable to load this chapter. Please try again shortly.',
+          );
+        case BibleApiErrorKind.notFound:
+          return ServerFailure(
+            message:
+                'This chapter is not available in the selected Bible version.',
+            code: error.statusCode,
+          );
+        case BibleApiErrorKind.network:
+          return NetworkFailure(message: error.message);
+        case BibleApiErrorKind.unknown:
+          return ServerFailure(
+            message: 'Unable to load this chapter. Please try again shortly.',
+            code: error.statusCode,
+          );
+      }
+    }
+    return const UnknownFailure(
+      message: 'Unable to load this chapter. Please try again shortly.',
+    );
+  }
 }

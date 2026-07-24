@@ -6,6 +6,13 @@
 // - Error state with retry
 // - Fullscreen via orientation lock
 // - Replay support when live ends
+// - Embed-restriction fallback ("Open in YouTube") so the user is
+//   never left on a broken player.
+//
+// The `LiveServiceState.youtubeId` field is whatever the repository
+// stored from `live_services.youtube_video_id`. That column is the
+// canonical 11-char video ID — but to be defensive we still run it
+// through `normaliseYouTubeId` before passing it to the IFrame.
 
 import 'dart:async';
 
@@ -15,6 +22,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
 import 'package:kingdom_heir/core/theme/app_spacing.dart';
 import 'package:kingdom_heir/core/theme/app_typography.dart';
+import 'package:kingdom_heir/core/utils/youtube_player_utils.dart';
+import 'package:kingdom_heir/features/live_service/domain/entities/live_service_models.dart';
 import 'package:kingdom_heir/features/live_service/presentation/providers/live_service_provider.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
@@ -29,26 +38,82 @@ class _LiveVideoPlayerState extends ConsumerState<LiveVideoPlayer> {
   YoutubePlayerController? _controller;
   String? _currentVideoId;
   bool _isFullscreen = false;
+  StreamSubscription<YoutubePlayerValue>? _ytSub;
+  bool _fallbackShown = false;
+  String? _activeVideoId;
+  String? _initError;
 
   @override
   void dispose() {
+    _ytSub?.cancel();
     _controller?.close();
     super.dispose();
   }
 
-  void _initController(String videoId) {
-    if (_currentVideoId == videoId) return;
-    _currentVideoId = videoId;
+  void _initController(String rawVideoId) {
+    // The repository may have handed us a full URL rather than a
+    // bare 11-char ID. Normalise once before mounting the WebView.
+    final normalised = normaliseYouTubeId(rawVideoId);
+    if (!normalised.isValid) {
+      _initError = normalised.isPlaylistOnly
+          ? 'This stream links to a YouTube playlist and cannot be '
+              'played here. Open it in YouTube instead.'
+          : 'This stream does not have a valid YouTube link.';
+      _currentVideoId = null;
+      _controller?.close();
+      _controller = null;
+      return;
+    }
+    final id = normalised.videoId!;
+    _activeVideoId = id;
+    _initError = null;
+    if (_currentVideoId == id && _controller != null) return;
+    _currentVideoId = id;
     _controller?.close();
     _controller = YoutubePlayerController.fromVideoId(
-      videoId: videoId,
+      videoId: id,
       autoPlay: true,
       params: const YoutubePlayerParams(
         showFullscreenButton: true,
         enableCaption: false,
         showVideoAnnotations: false,
+        strictRelatedVideos: true,
       ),
     );
+    _fallbackShown = false;
+    _ytSub?.cancel();
+    _ytSub = _controller!.listen(
+      _onYouTubeValue,
+      onError: (_) => _maybeShowFallback(),
+    );
+  }
+
+  void _onYouTubeValue(YoutubePlayerValue value) {
+    // `value.error` is the IFrame Player API's current error state.
+    // We only react to codes that mean "this video cannot be played
+    // in an embedded player" — every other code is either the happy
+    // path (`none`) or transient and the IFrame will recover.
+    switch (value.error) {
+      case YoutubeError.none:
+        break;
+      case YoutubeError.notEmbeddable:
+      case YoutubeError.sameAsNotEmbeddable:
+      case YoutubeError.videoNotFound:
+      case YoutubeError.cannotFindVideo:
+      case YoutubeError.html5Error:
+      case YoutubeError.invalidParam:
+      case YoutubeError.unknown:
+        _maybeShowFallback();
+    }
+  }
+
+  Future<void> _maybeShowFallback() async {
+    if (_fallbackShown) return;
+    if (!mounted) return;
+    final id = _activeVideoId;
+    if (id == null) return;
+    _fallbackShown = true;
+    await showYouTubeFallbackSheet(context, videoId: id);
   }
 
   Future<void> _toggleFullscreen() async {
@@ -81,7 +146,14 @@ class _LiveVideoPlayerState extends ConsumerState<LiveVideoPlayer> {
             return _NoStreamPlaceholder(state: state);
           }
 
+          // Side-effect: tear down / re-init the controller when the
+          // resolved video ID changes. We call this from build
+          // because `state` is the source of truth and the player
+          // is otherwise pure.
           _initController(videoId);
+          if (_controller == null) {
+            return _InitErrorBanner(message: _initError ?? 'Invalid stream');
+          }
 
           return AspectRatio(
             aspectRatio: 16 / 9,
@@ -159,11 +231,41 @@ class _LiveVideoPlayerState extends ConsumerState<LiveVideoPlayer> {
   }
 }
 
+// ─── Init error banner (used when the repository gives us a malformed
+// video ID rather than a null one) ─────────────────────────────────────
+
+class _InitErrorBanner extends StatelessWidget {
+  const _InitErrorBanner({required this.message});
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return AspectRatio(
+      aspectRatio: 16 / 9,
+      child: ColoredBox(
+        color: const Color(0xFF0A0F1E),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Center(
+            child: Text(
+              message,
+              textAlign: TextAlign.center,
+              style: AppTypography.textTheme.bodySmall?.copyWith(
+                color: Colors.white60,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 // ─── No Stream Placeholder ────────────────────────────────────────────────────
 
 class _NoStreamPlaceholder extends StatelessWidget {
   const _NoStreamPlaceholder({required this.state});
-  final dynamic state; // LiveServiceState
+  final LiveServiceState state;
 
   @override
   Widget build(BuildContext context) {

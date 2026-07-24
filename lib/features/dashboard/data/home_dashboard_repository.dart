@@ -7,6 +7,7 @@
 
 import 'dart:async';
 import 'dart:io';
+import 'package:kingdom_heir/core/error/error_handler.dart';
 import 'package:kingdom_heir/core/error/failure.dart';
 import 'package:kingdom_heir/core/logging/structured_logger.dart';
 import 'package:kingdom_heir/core/storage/cache_keys.dart';
@@ -449,30 +450,50 @@ class HomeDashboardRepository {
       );
 
       return parseJson(data);
-    } catch (e) {
+    } catch (e, st) {
       stopwatch.stop();
-      
-      final isNetworkError = e is SocketException || e is TimeoutException || e.toString().toLowerCase().contains('network') || e.toString().toLowerCase().contains('socket');
-      
-      if (!isNetworkError) {
-        // Rule 5: Non-recoverable failures (e.g. parsing, logic) must THROW.
+
+      // ── Permission / RLS / table-not-found errors (e.g.
+      //    `permission denied for table auth.users` from
+      //    get_dashboard_greeting) used to be rethrown, which
+      //    surfaced the raw PostgrestException to the UI. We now
+      //    map them to typed Failures, log the technical detail
+      //    for Sentry / Crashlytics, and fall through to the
+      //    cache → empty-state path so the rest of the dashboard
+      //    renders unaffected.
+      final failure = ErrorHandler.handle(e, st);
+
+      // Distinguish "network is gone / RPC timed out" from
+      // "server returned an error" so we log different events.
+      final isNetworkError =
+          e is SocketException || e is TimeoutException;
+
+      if (isNetworkError) {
+        StructuredLogger.networkRequestFailed(
+          feature: 'dashboard',
+          repository: 'HomeDashboardRepository',
+          datasource: 'supabase_rpc',
+          durationMs: stopwatch.elapsedMilliseconds,
+          errorType: e.runtimeType.toString(),
+        );
+      } else {
+        // Includes PostgrestException (e.g. 42501 auth.users
+        // permission denied), parse errors, schema mismatches, and
+        // any non-network failure. The full error is captured by
+        // ErrorHandler.handle → Crashlytics/Sentry in
+        // production. The structured event is intentionally
+        // generic (no PII) for the JSON log stream.
         StructuredLogger.parsingFailed(
           feature: 'dashboard',
           repository: 'HomeDashboardRepository',
-          error: e.toString(),
+          error: failure.runtimeType.toString(),
         );
-        rethrow;
       }
 
-      StructuredLogger.networkRequestFailed(
-        feature: 'dashboard',
-        repository: 'HomeDashboardRepository',
-        datasource: 'supabase_rpc',
-        durationMs: stopwatch.elapsedMilliseconds,
-        errorType: e.runtimeType.toString(),
-      );
-
-      // Rule 4: Recoverable failures fallback to cache
+      // Rule 4: Recoverable failures (and now also non-recoverable
+      // server errors) fall back to cache, then to an empty state.
+      // We never rethrow — surfacing a raw PostgrestException to
+      // the UI is the regression we are fixing.
       final cached = _cacheManager.read(
         key: cacheKey,
         feature: 'dashboard',
@@ -482,7 +503,11 @@ class HomeDashboardRepository {
       if (cached != null) {
         try {
           return parseJson(cached);
-        } catch (_) {}
+        } catch (_) {
+          // Cache payload itself failed to parse (e.g. schema
+          // drift). Drop through to the empty state rather than
+          // surfacing the parser error.
+        }
       }
       return emptyState();
     }

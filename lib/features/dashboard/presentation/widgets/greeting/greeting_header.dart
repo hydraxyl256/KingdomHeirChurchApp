@@ -48,13 +48,18 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 /// identity replaces it so the app never displays a user name as the title.
 class DashboardTopBar extends StatelessWidget {
   const DashboardTopBar({
-    required this.greeting,
     super.key,
+    this.greeting,
     this.onNotificationTap,
     this.onAvatarTap,
   });
 
-  final DashboardGreeting greeting;
+  /// Optional greeting. When `null` (e.g. greeting provider still
+  /// loading, or that section failed), the top bar renders without
+  /// the avatar image and without the notification dot. This is the
+  /// expected behavior in the per-section resilience refactor —
+  /// the dashboard should never blank because one section is slow.
+  final DashboardGreeting? greeting;
   final VoidCallback? onNotificationTap;
   final VoidCallback? onAvatarTap;
 
@@ -86,12 +91,12 @@ class DashboardTopBar extends StatelessWidget {
                 child: CircleAvatar(
                   radius: 16,
                   backgroundColor: AppColors.gold.withValues(alpha: 0.18),
-                  backgroundImage: greeting.avatarUrl != null
-                      ? NetworkImage(greeting.avatarUrl!)
+                  backgroundImage: greeting?.avatarUrl != null
+                      ? NetworkImage(greeting!.avatarUrl!)
                       : null,
                   onBackgroundImageError:
-                      greeting.avatarUrl != null ? (_, __) {} : null,
-                  child: greeting.avatarUrl == null
+                      greeting?.avatarUrl != null ? (_, __) {} : null,
+                  child: greeting?.avatarUrl == null
                       ? const Icon(
                           PhosphorIconsRegular.userCircle,
                           color: AppColors.gold,
@@ -129,12 +134,12 @@ class DashboardTopBar extends StatelessWidget {
               ),
               onPressed: onNotificationTap,
             ),
-            if (greeting.unreadNotifications > 0)
+            if ((greeting?.unreadNotifications ?? 0) > 0)
               Positioned(
                 top: 10,
                 right: 10,
                 child: _NotificationDot(
-                  count: greeting.unreadNotifications,
+                  count: greeting!.unreadNotifications,
                 ).animate().scale(
                       duration: const Duration(milliseconds: 350),
                       curve: Curves.easeOutBack,

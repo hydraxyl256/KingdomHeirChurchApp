@@ -1,8 +1,10 @@
 import 'dart:developer' as dev;
 
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kingdom_heir/core/auth/deep_links.dart';
 import 'package:kingdom_heir/core/config/env.dart';
+import 'package:kingdom_heir/core/error/error_handler.dart';
 import 'package:kingdom_heir/features/auth/data/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -121,6 +123,24 @@ class AuthRemoteDataSource {
   /// Throws [AuthException] with a user-friendly message on all other failures.
   Future<UserModel> signInWithGoogle() async {
     dev.log('[Google Auth] Starting native sign-in flow', name: 'AuthDS');
+    if (kDebugMode) {
+      dev.log(
+        '[Google Auth] Resolved GOOGLE_WEB_CLIENT_ID: '
+        '${Env.googleWebClientId}',
+        name: 'AuthDS',
+      );
+    }
+    if (Env.googleWebClientId.trim().isEmpty) {
+      const error = AuthException(
+        'Google sign-in is not configured for this build.',
+      );
+      _reportGoogleFailure(
+        stage: 'configuration',
+        error: error,
+        stackTrace: StackTrace.current,
+      );
+      throw error;
+    }
 
     // ── Step 1: Sign out any stale Google session first ───────────────────
     // Prevents the picker from auto-selecting the wrong account when the
@@ -135,9 +155,8 @@ class AuthRemoteDataSource {
     final GoogleSignInAccount? googleAccount;
     try {
       googleAccount = await _googleSignIn.signIn();
-    } catch (e) {
-      dev.log('[Google Auth] signIn() threw: $e', name: 'AuthDS');
-      _handleGoogleError(e);
+    } catch (e, st) {
+      _handleGoogleError(e, st, stage: 'native_sign_in');
     }
 
     if (googleAccount == null) {
@@ -155,9 +174,8 @@ class AuthRemoteDataSource {
     final GoogleSignInAuthentication googleAuth;
     try {
       googleAuth = await googleAccount.authentication;
-    } catch (e) {
-      dev.log('[Google Auth] authentication threw: $e', name: 'AuthDS');
-      _handleGoogleError(e);
+    } catch (e, st) {
+      _handleGoogleError(e, st, stage: 'token_retrieval');
     }
 
     final idToken = googleAuth.idToken;
@@ -193,10 +211,19 @@ class AuthRemoteDataSource {
         idToken: idToken,
         accessToken: accessToken,
       );
-    } on AuthException {
+    } on AuthException catch (e, st) {
+      _reportGoogleFailure(
+        stage: 'supabase_token_exchange',
+        error: e,
+        stackTrace: st,
+      );
       rethrow;
-    } catch (e) {
-      dev.log('[Google Auth] signInWithIdToken threw: $e', name: 'AuthDS');
+    } catch (e, st) {
+      _reportGoogleFailure(
+        stage: 'supabase_token_exchange',
+        error: e,
+        stackTrace: st,
+      );
       throw const AuthException(
         'Unable to sign in with Google. '
         'Please try again or contact support if the problem continues.',
@@ -335,8 +362,10 @@ class AuthRemoteDataSource {
     required User user,
     required GoogleSignInAccount googleAccount,
   }) async {
-    dev.log('[Google Auth] Upserting profile for ${user.email}',
-        name: 'AuthDS',);
+    dev.log(
+      '[Google Auth] Upserting profile for ${user.email}',
+      name: 'AuthDS',
+    );
 
     try {
       // Check whether the profile row already exists.
@@ -395,7 +424,12 @@ class AuthRemoteDataSource {
 
   /// Translates raw Google / platform exceptions into user-friendly [AuthException]s.
   /// Always throws — the return type is `Never` by convention.
-  Never _handleGoogleError(Object e) {
+  Never _handleGoogleError(
+    Object e,
+    StackTrace stackTrace, {
+    required String stage,
+  }) {
+    _reportGoogleFailure(stage: stage, error: e, stackTrace: stackTrace);
     final msg = e.toString().toLowerCase();
 
     // DEVELOPER_ERROR (10): SHA mismatch or wrong package name.
@@ -427,6 +461,22 @@ class AuthRemoteDataSource {
       'Unable to sign in with Google. '
       'Please try again or contact support if the problem continues.',
     );
+  }
+
+  void _reportGoogleFailure({
+    required String stage,
+    required Object error,
+    required StackTrace stackTrace,
+  }) {
+    dev.log(
+      '[Google Auth] $stage failed (${error.runtimeType}): $error',
+      name: 'AuthDS',
+      stackTrace: stackTrace,
+    );
+
+    // Preserve the original platform/Supabase exception for release
+    // diagnostics while the UI receives only the curated AuthException.
+    if (!kDebugMode) ErrorHandler.handle(error, stackTrace);
   }
 }
 

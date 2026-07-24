@@ -96,27 +96,19 @@ class EventListingScreen extends ConsumerWidget {
                             height: 120,
                             width: double.infinity,
                             fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => const _EventCardPlaceholder(
+                              height: 120,
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(AppSpacing.radiusLg),
+                              ),
+                            ),
                           ),
                         )
                       else
-                        Container(
+                        const _EventCardPlaceholder(
                           height: 80,
-                          decoration: const BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [AppColors.navy, AppColors.navyAccent],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.vertical(
-                              top: Radius.circular(AppSpacing.radiusLg),
-                            ),
-                          ),
-                          child: Center(
-                            child: Icon(
-                              Icons.church_rounded,
-                              color: AppColors.gold.withValues(alpha: 0.3),
-                              size: 40,
-                            ),
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(AppSpacing.radiusLg),
                           ),
                         ),
 
@@ -224,6 +216,35 @@ class EventListingScreen extends ConsumerWidget {
             },
           );
         },
+      ),
+    );
+  }
+}
+
+class _EventCardPlaceholder extends StatelessWidget {
+  const _EventCardPlaceholder({required this.height, required this.borderRadius});
+
+  final double height;
+  final BorderRadius borderRadius;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: height,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [AppColors.navy, AppColors.navyAccent],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: borderRadius,
+      ),
+      child: Center(
+        child: Icon(
+          Icons.church_rounded,
+          color: AppColors.gold.withValues(alpha: 0.3),
+          size: 40,
+        ),
       ),
     );
   }

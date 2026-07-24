@@ -477,7 +477,7 @@ class _SearchResults extends ConsumerWidget {
               ),
               const SizedBox(height: AppSpacing.xxs),
               Text(
-                err.toString().replaceFirst('Exception: ', ''),
+                bibleFriendlyErrorMessage(err),
                 textAlign: TextAlign.center,
                 style: AppTypography.textTheme.bodySmall?.copyWith(
                   color: palette.foregroundMuted,

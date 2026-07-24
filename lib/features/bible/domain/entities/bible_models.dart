@@ -90,7 +90,7 @@ class BibleChapter extends Equatable {
   });
 
   factory BibleChapter.fromJson(Map<String, dynamic> json) {
-    // YouVersion: chapter list entry looks like {"usfm":"GEN.1","human":"Genesis 1","version_id":1}
+    // YouVersion: chapter list entry looks like {"usfm":"GEN.1","human":"Genesis 1","version_id":3034}
     final usfm = json['usfm'] as String? ?? json['id'] as String? ?? '';
     final parts = usfm.split('.');
     final number = parts.length >= 2 ? parts[1] : usfm;
@@ -132,7 +132,7 @@ class BibleChapterContent extends Equatable {
 
   factory BibleChapterContent.fromJson(Map<String, dynamic> json) {
     // YouVersion passage response:
-    // { "data": { "reference": {"usfm":"GEN.1","human":"Genesis 1","version_id":1},
+    // { "data": { "reference": {"usfm":"GEN.1","human":"Genesis 1","version_id":3034},
     //             "content": "<div>...</div>",
     //             "next":     {"usfm":"GEN.2","human":"Genesis 2"},
     //             "previous": {"usfm":"...","human":"..."} } }

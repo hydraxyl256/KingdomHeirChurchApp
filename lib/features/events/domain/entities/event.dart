@@ -44,6 +44,7 @@ class Event extends Equatable {
     this.currency = 'GHS',
     this.coverImageUrl,
     this.meetingLink,
+    this.speaker = 'Guest Speaker',
     this.tags = const [],
     this.userRsvp = RsvpStatus.none,
     this.reminderSet = false,
@@ -68,6 +69,7 @@ class Event extends Equatable {
   final String currency;
   final String? coverImageUrl;
   final String? meetingLink;
+  final String speaker;
   final List<String> tags;
   final RsvpStatus userRsvp;
   final bool reminderSet;
@@ -117,6 +119,7 @@ class Event extends Equatable {
         currency: currency,
         coverImageUrl: coverImageUrl,
         meetingLink: meetingLink,
+        speaker: speaker,
         tags: tags,
         userRsvp: userRsvp ?? this.userRsvp,
         reminderSet: reminderSet ?? this.reminderSet,
@@ -143,6 +146,7 @@ class Event extends Equatable {
         currency,
         coverImageUrl,
         meetingLink,
+        speaker,
         tags,
         userRsvp,
         reminderSet,

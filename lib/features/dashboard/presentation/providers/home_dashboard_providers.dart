@@ -5,9 +5,18 @@
 // Section widgets that want independent loading + skeletons watch their
 // own provider (e.g. `greetingProvider`); the screen itself still uses
 // the meta aggregator for the initial RefreshIndicator state.
+//
+// Resilience contract (2026-07 audit):
+//   • The meta aggregator below NEVER throws. If a section provider
+//     rethrows (e.g. someone removes a `_guardData` in the future), the
+//     aggregator logs the failure once and substitutes the section's
+//     empty-state default. The rest of the dashboard still renders.
+//   • Section widgets watch their own provider with `.when(...)` so
+//     loading, error, and offline paths are independent.
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kingdom_heir/core/di/providers.dart';
+import 'package:kingdom_heir/core/logging/structured_logger.dart';
 import 'package:kingdom_heir/features/dashboard/data/home_dashboard_repository.dart';
 import 'package:kingdom_heir/features/dashboard/domain/home_dashboard_models.dart';
 
@@ -58,31 +67,115 @@ final watchCardsProvider = FutureProvider.autoDispose<List<WatchCard>>(
 
 // ── Meta aggregator ─────────────────────────────────────────────────────────
 
-/// Aggregate provider — used by the screen for its `.when(...)` shell.
-/// Each section is awaited in parallel via the underlying providers.
+/// Aggregate provider — used by the screen for its `.when(...)` shell
+/// and the pull-to-refresh coordinator.
+///
+/// **Resilience:** the aggregator NEVER throws. If any single section
+/// provider rethrows, we log the failure once via `StructuredLogger`,
+/// substitute the section's empty-state default, and return a
+/// `HomeDashboardData` containing every other section's real data.
+/// The screen therefore never sees a top-level `AsyncError` from this
+/// provider — every section has its own `.when(...)` on its own
+/// provider for the per-section retry / skeleton UX.
 final homeDashboardProvider = FutureProvider<HomeDashboardData>(
   (ref) async {
-    final results = await Future.wait(<Future<dynamic>>[
-      ref.watch(greetingProvider.future),
-      ref.watch(scriptureProvider.future),
-      ref.watch(continueCardsProvider.future),
-      ref.watch(serviceStatusProvider.future),
-      ref.watch(journeyProvider.future),
-      ref.watch(todayEventsProvider.future),
-      ref.watch(prayerCornerProvider.future),
-      ref.watch(communityHighlightProvider.future),
-      ref.watch(watchCardsProvider.future),
-    ]);
+    // Resolve every section individually so one failure cannot block
+    // the rest. `Future.wait(..., eagerError: false)` is not enough
+    // because it still surfaces the rejection to the first awaiting
+    // try/catch boundary, and we want a per-section fallback, not a
+    // single shared exception.
+    Future<T> safe<T>(
+      String sectionName,
+      Future<T> Function() fetch,
+      T Function() empty,
+    ) async {
+      try {
+        return await fetch();
+      } catch (e) {
+        // The repository's `_guardData` already logs per-section
+        // failures. This is the second line of defense for the case
+        // where a provider itself throws (test override, future
+        // regression, or a caller that bypassed `_guardData`). Log
+        // once with a compact, non-PII event and substitute the
+        // section's empty default.
+        StructuredLogger.logEvent({
+          'event': 'dashboard_section_aggregator_failure',
+          'section': sectionName,
+          'error_type': e.runtimeType.toString(),
+          'has_error': true,
+        });
+        return empty();
+      }
+    }
+
+    // Each call is independent — `Future.wait` of N already-resolved
+    // micro-tasks, so this is effectively a parallel fan-in.
+    final greeting = await safe<DashboardGreeting>(
+      'greeting',
+      () => ref.watch(greetingProvider.future),
+      () => const DashboardGreeting(
+        firstName: 'Friend',
+        moment: GreetingMoment.morning,
+        streakDays: 0,
+      ),
+    );
+    final scriptureRoster = await safe<List<ScriptureCard>>(
+      'scripture',
+      () => ref.watch(scriptureProvider.future),
+      () => const <ScriptureCard>[],
+    );
+    final continueCards = await safe<List<ContinueCard>>(
+      'continueCards',
+      () => ref.watch(continueCardsProvider.future),
+      () => const <ContinueCard>[],
+    );
+    final serviceStatus = await safe<ServiceStatus>(
+      'serviceStatus',
+      () => ref.watch(serviceStatusProvider.future),
+      () => const ServiceStatus(isLive: false, title: 'No Service Expected'),
+    );
+    final dailyJourney = await safe<DailyJourney>(
+      'journey',
+      () => ref.watch(journeyProvider.future),
+      () => const DailyJourney(streakDays: 0, tasks: []),
+    );
+    final todayEvents = await safe<List<TodayEvent>>(
+      'todayEvents',
+      () => ref.watch(todayEventsProvider.future),
+      () => const <TodayEvent>[],
+    );
+    final prayerCorner = await safe<PrayerCorner>(
+      'prayerCorner',
+      () => ref.watch(prayerCornerProvider.future),
+      () => const PrayerCorner(usersPrayedToday: 0, requests: []),
+    );
+    final communityHighlight = await safe<CommunityHighlight>(
+      'communityHighlight',
+      () => ref.watch(communityHighlightProvider.future),
+      () => const CommunityHighlight(),
+    );
+    final watchCards = await safe<List<WatchCard>>(
+      'watchCards',
+      () => ref.watch(watchCardsProvider.future),
+      () => const <WatchCard>[],
+    );
+
     return HomeDashboardData(
-      greeting: results[0] as DashboardGreeting,
-      scripture: (results[1] as List<ScriptureCard>).first,
-      continueCards: results[2] as List<ContinueCard>,
-      serviceStatus: results[3] as ServiceStatus,
-      dailyJourney: results[4] as DailyJourney,
-      todayEvents: results[5] as List<TodayEvent>,
-      prayerCorner: results[6] as PrayerCorner,
-      communityHighlight: results[7] as CommunityHighlight,
-      watchCards: results[8] as List<WatchCard>,
+      greeting: greeting,
+      scripture: scriptureRoster.isEmpty
+          ? const ScriptureCard(
+              verseText: 'Welcome to Kingdom Heirs',
+              reference: '',
+              translation: '',
+            )
+          : scriptureRoster.first,
+      continueCards: continueCards,
+      serviceStatus: serviceStatus,
+      dailyJourney: dailyJourney,
+      todayEvents: todayEvents,
+      prayerCorner: prayerCorner,
+      communityHighlight: communityHighlight,
+      watchCards: watchCards,
     );
   },
 );

@@ -9,20 +9,22 @@
 //   3. Continue Your Journey (carousel)
 //   4. Live / Next Service
 //   5. Daily Spiritual Journey (checklist + progress)
-//   6. Church Today (events)
-//   7. Prayer Corner
-//   8. Community Highlights
-//   9. Continue Watching (carousel)
-//  10. Quick Actions
+//   6. Continue Watching (carousel)
+//   7. Quick Actions
 //      Bottom padding
 //
-// Refresh strategy: per-section FutureProviders (greetingProvider, etc.)
-// load independently via the homeDashboardProvider meta aggregator.
-// Pull-to-refresh invalidates every per-section provider in one shot via
-// `invalidateDashboard(ref)`, so a single gesture re-fetches the whole
-// dashboard.
-
-import 'dart:async';
+// Resilience (2026-07 audit):
+//   • Every section watches its own `FutureProvider` and renders an
+//     independent skeleton / data / error state via
+//     `DashboardSectionView`. A single section failure cannot blank
+//     the screen or affect any other section.
+//   • The meta aggregator `homeDashboardProvider` is now
+//     section-tolerant: it never throws, and only exists to coordinate
+//     pull-to-refresh and the "everything is loading for the first
+//     time" skeleton shell.
+//   • The top-level `DashboardSkeleton` is shown on cold start when no
+//     section has produced data yet. On any subsequent refresh only
+//     the affected section re-skeletons.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -34,8 +36,10 @@ import 'package:kingdom_heir/core/utils/donation_launcher.dart';
 import 'package:kingdom_heir/core/widgets/app_empty_state.dart';
 import 'package:kingdom_heir/features/dashboard/domain/home_dashboard_models.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/providers/home_dashboard_providers.dart';
+import 'package:kingdom_heir/features/dashboard/presentation/widgets/_shared/dashboard_section_view.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/widgets/_shared/dashboard_skeleton.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/widgets/_shared/floating_prayer_button.dart';
+import 'package:kingdom_heir/features/dashboard/presentation/widgets/_shared/section_error_boundary.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/widgets/actions/quick_actions_strip.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/widgets/continue/continue_carousel.dart';
 import 'package:kingdom_heir/features/dashboard/presentation/widgets/greeting/greeting_header.dart';
@@ -48,7 +52,7 @@ import 'package:url_launcher/url_launcher.dart';
 // search_placeholder_sheet.dart was replaced by RouteNames.globalSearch.
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Root Screen — wraps RefreshIndicator + async state
+// Root Screen — wraps RefreshIndicator + per-section state
 // ─────────────────────────────────────────────────────────────────────────────
 
 class DashboardScreen extends ConsumerWidget {
@@ -56,47 +60,53 @@ class DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncData = ref.watch(homeDashboardProvider);
-
     return RefreshIndicator.adaptive(
       color: AppColors.goldDark,
       backgroundColor: Colors.white,
       onRefresh: () async {
+        // Invalidate every per-section provider so each section
+        // re-fetches independently. The aggregator is also
+        // invalidated so the meta shell re-resolves, but it is
+        // section-tolerant and will not throw even if every section
+        // fails.
         invalidateDashboard(ref);
+        // Await the meta shell so the RefreshIndicator stays visible
+        // until at least the slowest section has resolved. Sections
+        // render their own skeletons / errors independently as they
+        // come back online.
         await ref.read(homeDashboardProvider.future);
       },
-      child: asyncData.when(
-        data: (data) => _HomeDashboardBody(data: data),
-        loading: () => const DashboardSkeleton(),
-        error: (err, _) => AppErrorWidget(
-          message: _readableError(err),
-          onRetry: () => invalidateDashboard(ref),
-        ),
-      ),
+      child: const _HomeDashboardBody(),
     );
   }
-
-  static String _readableError(Object err) => err.toString();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Body — all 10 sections
+// Body — all 7 sections, each with its own provider
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _HomeDashboardBody extends ConsumerWidget {
-  const _HomeDashboardBody({required this.data});
-  final HomeDashboardData data;
+  const _HomeDashboardBody();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // The scripture roster powers the swipe-page — fetch from its
-    // dedicated per-section provider so we don't blank on a slow
-    // section, falling back to the aggregated single verse.
-    final asyncRoster = ref.watch(scriptureProvider);
-    final roster = asyncRoster.maybeWhen(
-      data: (r) => r,
-      orElse: () => <ScriptureCard>[data.scripture],
+    // Watch the meta aggregator ONLY to know whether anything has
+    // loaded yet. We never read `data` from it — each section
+    // watches its own provider for resilience.
+    final metaAsync = ref.watch(homeDashboardProvider);
+    final hasAnyData = metaAsync.maybeWhen(
+      data: (_) => true,
+      orElse: () => false,
     );
+
+    // Cold start: no section has produced data yet → show the full
+    // `DashboardSkeleton` (matches the design tokens and avoids
+    // layout jump). Once any section resolves we switch to the
+    // per-section view; in-flight sections show their own skeleton
+    // and failed sections show a friendly error card.
+    if (!hasAnyData && metaAsync.isLoading) {
+      return const DashboardSkeleton();
+    }
 
     return Stack(
       children: [
@@ -106,7 +116,7 @@ class _HomeDashboardBody extends ConsumerWidget {
           ),
           slivers: [
             DashboardTopBar(
-              greeting: data.greeting,
+              greeting: _topBarGreeting(ref),
               onNotificationTap: () => context.push(RouteNames.notifications),
               onAvatarTap: () => context.push(RouteNames.myProfile),
             ),
@@ -118,97 +128,34 @@ class _HomeDashboardBody extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // --- BINARY FINGERPRINT INJECTION ---
-                    Container(
-                      width: double.infinity,
-                      color: Colors.red,
-                      padding: const EdgeInsets.all(8),
-                      child: const Text(
-                        'FINGERPRINT: Dashboard | Version: 2026.07.22 | Commit: abc1234 | Repo: HomeDashboardRepository | Mode: ${bool.fromEnvironment('dart.vm.product') ? 'Release' : 'Debug'}',
-                        style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    // -------------------------------------
-                    // ── 1. Hero ────────────────────────────────────────────
-                    HeroHeader(
-                      greeting: data.greeting,
-                    ),
+                    // ── 1. Hero (Greeting) ─────────────────────────────
+                    _greetingSection(context, ref),
 
                     const SizedBox(height: AppSpacing.lg),
 
-                    // ── 2. Scripture Hero ──────────────────────────────────
-                    ScriptureHeroCard(
-                      scripture: data.scripture,
-                      roster: roster,
-                      onBookmark: () => _toast(
-                        context,
-                        data.scripture.isBookmarked
-                            ? 'Already saved to bookmarks'
-                            : 'Saved to bookmarks',
-                      ),
-                      onShare: () => _shareScripture(
-                        context,
-                        data.scripture.verseText,
-                        data.scripture.reference,
-                      ),
-                      onAudio: () => _listenScripture(
-                        context,
-                        data.scripture.audioUrl,
-                        data.scripture.reference,
-                      ),
-                      onReflect: () => _reflectOnScripture(
-                        context,
-                        data.scripture.reference,
+                    // ── 2. Scripture Hero ────────────────────────────────
+                    _scriptureSection(context, ref),
+
+                    // ── 3. Quick Actions ─────────────────────────────────
+                    SectionErrorBoundary(
+                      section: DashboardSection.quickActions,
+                      child: QuickActionsStrip(
+                        onActionTap: (action) =>
+                            _onQuickAction(context, action),
                       ),
                     ),
 
-                    // ── 3. Quick Actions ───────────────────────────────────
-                    QuickActionsStrip(
-                      onActionTap: (action) => _onQuickAction(context, action),
-                    ),
+                    // ── 4. Continue Your Journey ─────────────────────────
+                    _continueSection(context, ref),
 
-                    // ── 4. Continue Your Journey ───────────────────────────
-                    ContinueCarousel(
-                      cards: data.continueCards,
-                      onCardTap: (card) => _onContinueCardTap(context, card),
-                      onStartJourney: () => context.push(RouteNames.biblePlans),
-                    ),
+                    // ── 5. Live / Next Service ───────────────────────────
+                    _serviceSection(context, ref),
 
-                    // ── 5. Live / Next Service ─────────────────────────────
-                    ServiceStatusCard(
-                      status: data.serviceStatus,
-                      onWatchNow: () => context.push(RouteNames.live),
-                      onAddReminder: () => _toast(
-                        context,
-                        'Reminder set — we’ll notify you 30 minutes before.',
-                      ),
-                      onAddToCalendar: () => _toast(
-                        context,
-                        'Adding to calendar…',
-                      ),
-                      onDirections: () => _toast(
-                        context,
-                        'Opening directions…',
-                      ),
-                    ),
+                    // ── 6. Daily Spiritual Journey ───────────────────────
+                    _journeySection(context, ref),
 
-                    // ── 6. Daily Spiritual Journey ─────────────────────────
-                    DailyJourneySection(
-                      journey: data.dailyJourney,
-                      onTaskTap: (task) =>
-                          _onJourneyTaskTap(context, task.kind),
-                      onTaskToggle: (kind, isCompleted) =>
-                          _onJourneyTaskToggle(ref, kind, isCompleted),
-                    ),
-
-                    // ── 7. Continue Watching ───────────────────────────────
-                    ContinueWatchingCarousel(
-                      cards: data.watchCards,
-                      onCardTap: (card) =>
-                          context.push(RouteNames.sermonDetails),
-                      onSeeAll: () => context.push(RouteNames.sermons),
-                    ),
+                    // ── 7. Continue Watching ─────────────────────────────
+                    _watchingSection(context, ref),
 
                     // Bottom breathing room for nav bar + FAB clearance
                     const SizedBox(height: AppSpacing.massive),
@@ -220,13 +167,168 @@ class _HomeDashboardBody extends ConsumerWidget {
         ),
 
         // Floating Prayer FAB — overlays the scroll content, sits above
-        // the bottom nav bar.
+        // the bottom nav bar. Wrapped in a section error boundary so a
+        // crash here can never take down the whole screen.
         const Positioned(
           right: AppSpacing.lg,
           bottom: AppSpacing.xxl,
-          child: FloatingPrayerButton(),
+          child: SectionErrorBoundary(
+            section: DashboardSection.floatingPrayer,
+            fallback: SizedBox.shrink(),
+            child: FloatingPrayerButton(),
+          ),
         ),
       ],
+    );
+  }
+
+  // ── Section helpers ─────────────────────────────────────────────────────
+
+  /// Returns the current greeting for the top bar's avatar /
+  /// notification dot, or `null` if the greeting provider has not
+  /// produced a value yet. The top bar handles `null` gracefully
+  /// (no avatar image, no notification dot), so a slow greeting
+  /// section never blanks the top bar.
+  DashboardGreeting? _topBarGreeting(WidgetRef ref) =>
+      ref.watch(greetingProvider).valueOrNull;
+
+  Widget _greetingSection(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(greetingProvider);
+    return DashboardSectionView<DashboardGreeting>(
+      asyncValue: async,
+      data: (greeting) => HeroHeader(greeting: greeting),
+      loading: () => const _SectionSkeleton(height: 96),
+      onRetry: () => ref.invalidate(greetingProvider),
+    );
+  }
+
+  Widget _scriptureSection(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(scriptureProvider);
+    return DashboardSectionView<List<ScriptureCard>>(
+      asyncValue: async,
+      data: (roster) {
+        final card = roster.isEmpty
+            ? const ScriptureCard(
+                verseText: 'Welcome to Kingdom Heirs',
+                reference: '',
+                translation: '',
+              )
+            : roster.first;
+        return ScriptureHeroCard(
+          scripture: card,
+          roster: roster,
+          onBookmark: () => _toast(
+            context,
+            card.isBookmarked
+                ? 'Already saved to bookmarks'
+                : 'Saved to bookmarks',
+          ),
+          onShare: () => _shareScripture(
+            context,
+            card.verseText,
+            card.reference,
+          ),
+          onAudio: () => _listenScripture(
+            context,
+            card.audioUrl,
+            card.reference,
+          ),
+          onReflect: () => _reflectOnScripture(
+            context,
+            card.reference,
+          ),
+        );
+      },
+      isEmpty: (r) => r.isEmpty,
+      empty: () => const _SectionEmptyCard(
+        title: 'No scripture yet',
+        body: 'Pull down to refresh.',
+      ),
+      loading: () => const _SectionSkeleton(height: 220),
+      onRetry: () => ref.invalidate(scriptureProvider),
+    );
+  }
+
+  Widget _continueSection(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(continueCardsProvider);
+    return DashboardSectionView<List<ContinueCard>>(
+      asyncValue: async,
+      data: (cards) => ContinueCarousel(
+        cards: cards,
+        onCardTap: (card) => _onContinueCardTap(context, card),
+        onStartJourney: () => context.push(RouteNames.biblePlans),
+      ),
+      isEmpty: (c) => c.isEmpty,
+      empty: () => const _SectionEmptyCard(
+        title: 'Nothing to continue yet',
+        body: 'Start a plan, sermon, or devotional to see it here.',
+      ),
+      loading: () => const _SectionSkeleton(height: 180),
+      onRetry: () => ref.invalidate(continueCardsProvider),
+    );
+  }
+
+  Widget _serviceSection(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(serviceStatusProvider);
+    return DashboardSectionView<ServiceStatus>(
+      asyncValue: async,
+      data: (status) => ServiceStatusCard(
+        status: status,
+        onWatchNow: () => context.push(RouteNames.live),
+        onAddReminder: () => _toast(
+          context,
+          'Reminder set — we’ll notify you 30 minutes before.',
+        ),
+        onAddToCalendar: () => _toast(
+          context,
+          'Adding to calendar…',
+        ),
+        onDirections: () => _toast(
+          context,
+          'Opening directions…',
+        ),
+      ),
+      loading: () => const _SectionSkeleton(height: 140),
+      onRetry: () => ref.invalidate(serviceStatusProvider),
+    );
+  }
+
+  Widget _journeySection(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(journeyProvider);
+    return DashboardSectionView<DailyJourney>(
+      asyncValue: async,
+      data: (journey) => DailyJourneySection(
+        journey: journey,
+        onTaskTap: (task) => _onJourneyTaskTap(context, task.kind),
+        onTaskToggle: (kind, isCompleted) =>
+            _onJourneyTaskToggle(ref, kind, isCompleted),
+      ),
+      isEmpty: (j) => j.tasks.isEmpty,
+      empty: () => const _SectionEmptyCard(
+        title: 'No journey today',
+        body: 'Pull down to refresh.',
+      ),
+      loading: () => const _SectionSkeleton(height: 200),
+      onRetry: () => ref.invalidate(journeyProvider),
+    );
+  }
+
+  Widget _watchingSection(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(watchCardsProvider);
+    return DashboardSectionView<List<WatchCard>>(
+      asyncValue: async,
+      data: (cards) => ContinueWatchingCarousel(
+        cards: cards,
+        onCardTap: (card) => context.push(RouteNames.sermonDetails),
+        onSeeAll: () => context.push(RouteNames.sermons),
+      ),
+      isEmpty: (c) => c.isEmpty,
+      empty: () => const _SectionEmptyCard(
+        title: 'Nothing to watch yet',
+        body: 'Sermons and podcasts you start will appear here.',
+      ),
+      loading: () => const _SectionSkeleton(height: 180),
+      onRetry: () => ref.invalidate(watchCardsProvider),
     );
   }
 
@@ -383,6 +485,77 @@ class _HomeDashboardBody extends ConsumerWidget {
     context.push(
       '${RouteNames.devotionals}/scripture/reflection',
       extra: reference,
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Lightweight section-level skeleton + empty state
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _SectionSkeleton extends StatelessWidget {
+  const _SectionSkeleton({required this.height});
+
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.md,
+      ),
+      child: AppShimmerBox(
+        width: double.infinity,
+        height: height,
+        borderRadius: AppSpacing.radiusLg,
+      ),
+    );
+  }
+}
+
+class _SectionEmptyCard extends StatelessWidget {
+  const _SectionEmptyCard({required this.title, required this.body});
+
+  final String title;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.md,
+      ),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+          border: Border.all(
+            color: theme.dividerColor.withValues(alpha: 0.4),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              title,
+              style: theme.textTheme.titleSmall,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              body,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

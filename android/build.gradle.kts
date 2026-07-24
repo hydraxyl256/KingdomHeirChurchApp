@@ -26,7 +26,12 @@ subprojects {
         if (project.plugins.hasPlugin("com.android.library") ||
             project.plugins.hasPlugin("com.android.application")) {
             extensions.configure<com.android.build.gradle.BaseExtension> {
-                compileSdkVersion(35)
+                // compileSdk intentionally NOT overridden here: the app module
+                // declares compileSdk = 36 and every Flutter plugin must
+                // compile against that same SDK, otherwise symbols added in
+                // newer API levels (e.g. Build.VERSION_CODES.BAKLAVA,
+                // Locale.of(), Thread.threadId()) are not on the classpath
+                // and plugin compilation fails.
                 compileOptions {
                     sourceCompatibility = JavaVersion.VERSION_17
                     targetCompatibility = JavaVersion.VERSION_17

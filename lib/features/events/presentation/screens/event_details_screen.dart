@@ -43,23 +43,12 @@ class EventDetailsScreen extends ConsumerWidget {
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
               background: event.coverImageUrl != null
-                  ? Image.network(event.coverImageUrl!, fit: BoxFit.cover)
-                  : Container(
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [AppColors.tertiary, AppColors.primary],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                      ),
-                      child: const Center(
-                        child: Icon(
-                          Icons.church_rounded,
-                          color: Colors.white54,
-                          size: 80,
-                        ),
-                      ),
-                    ),
+                  ? Image.network(
+                      event.coverImageUrl!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const _EventHeroPlaceholder(),
+                    )
+                  : const _EventHeroPlaceholder(),
               title: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
@@ -145,6 +134,10 @@ class EventDetailsScreen extends ConsumerWidget {
                         : Icons.location_on_rounded,
                     label: event.location,
                   ).animate().fadeIn(delay: 250.ms),
+                  _InfoRow(
+                    icon: Icons.person_outline_rounded,
+                    label: event.speaker,
+                  ).animate().fadeIn(delay: 275.ms),
 
                   if (event.maxAttendees > 0)
                     _InfoRow(
@@ -181,6 +174,26 @@ class EventDetailsScreen extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _EventHeroPlaceholder extends StatelessWidget {
+  const _EventHeroPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.tertiary, AppColors.primary],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: const Center(
+        child: Icon(Icons.church_rounded, color: Colors.white54, size: 80),
       ),
     );
   }

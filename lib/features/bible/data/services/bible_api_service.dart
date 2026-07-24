@@ -4,9 +4,11 @@ import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:http/http.dart' as http;
 import 'package:kingdom_heir/core/config/env.dart';
 import 'package:kingdom_heir/features/bible/domain/entities/bible_models.dart';
+import 'package:kingdom_heir/features/bible/domain/entities/bible_version_config.dart';
 
 /// YouVersion Platform REST API client.
 ///
@@ -16,17 +18,62 @@ import 'package:kingdom_heir/features/bible/domain/entities/bible_models.dart';
 /// All methods throw a [BibleApiException] on network, auth, or parse errors.
 /// No mock/fallback data is ever returned — callers display error states.
 class BibleApiService {
-  BibleApiService() : _apiKey = Env.youVersionKey;
+  BibleApiService()
+      : _apiKey = Env.youVersionKey,
+        _client = null,
+        _preferredVersionIds = null,
+        _fallbackVersionId = null;
+
+  /// Test-only constructor. Lets unit tests inject a stub [http.Client]
+  /// and a known API key without going through [Env].
+  @visibleForTesting
+  BibleApiService.withClient({
+    required http.Client client,
+    String apiKey = 'test-key',
+    List<int>? preferredVersionIds,
+    int? fallbackVersionId,
+  })  : _apiKey = apiKey,
+        _client = client,
+        _preferredVersionIds = preferredVersionIds,
+        _fallbackVersionId = fallbackVersionId;
 
   final String _apiKey;
+  final http.Client? _client;
+  final List<int>? _preferredVersionIds;
+  final int? _fallbackVersionId;
 
   static const _baseUrl = 'https://api.youversion.com/v1';
   static const _timeout = Duration(seconds: 10);
   static const int _maxRetries = 3;
 
-  // Default English YouVersion Bible ID (KJV = 1, NIV = 111, ESV = 59)
-  // This is used only as a fallback; the user's chosen version overrides it.
-  static const int defaultVersionId = 1; // KJV
+  /// Test-only override for the exponential backoff between retries.
+  /// Production uses [_defaultBackoff]. Set to `(_) async {}` in
+  /// tests to keep the suite fast.
+  @visibleForTesting
+  static Future<void> Function(int attempt) backoff = _defaultBackoff;
+
+  static Future<void> _defaultBackoff(int attempt) async {
+    // Exponential backoff: 1s, 2s, 4s, 8s … jittered lightly to
+    // avoid synchronised retry storms from a fleet of clients.
+    final baseDelayMs = math.pow(2, attempt - 1) * 1000;
+    final jitterMs = math.Random().nextInt(250);
+    await Future<void>.delayed(
+      Duration(milliseconds: baseDelayMs.toInt() + jitterMs),
+    );
+  }
+
+  http.Client get _http => _client ?? http.Client();
+
+  /// Default licensed version. The app never relies on provider-global ID 1.
+  static int get defaultVersionId => BibleVersionConfig.fallbackVersionId();
+
+  int _normalizedVersionId(int requestedVersionId) {
+    return BibleVersionConfig.normalizeVersionId(
+      requestedVersionId,
+      overrides: _preferredVersionIds,
+      fallbackOverride: _fallbackVersionId,
+    );
+  }
 
   Map<String, String> get _headers => {
         'X-YVP-App-Key': _apiKey,
@@ -35,15 +82,36 @@ class BibleApiService {
 
   // ── Helper ──────────────────────────────────────────────────────────────────
 
+  /// Status codes that justify an exponential-backoff retry.
+  ///
+  /// We deliberately retry ONLY transient server-side failures
+  /// (429 rate-limit, 500/502/503/504). 401/403 mean the key is
+  /// rejected — retrying is pointless and burns rate-limit budget.
+  /// 404 means the path is wrong — also pointless to retry.
+  /// 4xx other than the above are client errors that won't fix
+  /// themselves.
+  static const Set<int> _retryableStatusCodes = {429, 500, 502, 503, 504};
+
+  /// True when the given HTTP status is eligible for one more attempt.
+  @visibleForTesting
+  static bool isRetryableStatusCode(int statusCode) =>
+      _retryableStatusCodes.contains(statusCode);
+
   Future<Map<String, dynamic>> _get(String path) async {
+    if (_apiKey.trim().isEmpty) {
+      throw const BibleApiException.auth(
+        'Bible service configuration is unavailable. Please try again later.',
+        statusCode: 401,
+      );
+    }
     final uri = Uri.parse('$_baseUrl$path');
     var attempt = 0;
 
-    while (attempt <= _maxRetries) {
+    while (true) {
       attempt++;
       final sw = Stopwatch()..start();
       try {
-        final response = await http.get(uri, headers: _headers).timeout(_timeout);
+        final response = await _http.get(uri, headers: _headers).timeout(_timeout);
         sw.stop();
 
         developer.log(
@@ -52,38 +120,28 @@ class BibleApiService {
           error: 'Status: ${response.statusCode} | Time: ${sw.elapsedMilliseconds}ms | Attempt: $attempt',
         );
 
-        if (response.statusCode == 401 || response.statusCode == 403) {
-          throw BibleApiException(
-            'Unable to load Scripture. Please try again in a few moments.',
-            statusCode: response.statusCode,
-          );
-        }
-        if (response.statusCode == 404) {
-          throw BibleApiException('Content not found: $path', statusCode: 404);
-        }
-        if (response.statusCode == 429) {
-          throw const BibleApiException(
-            'Rate limit reached. Please wait a moment and try again.',
-            statusCode: 429,
-          );
-        }
-        if (response.statusCode != 200 && response.statusCode != 201) {
-          throw BibleApiException(
-            'API error ${response.statusCode} for $path',
-            statusCode: response.statusCode,
-          );
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          return jsonDecode(response.body) as Map<String, dynamic>;
         }
 
-        return jsonDecode(response.body) as Map<String, dynamic>;
+        // Non-2xx — decide whether to retry. 401/403/404 are terminal;
+        // 429/500/502/503/504 are retryable up to _maxRetries.
+        if (!isRetryableStatusCode(response.statusCode)) {
+          throw _terminalExceptionFor(response.statusCode, path);
+        }
+
+        if (attempt > _maxRetries) {
+          throw _terminalExceptionFor(response.statusCode, path);
+        }
       } on SocketException {
         if (attempt > _maxRetries) {
-          throw const BibleApiException(
+          throw const BibleApiException.network(
             'No internet connection. Please check your network and try again.',
           );
         }
       } on TimeoutException {
         if (attempt > _maxRetries) {
-          throw const BibleApiException(
+          throw const BibleApiException.network(
             'Connection is taking longer than expected. Tap Retry.',
           );
         }
@@ -91,18 +149,44 @@ class BibleApiService {
         rethrow;
       } catch (e) {
         if (attempt > _maxRetries) {
-          throw BibleApiException('Network error: $e');
+          throw BibleApiException.network('Network error: $e');
         }
       }
 
-      // Exponential backoff
-      if (attempt <= _maxRetries) {
-        final delayMs = math.pow(2, attempt) * 500;
-        await Future<void>.delayed(Duration(milliseconds: delayMs.toInt()));
-      }
+      // Exponential backoff (overridable for tests).
+      await backoff(attempt);
     }
+  }
 
-    throw const BibleApiException('Request failed after retries.');
+  /// Maps a non-retryable status code to the right [BibleApiException]
+  /// flavour. 401/403 → [BibleApiException.auth]; 404 → [BibleApiException.notFound];
+  /// everything else → generic.
+  ///
+  /// Exposed as `static` so the unit tests in
+  /// `bible_api_retry_policy_test.dart` can assert on the kind
+  /// each status code produces without re-running the full HTTP
+  /// stack.
+  static BibleApiException _terminalExceptionFor(int statusCode, String path) {
+    switch (statusCode) {
+      case 401:
+      case 403:
+        return const BibleApiException.auth(
+          'This chapter could not be opened. Please try again shortly.',
+          statusCode: 403,
+        );
+      case 404:
+        return BibleApiException.notFound('Content not found: $path', statusCode: 404);
+      case 429:
+        return const BibleApiException(
+          'Too many requests. Please wait a moment and try again.',
+          statusCode: 429,
+        );
+      default:
+        return BibleApiException(
+          'The Scripture service is unavailable right now. Please try again shortly.',
+          statusCode: statusCode,
+        );
+    }
   }
 
   // ── Versions ────────────────────────────────────────────────────────────────
@@ -121,7 +205,7 @@ class BibleApiService {
 
   /// Returns the 66 books for the given Bible [versionId].
   Future<List<BibleBook>> getBooks(int versionId) async {
-    final json = await _get('/bibles/$versionId/books');
+    final json = await _get('/bibles/${_normalizedVersionId(versionId)}/books');
     final data = json['data'] as List<dynamic>? ?? [];
     return data
         .map((e) => BibleBook.fromJson(e as Map<String, dynamic>))
@@ -132,7 +216,9 @@ class BibleApiService {
 
   /// Returns chapter list for the given book USFM code (e.g. "GEN", "JHN").
   Future<List<BibleChapter>> getChapters(int versionId, String bookUsfm) async {
-    final json = await _get('/bibles/$versionId/books/$bookUsfm/chapters');
+    final json = await _get(
+      '/bibles/${_normalizedVersionId(versionId)}/books/$bookUsfm/chapters',
+    );
     final data = json['data'] as List<dynamic>? ?? [];
     return data
         .map((e) => BibleChapter.fromJson(e as Map<String, dynamic>))
@@ -153,9 +239,25 @@ class BibleApiService {
     // YouVersion passages endpoint:
     // GET /bibles/{version_id}/passages/{passage_id}
     // where passage_id for a chapter is e.g. "JHN.3" (fetches entire chapter)
-    final json = await _get('/bibles/$versionId/passages/$chapterId');
-    final data = json['data'] as Map<String, dynamic>? ?? json;
-    return BibleChapterContent.fromJson(data);
+    BibleApiException? lastAuthorizationError;
+    for (final candidate in BibleVersionConfig.orderedCandidates(
+      versionId,
+      overrides: _preferredVersionIds,
+      fallbackOverride: _fallbackVersionId,
+    )) {
+      try {
+        final json = await _get('/bibles/$candidate/passages/$chapterId');
+        final data = json['data'] as Map<String, dynamic>? ?? json;
+        return BibleChapterContent.fromJson(data);
+      } on BibleApiException catch (error) {
+        if (error.kind != BibleApiErrorKind.auth) rethrow;
+        lastAuthorizationError = error;
+      }
+    }
+    throw lastAuthorizationError ?? const BibleApiException.auth(
+      'This chapter could not be opened. Please try again shortly.',
+      statusCode: 403,
+    );
   }
 
   // ── Search ───────────────────────────────────────────────────────────────────
@@ -546,13 +648,44 @@ class BibleApiService {
 }
 
 /// Typed exception for all Bible API errors.
+///
+/// The [message] is always a **user-safe** sentence — it is what
+/// surfaces in the UI. Technical detail (status code, raw
+/// `http.Response.body`, exception chain) belongs in the
+/// [technicalDetails] getter, which the repository forwards to
+/// the `ErrorHandler` (Sentry / Crashlytics) but never to the user.
 class BibleApiException implements Exception {
-  const BibleApiException(this.message, {this.statusCode});
+  const BibleApiException(this.message, {this.statusCode})
+      : kind = BibleApiErrorKind.unknown;
+
+  /// 401/403 — the API key is rejected or out of scope.
+  const BibleApiException.auth(this.message, {required this.statusCode})
+      : kind = BibleApiErrorKind.auth;
+
+  /// 404 — the requested passage does not exist for this version.
+  const BibleApiException.notFound(this.message, {required this.statusCode})
+      : kind = BibleApiErrorKind.notFound;
+
+  /// SocketException / TimeoutException — the device is offline or
+  /// the request is too slow.
+  const BibleApiException.network(this.message, {this.statusCode})
+      : kind = BibleApiErrorKind.network;
+
   final String message;
   final int? statusCode;
+  final BibleApiErrorKind kind;
+
+  /// Anything the UI must NOT show. The repository forwards this
+  /// string to Sentry / Crashlytics via `ErrorHandler.handle` and
+  /// never to the screen.
+  @visibleForTesting
+  String get technicalDetails {
+    final code = statusCode == null ? '—' : statusCode.toString();
+    return 'BibleApiException[$kind, $code]: $message';
+  }
 
   @override
-  String toString() => statusCode != null
-      ? 'BibleApiException($statusCode): $message'
-      : 'BibleApiException: $message';
+  String toString() => message;
 }
+
+enum BibleApiErrorKind { auth, notFound, network, unknown }

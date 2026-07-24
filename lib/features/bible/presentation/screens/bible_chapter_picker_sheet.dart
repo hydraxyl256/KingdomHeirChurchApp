@@ -121,7 +121,7 @@ class _BibleChapterPickerSheetState
                     ),
                     error: (e, _) => _Error(
                       palette: widget.palette,
-                      message: e.toString(),
+                      message: bibleFriendlyErrorMessage(e),
                     ),
                     data: (books) {
                       final selected = books.firstWhere(
@@ -512,7 +512,8 @@ class _ChapterGrid extends ConsumerWidget {
       ),
       error: (e, _) => Center(
         child: Text(
-          e.toString(),
+          bibleFriendlyErrorMessage(e),
+          textAlign: TextAlign.center,
           style: TextStyle(color: palette.foregroundMuted),
         ),
       ),

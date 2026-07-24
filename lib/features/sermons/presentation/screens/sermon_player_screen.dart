@@ -4,11 +4,27 @@
 // when the sermon has a youtubeId, otherwise mounts a chewie player
 // with the videoUrl. Below the player: a related-sermons carousel.
 // Progress is recorded to the continue-watching provider on dispose.
+//
+// YouTube handling:
+//   • The `sermon.youtubeId` field can arrive as a bare 11-char ID
+//     OR a full YouTube URL of any shape (watch, youtu.be, embed,
+//     live, shorts, music, mobile). We normalise once via
+//     `normaliseYouTubeId` before handing it to
+//     `YoutubePlayerController.fromVideoId` — otherwise the WebView
+//     shows "Video unavailable — error 152-4".
+//   • We listen to the controller's `value.error` stream. When the
+//     YouTube IFrame reports an embed-restriction error
+//     (101 / 150 / 152 — code 152 is the iOS WebView variant of
+//     101), we hand the user a friendly "Open in YouTube" sheet
+//     and never leave them on a broken player.
+
+import 'dart:async';
 
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kingdom_heir/core/theme/app_colors.dart';
+import 'package:kingdom_heir/core/utils/youtube_player_utils.dart';
 import 'package:kingdom_heir/core/widgets/app_error_widget.dart';
 import 'package:kingdom_heir/features/sermons/domain/entities/sermon.dart';
 import 'package:kingdom_heir/features/sermons/presentation/providers/sermon_continue_provider.dart';
@@ -35,6 +51,9 @@ class _SermonPlayerScreenState extends ConsumerState<SermonPlayerScreen> {
   bool _initFailed = false;
   String? _initError;
   int _lastPositionSeconds = 0;
+  String? _resolvedVideoId;
+  StreamSubscription<YoutubePlayerValue>? _ytSub;
+  bool _fallbackShown = false;
 
   @override
   void initState() {
@@ -48,11 +67,36 @@ class _SermonPlayerScreenState extends ConsumerState<SermonPlayerScreen> {
     if (sermon == null) return;
     _sermon = sermon;
     try {
-      if (sermon.youtubeId != null && sermon.youtubeId!.isNotEmpty) {
-        _youtubeController = YoutubePlayerController.fromVideoId(
-          videoId: sermon.youtubeId!,
-          autoPlay: true,
-        );
+      final rawYoutube = sermon.youtubeId;
+      if (rawYoutube != null && rawYoutube.isNotEmpty) {
+        final normalised = normaliseYouTubeId(rawYoutube);
+        if (normalised.isValid) {
+          _resolvedVideoId = normalised.videoId;
+          _youtubeController = YoutubePlayerController.fromVideoId(
+            videoId: normalised.videoId!,
+            autoPlay: true,
+            params: const YoutubePlayerParams(
+              showFullscreenButton: true,
+              enableCaption: false,
+              showVideoAnnotations: false,
+              strictRelatedVideos: true,
+            ),
+          );
+          // Listen for embed-restriction errors and offer the
+          // "Open in YouTube" fallback so the user is never
+          // stranded on a broken player.
+          _ytSub = _youtubeController!.listen(
+            _onYouTubeValue,
+            onError: (_) => _maybeShowFallback(),
+          );
+        } else if (normalised.isPlaylistOnly) {
+          _initFailed = true;
+          _initError =
+              'This sermon links to a YouTube playlist. Please open it in YouTube.';
+        } else {
+          _initFailed = true;
+          _initError = 'This sermon does not have a valid YouTube link.';
+        }
       } else if (sermon.videoUrl != null && sermon.videoUrl!.isNotEmpty) {
         _videoController = VideoPlayerController.networkUrl(
           Uri.parse(sermon.videoUrl!),
@@ -80,8 +124,37 @@ class _SermonPlayerScreenState extends ConsumerState<SermonPlayerScreen> {
     }
   }
 
+  void _onYouTubeValue(YoutubePlayerValue value) {
+    // `value.error` is the IFrame Player API's current error state. We
+    // only react to codes that mean "this video cannot be played in
+    // an embedded player" — every other code is either the happy
+    // path (`none`) or transient and the IFrame will recover.
+    switch (value.error) {
+      case YoutubeError.none:
+        break;
+      case YoutubeError.notEmbeddable:
+      case YoutubeError.sameAsNotEmbeddable:
+      case YoutubeError.videoNotFound:
+      case YoutubeError.cannotFindVideo:
+      case YoutubeError.html5Error:
+      case YoutubeError.invalidParam:
+      case YoutubeError.unknown:
+        _maybeShowFallback();
+    }
+  }
+
+  Future<void> _maybeShowFallback() async {
+    if (_fallbackShown) return;
+    if (!mounted) return;
+    final id = _resolvedVideoId;
+    if (id == null) return;
+    _fallbackShown = true;
+    await showYouTubeFallbackSheet(context, videoId: id);
+  }
+
   @override
   void dispose() {
+    _ytSub?.cancel();
     final sermon = _sermon;
     if (sermon != null && _lastPositionSeconds > 0) {
       ref.read(continueWatchingListProvider.notifier).recordProgress(

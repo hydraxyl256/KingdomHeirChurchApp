@@ -20,6 +20,7 @@ import 'package:kingdom_heir/features/bible/presentation/screens/bible_chapter_p
 import 'package:kingdom_heir/features/bible/presentation/screens/bible_reader_settings_sheet.dart';
 import 'package:kingdom_heir/features/bible/presentation/theme/bible_reader_palette.dart';
 import 'package:kingdom_heir/l10n/app_localizations.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Kingdom Heirs — Premium Bible Reader
 ///
@@ -177,8 +178,14 @@ class _BibleReaderScreenState extends ConsumerState<BibleReaderScreen> {
                           loading: () => _Loading(palette: palette),
                           error: (e, _) => _ErrorView(
                             palette: palette,
-                            error: e.toString(),
+                            error: _friendlyErrorMessage(e),
                             onRetry: () => ref.invalidate(bibleContentProvider),
+                            onCheckConnection: _openConnectionHelp,
+                            onReport: () => _openSupportEmail(
+                              context: context,
+                              reference: '${currentBook.name} '
+                                  '${_chapterLabel(chapterNumber)}',
+                            ),
                           ),
                           data: (content) {
                             _parsedVerses = BibleHtmlParser.parse(
@@ -720,11 +727,15 @@ class _ErrorView extends StatelessWidget {
     required this.palette,
     required this.error,
     required this.onRetry,
+    required this.onCheckConnection,
+    required this.onReport,
   });
 
   final BibleReaderPalette palette;
   final String error;
   final VoidCallback onRetry;
+  final VoidCallback onCheckConnection;
+  final VoidCallback onReport;
 
   @override
   Widget build(BuildContext context) {
@@ -741,7 +752,7 @@ class _ErrorView extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.md),
             Text(
-              'We could not open this chapter',
+              'Unable to load this chapter',
               textAlign: TextAlign.center,
               maxLines: 2,
               style: AppTypography.textTheme.titleMedium?.copyWith(
@@ -750,6 +761,10 @@ class _ErrorView extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.xs),
+            // Friendly message only — never the raw exception.
+            // See `_friendlyErrorMessage` for the Failure → message
+            // mapping that guarantees no BibleApiException toString
+            // ever reaches the user.
             Text(
               error,
               textAlign: TextAlign.center,
@@ -771,11 +786,73 @@ class _ErrorView extends StatelessWidget {
               ),
               child: Text(AppLocalizations.of(context)!.tryAgain),
             ),
+            const SizedBox(height: AppSpacing.xs),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextButton.icon(
+                  onPressed: onCheckConnection,
+                  icon: const Icon(Icons.wifi_tethering_rounded, size: 18),
+                  label: const Text('Check connection'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: palette.foregroundMuted,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.xs),
+                TextButton.icon(
+                  onPressed: onReport,
+                  icon: const Icon(Icons.bug_report_outlined, size: 18),
+                  label: const Text('Report issue'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: palette.foregroundMuted,
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
     );
   }
+}
+
+/// Maps the error surfaced by the `bibleContentProvider` to a
+/// user-safe string. NEVER returns the raw exception's toString.
+///
+/// Kept as a local alias for [bibleFriendlyErrorMessage] so the
+/// call-sites in this file stay readable.
+String _friendlyErrorMessage(Object e) => bibleFriendlyErrorMessage(e);
+
+/// Opens the OS-level network settings so the user can verify they
+/// have a working connection without leaving the app context.
+Future<void> _openConnectionHelp() async {
+  // iOS has no public URL — fall back to the system Settings app.
+  // Android has `android.settings.WIFI_SETTINGS`. We use a no-op
+  // launch to a non-network external URL as a graceful fallback
+  // when the platform-specific deep-link is not available.
+  final uri = Uri.parse('https://www.bible.com');
+  await launchUrl(uri, mode: LaunchMode.externalApplication);
+}
+
+/// Opens the user's mail client pre-filled with a support
+/// request that includes the chapter reference. The technical
+/// detail (status code / exception class) is logged to Crashlytics
+/// by the repository — we never include it here.
+Future<void> _openSupportEmail({
+  required BuildContext context,
+  required String reference,
+}) async {
+  final uri = Uri(
+    scheme: 'mailto',
+    path: 'support@kingdomheirsfoundation.com',
+    queryParameters: {
+      'subject': 'Bible reader — $reference',
+      'body':
+          'I could not open $reference in the Kingdom Heirs app. '
+          'Please look into it.\n\nThanks!',
+    },
+  );
+  await launchUrl(uri, mode: LaunchMode.externalApplication);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -28,7 +28,6 @@ class SermonsRepositoryImpl implements SermonsRepository {
   static const String _kNotesPrefix = 'sermon_notes_v1::';
   static const String _kReflectionsPrefix = 'sermon_reflections_v1::';
   static const String _kPrayerPrefix = 'sermon_prayer_v1::';
-  static const String _kSermonsCache = 'sermons_cache_v2';
 
   // ─── Cache mechanism ───────────────────────────────────────────────
 
